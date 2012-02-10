@@ -9,7 +9,7 @@ globals = [ Variable('turnNumber', int, 'How many turns it has been since the be
   Variable('playerID', int, 'Player Number; either 0 or 1'),
   Variable('gameNumber', int, 'What number game this is for the server'),
   Variable('round',int,'What round you are in the match'),
-  Variable('victoriesNeeded,'int,'How many victories a player needs to win'),
+  Variable('victoriesNeeded', int,'How many victories a player needs to win'),
   Variable('mapRadius',int,'The radius of the map.  Center of screen is (0,0), with +x right, +y up')
 ]
 
@@ -31,36 +31,79 @@ Ship = Model('Ship',
     Variable('y', int, 'Position y'),
     Variable('radius', int, 'ship size radius'),
     Variable('type', str, 'The ship type'),
-	Variable('attacksLeft', int, 'how many more attacks it has'),
-	Variable('movementLeft', int, 'how much more movement it has')
-	Variable('maxMovement', int, 'the largest possible movement')
-	Variable('maxAttacks', int, 'the max number of attacks it has')
-	Variable('damage', int, 'the strength of its attacks')
-	Variable('health', int, 'the total health of the ship')
-	Variable('maxHealth', int, 'the max health possible for the ship')
+	  Variable('attacksLeft', int, 'how many more attacks it has'),
+	  Variable('movementLeft', int, 'how much more movement it has'),
+	  Variable('maxMovement', int, 'the largest possible movement'),
+	  Variable('maxAttacks', int, 'the max number of attacks it has'),
+	  Variable('damage', int, 'the strength of its attacks'),
+	  Variable('health', int, 'the total health of the ship'),
+	  Variable('maxHealth', int, 'the max health possible for the ship'),
     ],
-  doc='A space ship!!',
-  functions=[ Function('move', [Variable('file', int), Variable('rank', int), Variable('type', int) ]) ],
-  )
+  doc='A space ship!',
+  functions=[ 
+    Function('move', 
+      [Variable('x', int), Variable('y', int)]
+    ),
+    Function ('selfDestruct', []),
+     
+  ],
+)
 
-Move = Model('Move',
-  data=[ Variable('fromFile', int, 'The initial file location'),
-    Variable('fromRank', int, 'The initial rank location'),
-    Variable('toFile', int, 'The final file location'),
-    Variable('toRank', int, 'The final rank location'),
-    Variable('promoteType', int, 'The type of the piece for pawn promotion. Q=Queen, B=Bishop, N=Knight, R=Rook'),
+Ship.addFunctions([
+    Function("attack", [Variable("target", Ship)]),
+])
+ShipType = Model('ShipType',
+  data=[ Variable('type', str, 'The ship type'),
+    Variable('cost', int, 'The amount of money required to purchase this type of ship'),
     ],
-  doc='A chess move',
+    functions=[ 
+    Function('warpIn', 
+      [Variable('x', int), Variable('y', int)]
+    ),
+    ],
+  doc='An available ship type',
   )
 
 move = Animation('move',
-  data=[ Variable('fromFile', int),
-    Variable('fromRank', int),
-    Variable('toFile', int),
-    Variable('toRank', int),
-    Variable('promoteType', int),
+  data=[ Variable('fromX', int),
+    Variable('fromY', int),
+    Variable('toX', int),
+    Variable('toY', int),
+    Variable('acting', Ship),
     ],
   )
+
+attack = Animation('attack',
+  data=[
+    Variable('acting', Ship),
+    Variable('target', Ship),
+    ],
+  )
+  
+selfDestruct = Animation ('selfDestruct' ,
+  data=[
+    Variable('acting', Ship),
+    ],
+  )
+
+stealth = Animation('stealth',
+  data=[
+    Variable('acting', Ship),
+    ],
+  )
+
+deStealth = Animation('deStealth',
+  data=[
+    Variable('acting', Ship),
+    ],
+  )
+
+
+
+
+
+
+
 
 
 
