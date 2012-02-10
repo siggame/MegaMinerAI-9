@@ -275,7 +275,7 @@ void parsePlayer(Connection* c, _Player* object, sexp_t* expression)
   sub = sub->next;
   object->victories = atoi(sub->val);
   sub = sub->next;
-  object->money = atoi(sub->val);
+  object->energy = atoi(sub->val);
   sub = sub->next;
 
 }

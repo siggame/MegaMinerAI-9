@@ -25,11 +25,11 @@ class Player {
   float time();
   ///How many rounds you have won this match
   int victories();
-  ///How much money the player has
-  int money();
+  ///How much energy the player has left to warp in ships
+  int energy();
 
   // Actions
-  ///
+  ///Allows a player to display messages on the screen
   int talk(char* message);
 
   // Properties

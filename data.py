@@ -18,11 +18,11 @@ constants = [
   
 playerData = [
   Variable('victories',int,'How many rounds you have won this match'),
-  Variable('money', int, 'How much money the player has')
+  Variable('energy', int, 'How much energy the player has left to warp in ships'),
   ]
 
 playerFunctions = [
-  Function('talk', [Variable('message', str)])
+  Function('talk', [Variable('message', str)], doc='Allows a player to display messages on the screen')
   ]
 
 Ship = Model('Ship',
@@ -41,25 +41,18 @@ Ship = Model('Ship',
     ],
   doc='A space ship!',
   functions=[ 
-    Function('move', 
-      [Variable('x', int), Variable('y', int)]
-    ),
-    Function ('selfDestruct', []),
-     
+    Function('move', [Variable('x', int), Variable('y', int)], doc='Command a ship to move to a specified position'),
+    Function ('selfDestruct', [], doc='Blow yourself up, damage those around you'),
   ],
 )
 
-Ship.addFunctions([
-    Function("attack", [Variable("target", Ship)]),
-])
+Ship.addFunctions([Function("attack", [Variable("target", Ship)], doc='Commands your ship to attack a target')])
+
 ShipType = Model('ShipType',
   data=[ Variable('type', str, 'The ship type'),
     Variable('cost', int, 'The amount of money required to purchase this type of ship'),
     ],
-    functions=[ 
-    Function('warpIn', 
-      [Variable('x', int), Variable('y', int)]
-    ),
+  functions=[Function('warpIn', [Variable('x', int), Variable('y', int)], doc='Sends in a new ship of this type'),
     ],
   doc='An available ship type',
   )
@@ -97,13 +90,3 @@ deStealth = Animation('deStealth',
     Variable('acting', Ship),
     ],
   )
-
-
-
-
-
-
-
-
-
-

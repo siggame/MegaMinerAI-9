@@ -14,7 +14,7 @@ std::ostream& operator<<(std::ostream& stream, Player ob)
   stream << "playerName: " << ob.playerName  <<'\n';
   stream << "time: " << ob.time  <<'\n';
   stream << "victories: " << ob.victories  <<'\n';
-  stream << "money: " << ob.money  <<'\n';
+  stream << "energy: " << ob.energy  <<'\n';
   return stream;
 }
 

@@ -20,7 +20,7 @@ struct _Player
   char* playerName;
   float time;
   int victories;
-  int money;
+  int energy;
 };
 struct _Ship
 {

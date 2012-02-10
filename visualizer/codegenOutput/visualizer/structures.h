@@ -26,7 +26,7 @@ struct Player
   char* playerName;
   float time;
   int victories;
-  int money;
+  int energy;
 
   friend std::ostream& operator<<(std::ostream& stream, Player obj);
 };

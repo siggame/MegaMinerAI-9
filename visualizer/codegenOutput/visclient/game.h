@@ -67,15 +67,15 @@ extern "C"
 
 //commands
 
-  ///
+  ///Allows a player to display messages on the screen
   DLLEXPORT int playerTalk(_Player* object, char* message);
-  ///
+  ///Command a ship to move to a specified position
   DLLEXPORT int shipMove(_Ship* object, int x, int y);
-  ///
+  ///Blow yourself up, damage those around you
   DLLEXPORT int shipSelfDestruct(_Ship* object);
-  ///
+  ///Commands your ship to attack a target
   DLLEXPORT int shipAttack(_Ship* object, _Ship* target);
-  ///
+  ///Sends in a new ship of this type
   DLLEXPORT int shiptypeWarpIn(_ShipType* object, int x, int y);
 
 //derived properties

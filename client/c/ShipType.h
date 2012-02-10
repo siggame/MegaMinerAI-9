@@ -22,7 +22,7 @@ class ShipType {
   int cost();
 
   // Actions
-  ///
+  ///Sends in a new ship of this type
   int warpIn(int x, int y);
 
   // Properties

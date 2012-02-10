@@ -74,7 +74,7 @@ static bool parsePlayer(Player& object, sexp_t* expression)
     return false;
   }
 
-  object.money = atoi(sub->val);
+  object.energy = atoi(sub->val);
   sub = sub->next;
 
   return true;

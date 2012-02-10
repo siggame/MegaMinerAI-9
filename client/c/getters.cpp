@@ -16,9 +16,9 @@ DLLEXPORT int playerGetVictories(_Player* ptr)
 {
   return ptr->victories;
 }
-DLLEXPORT int playerGetMoney(_Player* ptr)
+DLLEXPORT int playerGetEnergy(_Player* ptr)
 {
-  return ptr->money;
+  return ptr->energy;
 }
 DLLEXPORT int shipGetId(_Ship* ptr)
 {

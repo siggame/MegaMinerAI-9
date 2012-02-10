@@ -19,7 +19,7 @@ DLLEXPORT int playerGetId(_Player* ptr);
 DLLEXPORT char* playerGetPlayerName(_Player* ptr);
 DLLEXPORT float playerGetTime(_Player* ptr);
 DLLEXPORT int playerGetVictories(_Player* ptr);
-DLLEXPORT int playerGetMoney(_Player* ptr);
+DLLEXPORT int playerGetEnergy(_Player* ptr);
 
 
 DLLEXPORT int shipGetId(_Ship* ptr);

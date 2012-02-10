@@ -43,11 +43,11 @@ class Ship {
   int maxHealth();
 
   // Actions
-  ///
+  ///Command a ship to move to a specified position
   int move(int x, int y);
-  ///
+  ///Blow yourself up, damage those around you
   int selfDestruct();
-  ///
+  ///Commands your ship to attack a target
   int attack(Ship& target);
 
   // Properties

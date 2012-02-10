@@ -32,9 +32,9 @@ int Player::victories()
   return ((_Player*)ptr)->victories;
 }
 
-int Player::money()
+int Player::energy()
 {
-  return ((_Player*)ptr)->money;
+  return ((_Player*)ptr)->energy;
 }
 
 
@@ -51,7 +51,7 @@ std::ostream& operator<<(std::ostream& stream,Player ob)
   stream << "playerName: " << ((_Player*)ob.ptr)->playerName  <<'\n';
   stream << "time: " << ((_Player*)ob.ptr)->time  <<'\n';
   stream << "victories: " << ((_Player*)ob.ptr)->victories  <<'\n';
-  stream << "money: " << ((_Player*)ob.ptr)->money  <<'\n';
+  stream << "energy: " << ((_Player*)ob.ptr)->energy  <<'\n';
   return stream;
 }
 
