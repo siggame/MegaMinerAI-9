@@ -193,6 +193,15 @@ static bool parseShip(Ship& object, sexp_t* expression)
     return false;
   }
 
+  object.range = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
   object.health = atoi(sub->val);
   sub = sub->next;
 
