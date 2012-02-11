@@ -87,13 +87,13 @@ class Ship:
       for unit in self.objects.ships:
         if unit.owner != self.owner:
           if unit.type == "mine":
-            if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):  
+            if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):
               #If a mine in range, hit the unit that moved there and destroy the mine
-              self.health -= unit.damage            
+              self.health -= unit.damage
               self.game.removeObject(unit)
               if target.health <= 0:
                 self.game.removeObject(self)
-              
+ 
       if self.movementLeft - moved < 0:
         return "Can not move that far"
       if moved == 0:
@@ -136,9 +136,8 @@ class Ship:
         if unit.owner == self.owner:
           if unit.type == "radar":
             if inRange(unit.x,unit.y,unit.range,target.x,target.y,target.radius):
-              #Increment the damage modifier for each radar in range
+            #Increment the damage modifier for each radar in range
               modifier+=unit.damage*.1
-      
       self.game.animations.append(['attack', self, target])
       target.health-=self.damage*modifer
       self.attacksLeft -= 1
@@ -169,11 +168,13 @@ class ShipType:
 
   def warpIn(self, x, y):
     #TODO fill in ship values
-    #TODO warp in ship range
-    #TODO check player resources
-    self.game.addObject(Ship,[self.owner, x, y, radius, self.type, attacksLeft, movementLeft, 
-                              maxMovement, maxAttacks, damage, range, health, maxHealth])
-    
+  #TODO warp in ship range
+  #TODO check player resources
+    self.game.addObject(Ship,[owner, 
+    x, y, radius, type, attacksLeft, movementLeft, 
+    maxMovement, maxAttacks, damage, health, maxHealth
+    ])
+  
     
 
 
