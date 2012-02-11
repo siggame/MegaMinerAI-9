@@ -1,6 +1,9 @@
 import math
 def distance(fromX, toX, fromY, toY):
-   return int(math.ceil(math.sqrt((fromX-toX)**2 + (fromY-toY)**2)))
+  return int(math.ceil(math.sqrt((fromX-toX)**2 + (fromY-toY)**2)))
+
+def inRange(x1, y1, rad1, x2, y2, rad2):
+  return distance(x1, x2, y1, y2) <= rad1 + rad2
 
 class Player:
   def __init__(self, game, id, playerName, time, victories, money):
@@ -86,11 +89,28 @@ class Ship:
 	  return True
 
   def selfDestruct(self):
-    pass
+    for target in self.objects.ships:
+      if inRange (self.x, self.y, self.radius,target.x, target.y, target.radius):
+        if target.owner != self.owner:
+          #TODO placeholder value
+          attack(target)		  
 
   def attack(self, target):
-    pass
-
+	if self.attacksLeft <= 0:
+	  return 'You have no attacks left'
+	if target.owner == self.owner:
+	  return 'No friendly fire please'
+    if not self.inRange (self, target):
+	  return "Target too far away"
+	else:
+	  self.game.animations.append(['attack', self, target])
+	  target.health-=self.damage
+	  self.attacksLeft -= 1
+	  if target.health <= 0:
+	    self.game.removeObject(target)
+	  
+  def inRange(self, target):
+    return inRange(self.x, self.y, self.range, target.x, target.y, target.range)
 
 
 class ShipType:
@@ -112,7 +132,14 @@ class ShipType:
     pass
 
   def warpIn(self, x, y):
-    pass
-
+    #TODO fill in ship values
+	#TODO warp in ship range
+	#TODO check player resources
+    self.game.addObject(Ship,[owner, 
+	  x, y, radius, type, attacksLeft, movementLeft, 
+	  maxMovement, maxAttacks, damage, health, maxHealth
+	  ])
+	  
+    
 
 
