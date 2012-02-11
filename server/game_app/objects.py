@@ -81,6 +81,17 @@ class Ship:
       return "Move is out of bounds of the map"
     else:
       moved = distance(self.x, x, self.y, y)
+			#Checking to see if the ship hits a mine after moving 
+			for unit in self.objects.ships:
+			  if unit.owner != self.owner:
+				  if unit.type == "mine":
+				    if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):	
+						  #If a mine in range, hit the unit that moved there and destroy the mine
+              self.health -= unit.damage						
+						  self.game.removeObject(unit)
+							if target.health <= 0:
+                self.game.removeObject(self)
+						  
       if self.movementLeft - moved < 0:
         return "Can not move that far"
       if moved == 0:
@@ -102,16 +113,32 @@ class Ship:
     #Figure out how to get things from the config
     #if ConfigSectionMap("Fighter")['name'] == "fighter":
       #print ConfigSectionMap("Fighter")['name']
-  
     if self.attacksLeft <= 0:
       return 'You have no attacks left'
+		#TODO Make sure the type for mine layer matches up with the logic
+		#Handles attacks for the mine layer
+		#Minelayer attacks self to drop a mine at its center
+    if self.type == "mineLayer" and self.id == target.id:
+		  ##TODO Plug in data here for the "Mine" ship
+		  self.game.addObject(Ship(owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, health, maxHealth))
+			self.attacksLeft -= 1
+		
     if target.owner == self.owner:
       return 'No friendly fire please'
     if not self.inRange (self, target):
       return "Target too far away"
     else:
+		  modifier = 1
+			#Checking to see if a radar is in range of the target
+		  for unit in self.objects.ships:
+			  if unit.owner == self.owner:
+				  if unit.type == "radar":
+				    if inRange(unit.x,unit.y,unit.range,target.x,target.y,target.radius):
+						  #Increment the damage modifier for each radar in range
+					    modifier+=unit.damage*.1
+			
       self.game.animations.append(['attack', self, target])
-      target.health-=self.damage
+      target.health-=self.damage*modifer
       self.attacksLeft -= 1
       if target.health <= 0:
         self.game.removeObject(target)
