@@ -168,11 +168,21 @@ class ShipType:
 
   def warpIn(self, x, y):
     #TODO fill in ship values
-  #TODO warp in ship range
-  #TODO check player resources
-    self.game.addObject(Ship,[owner, 
-    x, y, radius, type, attacksLeft, movementLeft, 
-    maxMovement, maxAttacks, damage, health, maxHealth
+    #TODO warp in ship range
+    #TODO check player resources
+    #self.game.addObject(Ship,[owner, 
+    #x, y, radius, type, attacksLeft, movementLeft, 
+    #maxMovement, maxAttacks, damage, health, maxHealth
+    #])
+    self.game.addObject(Ship,[owner, x, y, 
+    cfgUnits[self.type]["range"], self.type, 
+    cfgUnits[self.type]["maxAttacks"], 
+    cfgUnits[self.type]["maxMovement"], 
+    cfgUnits[self.type]["maxMovement"], 
+    cfgUnits[self.type]["maxAttacks"], 
+    cfgUnits[self.type]["damage"], 
+    cfgUnits[self.type]["maxHealth"], 
+    cfgUnits[self.type]["maxHealth"]
     ])
   
     
