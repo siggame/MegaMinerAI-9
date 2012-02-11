@@ -71,6 +71,9 @@ class Match(DefaultGameWorld):
     self.nextTurn()
     return True
 
+  def nextRound(self):
+    #TODO: Define how to start a new round
+    pass
 
   def nextTurn(self):
     self.turnNumber += 1
@@ -96,7 +99,8 @@ class Match(DefaultGameWorld):
     return True
 
   def checkWinner(self):
-    #TODO: Make this check if a player won, and call declareWinner with a player if they did
+    #TODO: Check if a player has won the round.
+    #TODO: Make this check if a player won the match, and call declareWinner with a player if they did
     pass
 
   def declareWinner(self, winner, reason=''):
