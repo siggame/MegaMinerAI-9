@@ -69,24 +69,24 @@ class Ship:
 
   def nextTurn(self):
     if self.owner == self.game.playerID:
-	  self.movementLeft = self.maxMovement
-	else:
-	  self.movementLeft = 0
+      self.movementLeft = self.maxMovement
+    else:
+      self.movementLeft = 0
 
   def move(self, x, y):
     if x**2 + y**2 > self.game.mapRadius**2:
-	  return "Move is out of bounds of the map"
-	else:
-	  moved = distance(self.x, x, self.y, y)
-	  if self.movementLeft - moved < 0:
-	    return "Can not move that far"
-	  if moved == 0:
-	    return "Must move somewhere"
-	  self.game.animations.append(['move', self.x, self.y, x, y, self])
-	  self.x = x
-	  self.y = y
-	  self.movementLeft -= moved
-	  return True
+      return "Move is out of bounds of the map"
+    else:
+      moved = distance(self.x, x, self.y, y)
+      if self.movementLeft - moved < 0:
+        return "Can not move that far"
+      if moved == 0:
+        return "Must move somewhere"
+      self.game.animations.append(['move', self.x, self.y, x, y, self])
+      self.x = x
+      self.y = y
+      self.movementLeft -= moved
+      return True
 
   def selfDestruct(self):
     for target in self.objects.ships:
@@ -96,19 +96,19 @@ class Ship:
           attack(target)		  
 
   def attack(self, target):
-	if self.attacksLeft <= 0:
-	  return 'You have no attacks left'
-	if target.owner == self.owner:
-	  return 'No friendly fire please'
+    if self.attacksLeft <= 0:
+      return 'You have no attacks left'
+    if target.owner == self.owner:
+      return 'No friendly fire please'
     if not self.inRange (self, target):
-	  return "Target too far away"
-	else:
-	  self.game.animations.append(['attack', self, target])
-	  target.health-=self.damage
-	  self.attacksLeft -= 1
-	  if target.health <= 0:
-	    self.game.removeObject(target)
-	  
+      return "Target too far away"
+    else:
+      self.game.animations.append(['attack', self, target])
+      target.health-=self.damage
+      self.attacksLeft -= 1
+      if target.health <= 0:
+        self.game.removeObject(target)
+    
   def inRange(self, target):
     return inRange(self.x, self.y, self.range, target.x, target.y, target.range)
 
