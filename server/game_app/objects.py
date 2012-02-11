@@ -1,3 +1,7 @@
+import math
+def distance(fromX, toX, fromY, toY):
+   return int(math.ceil(math.sqrt((fromX-toX)**2 + (fromY-toY)**2)))
+
 class Player:
   def __init__(self, game, id, playerName, time, victories, money):
     self.game = game
@@ -61,10 +65,25 @@ class Ship:
     return value
 
   def nextTurn(self):
-    pass
+    if self.owner == self.game.playerID:
+	  self.movementLeft = self.maxMovement
+	else:
+	  self.movementLeft = 0
 
   def move(self, x, y):
-    pass
+    if x**2 + y**2 > self.game.mapRadius**2:
+	  return "Move is out of bounds of the map"
+	else:
+	  moved = distance(self.x, x, self.y, y)
+	  if self.movementLeft - moved < 0:
+	    return "Can not move that far"
+	  if moved == 0:
+	    return "Must move somewhere"
+	  self.game.animations.append(['move', self.x, self.y, x, y, self])
+	  self.x = x
+	  self.y = y
+	  self.movementLeft -= moved
+	  return True
 
   def selfDestruct(self):
     pass
