@@ -6,13 +6,13 @@ def inRange(x1, y1, rad1, x2, y2, rad2):
   return distance(x1, x2, y1, y2) <= rad1 + rad2
 
 class Player:
-  def __init__(self, game, id, playerName, time, victories, money):
+  def __init__(self, game, id, playerName, time, victories, energy):
     self.game = game
     self.id = id
     self.playerName = playerName
     self.time = time
     self.victories = victories
-    self.money = money
+    self.energy = energy
 
   def toList(self):
     value = [
@@ -20,7 +20,7 @@ class Player:
       self.playerName,
       self.time,
       self.victories,
-      self.money,
+      self.energy,
       ]
     return value
 
