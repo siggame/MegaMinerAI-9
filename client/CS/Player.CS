@@ -37,7 +37,7 @@ public class Player
     
     //commands
     
-  ///
+  ///Allows a player to display messages on the screen
   public int talk(string message)
   {
     validify();
@@ -70,11 +70,11 @@ public class Player
     validify();
     return Client.playerGetVictories(ptr);
   }
-  ///How much money the player has
-  public int getMoney()
+  ///How much energy the player has left to warp in ships
+  public int getEnergy()
   {
     validify();
-    return Client.playerGetMoney(ptr);
+    return Client.playerGetEnergy(ptr);
   }
 
 }

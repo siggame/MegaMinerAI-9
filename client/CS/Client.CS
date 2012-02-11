@@ -73,7 +73,7 @@ public class Client {
   [DllImport("client")]
   public static extern int playerGetVictories(IntPtr ptr);
   [DllImport("client")]
-  public static extern int playerGetMoney(IntPtr ptr);
+  public static extern int playerGetEnergy(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int shipGetId(IntPtr ptr);
@@ -97,6 +97,8 @@ public class Client {
   public static extern int shipGetMaxAttacks(IntPtr ptr);
   [DllImport("client")]
   public static extern int shipGetDamage(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipGetRange(IntPtr ptr);
   [DllImport("client")]
   public static extern int shipGetHealth(IntPtr ptr);
   [DllImport("client")]
