@@ -25,7 +25,10 @@ class Player:
     return value
 
   def nextTurn(self):
-    pass
+    # If it's your turn and it isn't after the last turn, you get some energy
+    if self.id == self.game.playerID:
+      if self.game.turnNumber < self.game.turnLimit:
+        self.energy += 50
 
   def talk(self, message):
     pass
