@@ -41,6 +41,8 @@ class Ship {
   int maxAttacks();
   ///the strength of its attacks
   int damage();
+  ///the range of its attacks
+  int range();
   ///the total health of the ship
   int health();
   ///the max health possible for the ship

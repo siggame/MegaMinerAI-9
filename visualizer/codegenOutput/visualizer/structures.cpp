@@ -32,6 +32,7 @@ std::ostream& operator<<(std::ostream& stream, Ship ob)
   stream << "maxMovement: " << ob.maxMovement  <<'\n';
   stream << "maxAttacks: " << ob.maxAttacks  <<'\n';
   stream << "damage: " << ob.damage  <<'\n';
+  stream << "range: " << ob.range  <<'\n';
   stream << "health: " << ob.health  <<'\n';
   stream << "maxHealth: " << ob.maxHealth  <<'\n';
   return stream;
