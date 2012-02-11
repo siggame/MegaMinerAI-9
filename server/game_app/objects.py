@@ -36,7 +36,7 @@ class Player:
 
 
 class Ship:
-  def __init__(self, game, id, owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, health, maxHealth):
+  def __init__(self, game, id, owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, range, health, maxHealth):
     self.game = game
     self.id = id
     self.owner = owner
@@ -49,6 +49,7 @@ class Ship:
     self.maxMovement = maxMovement
     self.maxAttacks = maxAttacks
     self.damage = damage
+    self.range = range
     self.health = health
     self.maxHealth = maxHealth
 
@@ -65,6 +66,7 @@ class Ship:
       self.maxMovement,
       self.maxAttacks,
       self.damage,
+      self.range,
       self.health,
       self.maxHealth,
       ]
@@ -167,12 +169,10 @@ class ShipType:
 
   def warpIn(self, x, y):
     #TODO fill in ship values
-  #TODO warp in ship range
-  #TODO check player resources
-    self.game.addObject(Ship,[owner, 
-    x, y, radius, type, attacksLeft, movementLeft, 
-    maxMovement, maxAttacks, damage, health, maxHealth
-    ])
+    #TODO warp in ship range
+    #TODO check player resources
+    self.game.addObject(Ship,[self.owner, x, y, radius, self.type, attacksLeft, movementLeft, 
+                              maxMovement, maxAttacks, damage, range, health, maxHealth])
     
     
 
