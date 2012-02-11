@@ -93,9 +93,13 @@ class Ship:
       if inRange (self.x, self.y, self.radius,target.x, target.y, target.radius):
         if target.owner != self.owner:
           #TODO placeholder value
-          attack(target)		  
+          attack(target) 
 
   def attack(self, target):
+    #Figure out how to get things from the config
+    #if ConfigSectionMap("Fighter")['name'] == "fighter":
+      #print ConfigSectionMap("Fighter")['name']
+  
     if self.attacksLeft <= 0:
       return 'You have no attacks left'
     if target.owner == self.owner:
