@@ -64,6 +64,10 @@ DLLEXPORT int shipGetDamage(_Ship* ptr)
 {
   return ptr->damage;
 }
+DLLEXPORT int shipGetRange(_Ship* ptr)
+{
+  return ptr->range;
+}
 DLLEXPORT int shipGetHealth(_Ship* ptr)
 {
   return ptr->health;

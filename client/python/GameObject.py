@@ -32,7 +32,7 @@ class Player(GameObject):
         self.iteration = BaseAI.iteration
         return True
     raise ExistentialError()
-  ##
+  ##Allows a player to display messages on the screen
   def talk(self, message):
     self.validify()
     return library.playerTalk(self.ptr, message)
@@ -57,10 +57,10 @@ class Player(GameObject):
     self.validify()
     return library.playerGetVictories(self.ptr)
 
-  ##How much money the player has
-  def getMoney(self):
+  ##How much energy the player has left to warp in ships
+  def getEnergy(self):
     self.validify()
-    return library.playerGetMoney(self.ptr)
+    return library.playerGetEnergy(self.ptr)
 
 
   def __str__(self):
@@ -70,7 +70,7 @@ class Player(GameObject):
     ret += "playerName: %s\n" % self.getPlayerName()
     ret += "time: %s\n" % self.getTime()
     ret += "victories: %s\n" % self.getVictories()
-    ret += "money: %s\n" % self.getMoney()
+    ret += "energy: %s\n" % self.getEnergy()
     return ret
 
 ##A space ship!
@@ -94,17 +94,17 @@ class Ship(GameObject):
         self.iteration = BaseAI.iteration
         return True
     raise ExistentialError()
-  ##
+  ##Command a ship to move to a specified position
   def move(self, x, y):
     self.validify()
     return library.shipMove(self.ptr, x, y)
 
-  ##
+  ##Blow yourself up, damage those around you
   def selfDestruct(self):
     self.validify()
     return library.shipSelfDestruct(self.ptr)
 
-  ##
+  ##Commands your ship to attack a target
   def attack(self, target):
     self.validify()
     if not isinstance(target, Ship):
@@ -167,6 +167,11 @@ class Ship(GameObject):
     self.validify()
     return library.shipGetDamage(self.ptr)
 
+  ##the range of its attacks
+  def getRange(self):
+    self.validify()
+    return library.shipGetRange(self.ptr)
+
   ##the total health of the ship
   def getHealth(self):
     self.validify()
@@ -192,6 +197,7 @@ class Ship(GameObject):
     ret += "maxMovement: %s\n" % self.getMaxMovement()
     ret += "maxAttacks: %s\n" % self.getMaxAttacks()
     ret += "damage: %s\n" % self.getDamage()
+    ret += "range: %s\n" % self.getRange()
     ret += "health: %s\n" % self.getHealth()
     ret += "maxHealth: %s\n" % self.getMaxHealth()
     return ret
@@ -217,7 +223,7 @@ class ShipType(GameObject):
         self.iteration = BaseAI.iteration
         return True
     raise ExistentialError()
-  ##
+  ##Sends in a new ship of this type
   def warpIn(self, x, y):
     self.validify()
     return library.shipTypeWarpIn(self.ptr, x, y)

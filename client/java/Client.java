@@ -45,7 +45,7 @@ public interface Client extends Library {
   String playerGetPlayerName(Pointer ptr);
   float playerGetTime(Pointer ptr);
   int playerGetVictories(Pointer ptr);
-  int playerGetMoney(Pointer ptr);
+  int playerGetEnergy(Pointer ptr);
 
   int shipGetId(Pointer ptr);
   int shipGetOwner(Pointer ptr);
@@ -58,6 +58,7 @@ public interface Client extends Library {
   int shipGetMaxMovement(Pointer ptr);
   int shipGetMaxAttacks(Pointer ptr);
   int shipGetDamage(Pointer ptr);
+  int shipGetRange(Pointer ptr);
   int shipGetHealth(Pointer ptr);
   int shipGetMaxHealth(Pointer ptr);
 

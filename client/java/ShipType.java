@@ -29,7 +29,7 @@ class ShipType
     
     //commands
     
-  ///
+  ///Sends in a new ship of this type
   int warpIn(int x, int y)
   {
     validify();

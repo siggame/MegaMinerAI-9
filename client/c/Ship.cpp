@@ -65,6 +65,11 @@ int Ship::damage()
   return ((_Ship*)ptr)->damage;
 }
 
+int Ship::range()
+{
+  return ((_Ship*)ptr)->range;
+}
+
 int Ship::health()
 {
   return ((_Ship*)ptr)->health;
@@ -106,6 +111,7 @@ std::ostream& operator<<(std::ostream& stream,Ship ob)
   stream << "maxMovement: " << ((_Ship*)ob.ptr)->maxMovement  <<'\n';
   stream << "maxAttacks: " << ((_Ship*)ob.ptr)->maxAttacks  <<'\n';
   stream << "damage: " << ((_Ship*)ob.ptr)->damage  <<'\n';
+  stream << "range: " << ((_Ship*)ob.ptr)->range  <<'\n';
   stream << "health: " << ((_Ship*)ob.ptr)->health  <<'\n';
   stream << "maxHealth: " << ((_Ship*)ob.ptr)->maxHealth  <<'\n';
   return stream;

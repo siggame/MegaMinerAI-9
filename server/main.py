@@ -114,7 +114,7 @@ class GameApp(AccountsAppMixin, BaseApp):
   @requireTurn
   @requireTypes(None, int, str)
   def gameTalk(self, player, message):
-    """"""
+    """Allows a player to display messages on the screen"""
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.talk(player, message)
@@ -124,7 +124,7 @@ class GameApp(AccountsAppMixin, BaseApp):
   @requireTurn
   @requireTypes(None, int, int, int)
   def gameMove(self, ship, x, y):
-    """"""
+    """Command a ship to move to a specified position"""
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.move(ship, x, y)
@@ -134,7 +134,7 @@ class GameApp(AccountsAppMixin, BaseApp):
   @requireTurn
   @requireTypes(None, int)
   def gameSelfDestruct(self, ship):
-    """"""
+    """Blow yourself up, damage those around you"""
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.selfDestruct(ship)
@@ -144,7 +144,7 @@ class GameApp(AccountsAppMixin, BaseApp):
   @requireTurn
   @requireTypes(None, int, int)
   def gameAttack(self, ship, target):
-    """"""
+    """Commands your ship to attack a target"""
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.attack(ship, target)
@@ -154,7 +154,7 @@ class GameApp(AccountsAppMixin, BaseApp):
   @requireTurn
   @requireTypes(None, int, int, int)
   def gameWarpIn(self, shipType, x, y):
-    """"""
+    """Sends in a new ship of this type"""
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.warpIn(shipType, x, y)

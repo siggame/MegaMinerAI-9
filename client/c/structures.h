@@ -33,6 +33,7 @@ struct _Ship
   int maxMovement;
   int maxAttacks;
   int damage;
+  int range;
   int health;
   int maxHealth;
 };

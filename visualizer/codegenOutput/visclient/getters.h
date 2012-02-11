@@ -33,6 +33,7 @@ DLLEXPORT int shipGetMovementLeft(_Ship* ptr);
 DLLEXPORT int shipGetMaxMovement(_Ship* ptr);
 DLLEXPORT int shipGetMaxAttacks(_Ship* ptr);
 DLLEXPORT int shipGetDamage(_Ship* ptr);
+DLLEXPORT int shipGetRange(_Ship* ptr);
 DLLEXPORT int shipGetHealth(_Ship* ptr);
 DLLEXPORT int shipGetMaxHealth(_Ship* ptr);
 

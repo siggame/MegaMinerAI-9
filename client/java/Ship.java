@@ -29,19 +29,19 @@ class Ship
     
     //commands
     
-  ///
+  ///Command a ship to move to a specified position
   int move(int x, int y)
   {
     validify();
     return Client.INSTANCE.shipMove(ptr, x, y);
   }
-  ///
+  ///Blow yourself up, damage those around you
   int selfDestruct()
   {
     validify();
     return Client.INSTANCE.shipSelfDestruct(ptr);
   }
-  ///
+  ///Commands your ship to attack a target
   int attack(Ship target)
   {
     validify();
@@ -116,6 +116,12 @@ class Ship
   {
     validify();
     return Client.INSTANCE.shipGetDamage(ptr);
+  }
+  ///the range of its attacks
+  public int getRange()
+  {
+    validify();
+    return Client.INSTANCE.shipGetRange(ptr);
   }
   ///the total health of the ship
   public int getHealth()

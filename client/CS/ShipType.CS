@@ -37,7 +37,7 @@ public class ShipType
     
     //commands
     
-  ///
+  ///Sends in a new ship of this type
   public int warpIn(int x, int y)
   {
     validify();

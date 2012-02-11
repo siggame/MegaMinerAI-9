@@ -6,13 +6,13 @@ def inRange(x1, y1, rad1, x2, y2, rad2):
   return distance(x1, x2, y1, y2) <= rad1 + rad2
 
 class Player:
-  def __init__(self, game, id, playerName, time, victories, money):
+  def __init__(self, game, id, playerName, time, victories, energy):
     self.game = game
     self.id = id
     self.playerName = playerName
     self.time = time
     self.victories = victories
-    self.money = money
+    self.energy = energy
 
   def toList(self):
     value = [
@@ -20,7 +20,7 @@ class Player:
       self.playerName,
       self.time,
       self.victories,
-      self.money,
+      self.energy,
       ]
     return value
 
@@ -36,7 +36,7 @@ class Player:
 
 
 class Ship:
-  def __init__(self, game, id, owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, health, maxHealth):
+  def __init__(self, game, id, owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, range, health, maxHealth):
     self.game = game
     self.id = id
     self.owner = owner
@@ -49,6 +49,7 @@ class Ship:
     self.maxMovement = maxMovement
     self.maxAttacks = maxAttacks
     self.damage = damage
+    self.range = range
     self.health = health
     self.maxHealth = maxHealth
 
@@ -65,6 +66,7 @@ class Ship:
       self.maxMovement,
       self.maxAttacks,
       self.damage,
+      self.range,
       self.health,
       self.maxHealth,
       ]
@@ -85,9 +87,9 @@ class Ship:
       for unit in self.objects.ships:
         if unit.owner != self.owner:
           if unit.type == "mine":
-            if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):	
+            if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):
               #If a mine in range, hit the unit that moved there and destroy the mine
-              self.health -= unit.damage						
+              self.health -= unit.damage
               self.game.removeObject(unit)
               if target.health <= 0:
                 self.game.removeObject(self)
@@ -136,7 +138,6 @@ class Ship:
             if inRange(unit.x,unit.y,unit.range,target.x,target.y,target.radius):
             #Increment the damage modifier for each radar in range
               modifier+=unit.damage*.1
-
       self.game.animations.append(['attack', self, target])
       target.health-=self.damage*modifer
       self.attacksLeft -= 1

@@ -310,6 +310,8 @@ void parseShip(Connection* c, _Ship* object, sexp_t* expression)
   sub = sub->next;
   object->damage = atoi(sub->val);
   sub = sub->next;
+  object->range = atoi(sub->val);
+  sub = sub->next;
   object->health = atoi(sub->val);
   sub = sub->next;
   object->maxHealth = atoi(sub->val);

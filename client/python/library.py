@@ -107,8 +107,8 @@ library.playerGetTime.argtypes = [c_void_p]
 library.playerGetVictories.restype = c_int
 library.playerGetVictories.argtypes = [c_void_p]
 
-library.playerGetMoney.restype = c_int
-library.playerGetMoney.argtypes = [c_void_p]
+library.playerGetEnergy.restype = c_int
+library.playerGetEnergy.argtypes = [c_void_p]
 
 library.shipGetId.restype = c_int
 library.shipGetId.argtypes = [c_void_p]
@@ -142,6 +142,9 @@ library.shipGetMaxAttacks.argtypes = [c_void_p]
 
 library.shipGetDamage.restype = c_int
 library.shipGetDamage.argtypes = [c_void_p]
+
+library.shipGetRange.restype = c_int
+library.shipGetRange.argtypes = [c_void_p]
 
 library.shipGetHealth.restype = c_int
 library.shipGetHealth.argtypes = [c_void_p]
