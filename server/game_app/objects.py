@@ -123,6 +123,7 @@ class Ship:
 
   def attack(self, target):
     #TODO: A lot of things. 
+    #TODO: cannot attack same target >1 per turn. (can make a set of possible targets, and remove target each time)
     #TODO: Figure out how to get things from the config
     #if ConfigSectionMap("Fighter")['name'] == "fighter":
       #print ConfigSectionMap("Fighter")['name']
@@ -201,7 +202,7 @@ class ShipType:
     elif not inRange(warpX,warpY,cfgUnits["Warp Gate"]["range"],x,y,0) and self.type != "FTL":
       return "You must spawn that ship closer to your Warp Gate"
     else:    
-      #spawn the unit with it's numbers, from units.cfg in config directory
+      #spawn the unit with its stats, from units.cfg in config directory
       print self.type, "ship spawned for player", self.game.playerID
       self.game.addObject(Ship,[self.game.playerID, x, y, 
       cfgUnits[self.type]["radius"], self.type, 
