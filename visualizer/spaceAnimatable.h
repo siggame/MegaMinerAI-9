@@ -6,7 +6,7 @@
 
 namespace visualizer
 {
-    struct SpaceBoard: public Animatable
+    struct Background: public Animatable
     {
     };
   

@@ -31,12 +31,12 @@ namespace visualizer
   void Space::setup()
   {
     
-    renderer->setCamera( 0, 0, 8, 8 );
+    /*renderer->setCamera( 0, 0, 8, 8 );
     renderer->setGridDimensions( 8, 8 );
     
     resourceManager->loadResourceFile( "./plugins/space/textures.r" );
 
-    animationEngine->registerGame( this, this ); 
+    animationEngine->registerGame( this, this ); */
   }
 
   void Space::loadGamelog( std::string gamelog )
@@ -73,9 +73,11 @@ namespace visualizer
 
   void Space::load()
   {
-    //SmartPointer<SpaceBoard> board = new SpaceBoard();
-    
-    cout << "In load()" << endl;
+    // Setup the renderer as mapRadius*2 x mapRadius*2
+    renderer->setCamera( 0, 0, m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2);
+    renderer->setGridDimensions( m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2 );
+    resourceManager->loadResourceFile( "./plugins/space/textures.r" );
+    animationEngine->registerGame( this, this );    
     
     timeManager->setNumTurns( m_game->states.size() );
     
@@ -83,12 +85,14 @@ namespace visualizer
     for(int state = 0; state < m_game->states.size(); state++)
     {
         Frame turn;
+        cout << m_game->states[ state ].mapRadius << endl;
         
-        /*SmartPointer<SpaceBoard> board = new SpaceBoard();
-        board->addKeyFrame( new DrawBoard() );
-        turn.addAnimatable( board );
+        // Add and draw the background
+        SmartPointer<Background> background = new Background();
+        background->addKeyFrame( new DrawBackground() );
+        turn.addAnimatable( background );
         
-        // Loop though each Piece in the current state
+        /*// Loop though each Piece in the current state
         for(std::map<int, parser::Piece>::iterator i = m_game->states[ state ].pieces.begin(); i != m_game->states[ state ].pieces.end(); i++)
         {
             SmartPointer<SpacePiece> piece = new SpacePiece();
@@ -101,7 +105,6 @@ namespace visualizer
             piece->addKeyFrame( new DrawSpacePiece( piece ) );
             turn.addAnimatable( piece );
         }*/
-
         addFrame( turn );
     }
     

@@ -14,7 +14,7 @@ namespace visualizer
 
     };
   
-    class DrawBoard: public Anim
+    class DrawBackground: public Anim
     {
       public:
         void animate( const float& t, AnimData* d, IGame* game );
@@ -25,7 +25,7 @@ namespace visualizer
         float totalDuration() const
         { return 0; }
 
-    }; // DrawBoard
+    }; // DrawBackground
   
     class DrawSpacePiece: public Anim
     {
