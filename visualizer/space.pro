@@ -8,7 +8,8 @@ TEMPLATE = lib
 TARGET = space
 SOURCES = *.cpp \
           ./parser/*.cpp \
-          ./parser/sexp/*.cpp
+          ./parser/sexp/*.cpp \
+          ../common/*.cpp
 
 HEADERS +=  *.h \
             ./parser/*.h \
