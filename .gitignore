@@ -68,3 +68,6 @@ visualizer/botnet/Makefile
 
 #Build Logs don't go in the repository
 *build.log*
+
+#Dont ignore jna.jar
+!jna.jar
