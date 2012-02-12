@@ -5,6 +5,7 @@
 
 namespace visualizer
 {
+  Log errorLog( "chess.log" ); 
 
   Space::Space()
   {
