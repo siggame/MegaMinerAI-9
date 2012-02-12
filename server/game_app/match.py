@@ -7,8 +7,11 @@ from networking.sexpr.sexpr import *
 import os
 import itertools
 import scribe
+import random
 
 Scribe = scribe.Scribe
+#Initializes the cfgUnits file
+cfgUnits = networking.config.config.readConfig("config/units.cfg")
 
 def loadClassDefaults(cfgFile = "config/defaults.cfg"):
   cfg = networking.config.config.readConfig(cfgFile)
@@ -28,7 +31,7 @@ class Match(DefaultGameWorld):
     self.turnNumber = -1
     self.playerID = -1
     self.gameNumber = id
-    self.round = 0
+    self.round = -1
     self.victoriesNeeded = self.victories
     self.mapRadius = self.radius
 
@@ -62,30 +65,55 @@ class Match(DefaultGameWorld):
     if len(self.players) < 2:
       return "Game is not full"
     if self.winner is not None or self.turn is not None:
-      return "Game has already begun"
-    
-    #TODO: START STUFF
+      return "Game has already begun"    
+   
     self.turn = self.players[-1]
     self.turnNumber = -1
-
+    self.nextRound()
     self.nextTurn()
     return True
 
   def nextRound(self):
-    #TODO: Define how to start a new round
+    print "YOU ARE ENTERING A NEW ROUND", self.round
+    for player in self.players:
+      player.energy = 100
+    
+    for i in self.objects.values():
+      if isinstance(i,ShipType):
+        self.removeObject(i)
+    self.round += 1
+    Types = cfgUnits.keys()
+    Types.remove("Warp Gate")
+    Types.remove("Mine") 
+    i = 0
+    while i < 4:
+      rand = random.randrange(0,len(Types))
+      name=Types[rand]
+      cost=cfgUnits[name]["cost"]     
+      self.addObject(ShipType,[name,cost])
+      Types.remove(Types[rand])
+      i += 1
     pass
 
   def nextTurn(self):
-    self.turnNumber += 1
     if self.turn == self.players[0]:
       self.turn = self.players[1]
       self.playerID = 1
     elif self.turn == self.players[1]:
       self.turn = self.players[0]
       self.playerID = 0
-
     else:
-      return "Game is over."
+      return "Game is over." 
+    
+    self.turnNumber += 1
+    if self.turnNumber == 0:
+      self.nextRound()
+    else: 
+      if self.turnNumber%self.turnLimit == 0:
+        self.turnNumber = 0
+        self.nextRound()
+
+    
 
     for obj in self.objects.values():
       obj.nextTurn()
@@ -100,6 +128,13 @@ class Match(DefaultGameWorld):
 
   def checkWinner(self):
     #TODO: Check if a player has won the round.
+    if self.round == 5:
+      self.declareWinner (self.players[0],"I said so")
+    for ship in self.objects.values():
+      if isinstance(ship,Ship) and ship.type == "Warp Gate":
+        if ship.health <= 0:
+          pass
+        #TODO: Make the other player win
     #TODO: Make this check if a player won the match, and call declareWinner with a player if they did
     pass
 
