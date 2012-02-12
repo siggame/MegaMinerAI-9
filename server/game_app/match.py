@@ -69,18 +69,32 @@ class Match(DefaultGameWorld):
    
     self.turn = self.players[-1]
     self.turnNumber = -1
-    self.nextRound()
     self.nextTurn()
     return True
 
   def nextRound(self):
     print "YOU ARE ENTERING A NEW ROUND", self.round
-    for player in self.players:
-      player.energy = 100
-    
     for i in self.objects.values():
-      if isinstance(i,ShipType):
+      if isinstance(i,ShipType) or isinstance(i,Ship):
         self.removeObject(i)
+    for player in self.objects.players:
+      player.energy = 100
+      dirmod = 1
+      if player.id == 1:
+        dirmod = -1   
+      self.addObject(Ship,[player.id, (self.mapRadius/2)*dirmod, (self.mapRadius/2)*dirmod, 
+        cfgUnits["Warp Gate"]["radius"], 
+        "Warp Gate", 
+        cfgUnits["Warp Gate"]["maxAttacks"], 
+        cfgUnits["Warp Gate"]["maxMovement"], 
+        cfgUnits["Warp Gate"]["maxMovement"], 
+        cfgUnits["Warp Gate"]["maxAttacks"], 
+        cfgUnits["Warp Gate"]["damage"], 
+        cfgUnits["Warp Gate"]["range"],
+        cfgUnits["Warp Gate"]["maxHealth"], 
+        cfgUnits["Warp Gate"]["maxHealth"]
+        ])
+    
     self.round += 1
     Types = cfgUnits.keys()
     Types.remove("Warp Gate")
@@ -104,7 +118,6 @@ class Match(DefaultGameWorld):
       self.playerID = 0
     else:
       return "Game is over." 
-    
     self.turnNumber += 1
     if self.turnNumber == 0:
       self.nextRound()
@@ -112,8 +125,6 @@ class Match(DefaultGameWorld):
       if self.turnNumber%self.turnLimit == 0:
         self.turnNumber = 0
         self.nextRound()
-
-    
 
     for obj in self.objects.values():
       obj.nextTurn()

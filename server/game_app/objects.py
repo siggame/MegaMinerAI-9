@@ -1,4 +1,7 @@
 import math
+import networking.config.config
+#Initializes the cfgUnits file
+cfgUnits = networking.config.config.readConfig("config/units.cfg")
 def distance(fromX, toX, fromY, toY):
   return int(math.ceil(math.sqrt((fromX-toX)**2 + (fromY-toY)**2)))
 
@@ -25,10 +28,11 @@ class Player:
     return value
 
   def nextTurn(self):
-    # If it's your turn and it isn't after the last turn, you get some energy
-    if self.id == self.game.playerID:
-      if self.game.turnNumber < self.game.turnLimit:
-        self.energy += 50
+    pass
+    # If it's your turn and it isn't after the last turn, you get some energy (Maybe)
+    #if self.id == self.game.playerID:
+      #if self.game.turnNumber < self.game.turnLimit:
+        #self.energy += 50
 
   def talk(self, message):
     pass
@@ -79,14 +83,15 @@ class Ship:
       self.movementLeft = 0
 
   def move(self, x, y):
+    print x, "  ", y
     if x**2 + y**2 > self.game.mapRadius**2:
       return "Move is out of bounds of the map"
     else:
       moved = distance(self.x, x, self.y, y)
       #Checking to see if the ship hits a mine after moving 
-      for unit in self.objects.ships:
+      for unit in self.game.objects.ships:
         if unit.owner != self.owner:
-          if unit.type == "mine":
+          if unit.type == "Mine":
             if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):
               #If a mine in range, hit the unit that moved there and destroy the mine
               self.health -= unit.damage
@@ -135,7 +140,7 @@ class Ship:
       for unit in self.objects.ships:
         if unit.owner == self.owner:
           if unit.type == "radar":
-            if inRange(unit.x,unit.y,unit.range,target.x,target.y,target.radius):
+            if self.inRange(unit,target):
             #Increment the damage modifier for each radar in range
               modifier+=unit.damage*.1
       self.game.animations.append(['attack', self, target])
@@ -167,23 +172,39 @@ class ShipType:
     pass
 
   def warpIn(self, x, y):
-    #TODO fill in ship values
-    #TODO warp in ship range
-    #TODO check player resources
-    #self.game.addObject(Ship,[owner, 
-    #x, y, radius, type, attacksLeft, movementLeft, 
-    #maxMovement, maxAttacks, damage, health, maxHealth
-    #])
-    self.game.addObject(Ship,[owner, x, y, 
-    cfgUnits[self.type]["range"], self.type, 
-    cfgUnits[self.type]["maxAttacks"], 
-    cfgUnits[self.type]["maxMovement"], 
-    cfgUnits[self.type]["maxMovement"], 
-    cfgUnits[self.type]["maxAttacks"], 
-    cfgUnits[self.type]["damage"], 
-    cfgUnits[self.type]["maxHealth"], 
-    cfgUnits[self.type]["maxHealth"]
-    ])
+    if self.game.turnNumber == 0:
+      player = self.game.objects.players[0]
+    else:
+      player = self.game.objects.players[self.game.turnNumber%2]
+    #TODO (Maybe) Try to build library of ships each turn to speed up calculations (last priority)
+    warpX = 0; warpY = 0
+    for ship in self.game.objects.values():
+      if isinstance(ship,Ship):
+        if ship.type == "Warp Gate" and ship.owner == self.game.playerID:
+          warpX = ship.x
+          warpY = ship.y
+    if self.game.playerID != player.id:
+      return "You cannot warp in ships on your opponent's turn"
+    if x**2 + y**2 > self.game.mapRadius**2:
+      return "That ship would be lost in space...forever"
+    elif player.energy < self.cost:
+      return "You need to not be poor to buy that kind of ship"
+    elif not inRange(warpX,warpY,cfgUnits["Warp Gate"]["range"],x,y,0) and self.type != "FTL":
+      return "You must spawn that ship closer to your Warp Gate"
+    else:    
+      print self.type, "ship spawned for player", self.game.playerID
+      self.game.addObject(Ship,[self.game.playerID, x, y, 
+      cfgUnits[self.type]["radius"], self.type, 
+      cfgUnits[self.type]["maxAttacks"], 
+      cfgUnits[self.type]["maxMovement"], 
+      cfgUnits[self.type]["maxMovement"], 
+      cfgUnits[self.type]["maxAttacks"], 
+      cfgUnits[self.type]["damage"], 
+      cfgUnits[self.type]["radius"],
+      cfgUnits[self.type]["maxHealth"], 
+      cfgUnits[self.type]["maxHealth"]
+      ])
+      player.energy -= self.cost
   
     
 
