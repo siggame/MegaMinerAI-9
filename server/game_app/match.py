@@ -73,11 +73,14 @@ class Match(DefaultGameWorld):
     return True
 
   def nextRound(self):
+    #Handles logic for starting a new round:
+      #first get rid of all shiptypes and ships available that round, then put into a new subset of available ship types
     print "YOU ARE ENTERING A NEW ROUND", self.round
     for i in self.objects.values():
       if isinstance(i,ShipType) or isinstance(i,Ship):
         self.removeObject(i)
     for player in self.objects.players:
+      #give players money, and give add warpgates. dirmod = directional modifier, where warp gate spawns for each player
       player.energy = 100
       dirmod = 1
       if player.id == 1:
@@ -96,10 +99,12 @@ class Match(DefaultGameWorld):
         ])
     
     self.round += 1
+    #types are list of all ships, want to remove warp and mine from it before assigning what ships are available
     Types = cfgUnits.keys()
     Types.remove("Warp Gate")
     Types.remove("Mine") 
     i = 0
+    #add random ship types from map, remove that ship type to avoid duplicates
     while i < 4:
       rand = random.randrange(0,len(Types))
       name=Types[rand]
@@ -119,6 +124,8 @@ class Match(DefaultGameWorld):
     else:
       return "Game is over." 
     self.turnNumber += 1
+    
+    #determine when a new round should start. NEVER MOD BY 0, makes computer not happy. >_<
     if self.turnNumber == 0:
       self.nextRound()
     else: 
@@ -150,6 +157,7 @@ class Match(DefaultGameWorld):
     pass
 
   def declareWinner(self, winner, reason=''):
+  #TODO give reasons for winning, who has more round victories, etc..
     print "Player", self.getPlayerIndex(self.winner), "wins game", self.id
     self.winner = winner
 

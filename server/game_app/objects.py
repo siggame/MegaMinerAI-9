@@ -35,6 +35,7 @@ class Player:
         #self.energy += 50
 
   def talk(self, message):
+    #TODO: talk..look off past megaminers, very similar
     pass
 
 
@@ -84,30 +85,34 @@ class Ship:
 
   def move(self, x, y):
     print x, "  ", y
+    #moved is the distance they've moved, where they were to where they're going
+    moved = distance(self.x, x, self.y, y)       
+    #if they're trying to move outside the map
     if x**2 + y**2 > self.game.mapRadius**2:
-      return "Move is out of bounds of the map"
-    else:
-      moved = distance(self.x, x, self.y, y)
-      #Checking to see if the ship hits a mine after moving 
-      for unit in self.game.objects.ships:
-        if unit.owner != self.owner:
-          if unit.type == "Mine":
-            if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):
-              #If a mine in range, hit the unit that moved there and destroy the mine
-              self.health -= unit.damage
-              self.game.removeObject(unit)
-              if target.health <= 0:
-                self.game.removeObject(self)
- 
-      if self.movementLeft - moved < 0:
-        return "Can not move that far"
-      if moved == 0:
-        return "Must move somewhere"
-      self.game.animations.append(['move', self.x, self.y, x, y, self])
-      self.x = x
-      self.y = y
-      self.movementLeft -= moved
-      return True
+      return "You don't want to move out of the map, you'd be lost in Space"
+    #check if they can'at move that far
+    elif self.movementLeft - moved < 0:
+      return "You cannot move that far, your engines lack the power"#think of something clever here
+    #have to move somewhere..yeah.
+    elif moved == 0:
+      return "Must move somewhere"
+    
+    #successful move, yay! 
+    self.game.animations.append(['move', self.x, self.y, x, y, self]) #move animation for those visualizer guys
+    self.x = x
+    self.y = y
+    self.movementLeft -= moved
+    #Check to see if they moved onto a mine, TWAS A TRAP!
+    for unit in self.game.objects.ships:
+      if unit.owner != self.owner: 
+        if unit.type == "Mine": 
+          if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):
+            #If a mine in range, hit the unit that moved there and destroy the mine
+            self.health -= unit.damage
+            self.game.removeObject(unit)
+            if self.health <= 0:
+              self.game.removeObject(self)
+    return True
 
   def selfDestruct(self):
     for target in self.objects.ships:
@@ -117,11 +122,19 @@ class Ship:
           attack(target) 
 
   def attack(self, target):
-    #Figure out how to get things from the config
+    #TODO: A lot of things. 
+    #TODO: Figure out how to get things from the config
     #if ConfigSectionMap("Fighter")['name'] == "fighter":
       #print ConfigSectionMap("Fighter")['name']
+    
+    #make sure attack is not invalid
     if self.attacksLeft <= 0:
       return 'You have no attacks left'
+    elif target.owner == self.owner:
+      return 'No friendly fire please'
+    elif not self.inRange (self, target):
+      return "Target too far away"
+                     
     #TODO Make sure the type for mine layer matches up with the logic
     #Handles attacks for the mine layer
     #Minelayer attacks self to drop a mine at its center
@@ -129,11 +142,6 @@ class Ship:
       ##TODO Plug in data here for the "Mine" ship
       self.game.addObject(Ship(owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, health, maxHealth))
       self.attacksLeft -= 1
-    
-    if target.owner == self.owner:
-      return 'No friendly fire please'
-    if not self.inRange (self, target):
-      return "Target too far away"
     else:
       modifier = 1
       #Checking to see if a radar is in range of the target
@@ -172,6 +180,7 @@ class ShipType:
     pass
 
   def warpIn(self, x, y):
+    #check to see whose turn it is, hint: it's player's turn
     if self.game.turnNumber == 0:
       player = self.game.objects.players[0]
     else:
@@ -179,7 +188,7 @@ class ShipType:
     #TODO (Maybe) Try to build library of ships each turn to speed up calculations (last priority)
     warpX = 0; warpY = 0
     for ship in self.game.objects.values():
-      if isinstance(ship,Ship):
+      if isinstance(ship,Ship): #if ship is a Ship
         if ship.type == "Warp Gate" and ship.owner == self.game.playerID:
           warpX = ship.x
           warpY = ship.y
@@ -192,6 +201,7 @@ class ShipType:
     elif not inRange(warpX,warpY,cfgUnits["Warp Gate"]["range"],x,y,0) and self.type != "FTL":
       return "You must spawn that ship closer to your Warp Gate"
     else:    
+      #spawn the unit with it's numbers, from units.cfg in config directory
       print self.type, "ship spawned for player", self.game.playerID
       self.game.addObject(Ship,[self.game.playerID, x, y, 
       cfgUnits[self.type]["radius"], self.type, 
