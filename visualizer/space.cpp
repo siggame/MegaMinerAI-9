@@ -77,7 +77,9 @@ namespace visualizer
     renderer->setCamera( 0, 0, m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2);
     renderer->setGridDimensions( m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2 );
     resourceManager->loadResourceFile( "./plugins/space/textures.r" );
-    animationEngine->registerGame( this, this );    
+    animationEngine->registerGame( this, this );
+
+    m_mapRadius =  m_game->states[ 0 ].mapRadius;
     
     timeManager->setNumTurns( m_game->states.size() );
     
@@ -92,19 +94,21 @@ namespace visualizer
         background->addKeyFrame( new DrawBackground() );
         turn.addAnimatable( background );
         
-        /*// Loop though each Piece in the current state
-        for(std::map<int, parser::Piece>::iterator i = m_game->states[ state ].pieces.begin(); i != m_game->states[ state ].pieces.end(); i++)
+        // Loop though each Ship in the current state
+        for(std::map<int, parser::Ship>::iterator i = m_game->states[ state ].ships.begin(); i != m_game->states[ state ].ships.end(); i++)
         {
-            SmartPointer<SpacePiece> piece = new SpacePiece();
+            SmartPointer<SpaceShip> ship = new SpaceShip();
             
-            piece->x = i->second.file - 1;
-            piece->y = i->second.rank - 1;
-            piece->type = i->second.type;
-            piece->owner = i->second.owner;
+            ship->x = i->second.x + m_mapRadius;
+            ship->y = i->second.y + m_mapRadius;
+            ship->radius = i->second.radius;
+            ship->type = i->second.type;
+            ship->owner = i->second.owner;
             
-            piece->addKeyFrame( new DrawSpacePiece( piece ) );
-            turn.addAnimatable( piece );
-        }*/
+            ship->addKeyFrame( new DrawSpaceShip( ship ) );
+            turn.addAnimatable( ship );
+        }
+        
         addFrame( turn );
     }
     

@@ -27,14 +27,14 @@ namespace visualizer
 
     }; // DrawBackground
   
-    class DrawSpacePiece: public Anim
+    class DrawSpaceShip: public Anim
     {
       public:
-        DrawSpacePiece( SpacePiece* piece ) { m_piece = piece; }
+        DrawSpaceShip( SpaceShip* spaceShip ) { m_spaceShip = spaceShip; }
 
         void animate( const float& t, AnimData* d, IGame* game );
       private:
-        SpacePiece* m_piece;
+        SpaceShip* m_spaceShip;
         
     }; // DrawSpacePiece
 

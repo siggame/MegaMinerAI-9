@@ -12,23 +12,24 @@ namespace visualizer
     {
         game->renderer->setColor( Color( 1, 1, 1 ) );
         game->renderer->drawTexturedQuad(0, 0, 2000, 2000, "background");
-        game->renderer->drawCircle(1000, 1000, 1000, 1);
+        game->renderer->drawLine(490, 500, 510, 500, 1);
+        game->renderer->drawLine(500, 490, 500, 510, 1);
+        game->renderer->drawCircle(500, 500, 500, 1);
     }
   
-    void DrawSpacePiece::animate( const float& /* t */, AnimData * /* d */, IGame* game )
+    void DrawSpaceShip::animate( const float& /* t */, AnimData * /* d */, IGame* game )
     {
-        SpacePiece &piece = *m_piece;
-
-        stringstream ss;
-
-        ss << 1-piece.owner << "-" << (char)piece.type;
-
+        Color teamColor[] = { Color(1, 0, 0), Color(0, 0, 1) };
+        
+        SpaceShip &ship = *m_spaceShip;
+        
         game->renderer->setColor( Color( 1, 1, 1 ) );
-        if( game->options->getNumber( "RotateBoard" ) )
-          game->renderer->drawTexturedQuad(7-piece.x, piece.y, 1, 1, ss.str());
-        else
-          game->renderer->drawTexturedQuad(piece.x, 7-piece.y, 1, 1, ss.str());
-
+        
+        //if( game->options->getNumber( "RotateBoard" ) )
+        game->renderer->drawTexturedQuad((float)ship.x - (float)ship.radius/2, (float)ship.y - (float)ship.radius/2, ship.radius, ship.radius, "ship");
+        
+        game->renderer->setColor( teamColor[ship.owner] );
+        game->renderer->drawCircle(ship.x, ship.y, ship.radius, 1);
     }
 
 }

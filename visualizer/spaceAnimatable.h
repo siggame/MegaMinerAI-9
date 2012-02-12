@@ -10,12 +10,21 @@ namespace visualizer
     {
     };
   
-    struct SpacePiece: public Animatable
+    struct SpaceShip: public Animatable
     {
+        int owner;
         int x;
         int y;
-        int owner;
-        int type;
+        int radius;
+        string type;
+        int attacksLeft;
+        int movementLeft;
+        int maxMovement;
+        int maxAttacks;
+        int damage;
+        int range;
+        int health;
+        int maxHealth;
     };
 
 } // visualizer
