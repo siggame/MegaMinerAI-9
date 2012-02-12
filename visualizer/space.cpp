@@ -47,9 +47,12 @@ namespace visualizer
     setup();
 
     m_game = new parser::Game;
-
+    
+    cout << "done setting up" << endl;
+    
     if( !parser::parseGameFromString( *m_game, gamelog.c_str() ) )
     {
+        cout << "in if\n";
       delete m_game;
       m_game = 0;
       errorLog << gamelog;
@@ -59,24 +62,29 @@ namespace visualizer
         "Cannot load gamelog, %s", 
         gamelog.c_str()
         );
+        cout << "done in if\n";
     }
     // END: Initial Setup
-    
+    cout << "abotu to load()\n";
     load();
+    cout << "abtou to return" << endl;
+    return;
   } // Space::loadGamelog()
 
   void Space::load()
   {
-    SmartPointer<SpaceBoard> board = new SpaceBoard();
-
-    /*timeManager->setNumTurns( m_game->states.size() );
+    //SmartPointer<SpaceBoard> board = new SpaceBoard();
+    
+    cout << "In load()" << endl;
+    
+    timeManager->setNumTurns( m_game->states.size() );
     
     // Loop through each state in the gamelog
     for(int state = 0; state < m_game->states.size(); state++)
     {
         Frame turn;
         
-        SmartPointer<SpaceBoard> board = new SpaceBoard();
+        /*SmartPointer<SpaceBoard> board = new SpaceBoard();
         board->addKeyFrame( new DrawBoard() );
         turn.addAnimatable( board );
         
@@ -92,12 +100,12 @@ namespace visualizer
             
             piece->addKeyFrame( new DrawSpacePiece( piece ) );
             turn.addAnimatable( piece );
-        }
+        }*/
 
         addFrame( turn );
     }
     
-    timeManager->play();*/
+    timeManager->play();
   }
 
 } // visualizer
