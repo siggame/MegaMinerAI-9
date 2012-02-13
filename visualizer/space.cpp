@@ -25,7 +25,7 @@ namespace visualizer
     i.spectateMode = true;
     i.pluginName = "MegaMinerAI9: Space Plugin";
 
-    gui->checkForUpdate( "Chess Update Available At:\n" \
+    gui->checkForUpdate( "Space Update Available At:\n" \
       "ftp://r99acm.device.mst.edu:2121/", BUILD_NO, VERSION_FILE );
 
     options->loadOptionFile( "./plugins/space/space.xml", "space" );
