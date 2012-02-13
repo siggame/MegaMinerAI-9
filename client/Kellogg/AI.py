@@ -26,23 +26,33 @@ class AI(BaseAI):
     warpY = 0
     enemy_base = []
     warps = []
-       
+    player = 0
+    for i in self.players:
+      if i.getId() == self.playerID():
+        player = i.getId() 
     randShip = random.randrange(0,4)
     newshiptype = self.shipTypes[randShip]
     for ship in self.shipTypes:
+       print "AAAA"
        if ship.getType() == "Warp Gate":
          warps.append(ship)
-    for ship in self.ships 
-       enemy.append(ship)
-     for e in enemy:
-       if e.getType() == "Warp Gate":
-         enemy_base.append(e)
-      
-    newshiptype.warpIn(warpX,warpY)
+    for ship in self.ships:
+       print "BBBB"
+       print ship.getOwner(), " ", player
+       if ship.getOwner() == player:
+         print "-------"
+         ships.append(ship)
+       else:
+         print "******"
+         enemy.append(ship)
+   
     for ship in ships:
-      print ship.getType()
-    for ship in ships:
-       print ship.getType(), ship.getX(),ship.getY()
+      print "CCCC"
+      if ship.getType() == "Warp Gate": 
+         warpX = ship.getX()
+         warpY = ship.getY() 
+         newshiptype.warpIn(warpX,warpY)
+      else:
        dirX = 0; dirY = 0
        if ship.getX() > 40:
           dirX = -1*ship.getMovementLeft()/4
@@ -57,9 +67,7 @@ class AI(BaseAI):
          elif ship.getY() <= 40:
            dirY = ship.getMovementLeft()/4
            ship.move(ship.getX(),ship.getY()+dirY) 
-       print ship.getX()+dirX, ship.getY()+dirY
       
-    #ship.move((ship.getX()+ship.getMovementLeft()/5)*-1,(ship.getY()+ship.getMovementLeft()/5)*-1)
     return 1
 
   def __init__(self, conn):
