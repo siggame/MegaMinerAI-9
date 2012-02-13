@@ -34,6 +34,7 @@ class Match(DefaultGameWorld):
     self.round = -1
     self.victoriesNeeded = self.victories
     self.mapRadius = self.radius
+    self.stealthShips = []
 
   def addPlayer(self, connection, type="player"):
     connection.type = type
@@ -130,18 +131,23 @@ class Match(DefaultGameWorld):
       return "Game is over." 
     self.turnNumber += 1
     
+        
+   # for ship in self.stealthShips:
+    #  if ship.owner == self.playerID:
+    #    self.addObject(Ship,[self.playerID,ship.x, ship.y, ship.radius, ship.type, ship.maxAttacks,
+     #   ship.maxMovement,ship.maxMovement,ship.maxAttacks,ship.damage,ship.range,
+    #    ship.maxHealth,ship.maxHealth])
+      
+    for obj in self.objects.values():
+      obj.nextTurn()
+    self.checkWinner()
     #determine when a new round should start. NEVER MOD BY 0, makes computer not happy. >_<
     if self.turnNumber == 0:
       self.nextRound()
     else: 
-      if self.turnNumber%self.turnLimit == 0:
+      if self.turnNumber%self.turnLimit == 0 and self.winner is None:
         self.turnNumber = 0
         self.nextRound()
-
-    for obj in self.objects.values():
-      obj.nextTurn()
-
-    self.checkWinner()
     if self.winner is None:
       self.sendStatus([self.turn] +  self.spectators)
     else:
@@ -150,16 +156,68 @@ class Match(DefaultGameWorld):
     return True
 
   def checkWinner(self):
-    #TODO: Check if a player has won the round.
-    if self.round == 5:
-      self.declareWinner (self.players[0],"I said so")
-    for ship in self.objects.values():
-      if isinstance(ship,Ship) and ship.type == "Warp Gate":
-        if ship.health <= 0:
-          pass
-        #TODO: Make the other player win
-    #TODO: Make this check if a player won the match, and call declareWinner with a player if they did
-    pass
+    player1 = self.objects.players[0]
+    player2 = self.objects.players[1]
+    #Each turn victory check: Is a warp gate dead?
+    for ship in self.objects.ships:
+      if ship.type == "Warp Gate" and ship.health <= 0:
+        if ship.owner == 0:
+          print self.objects.players[1].playerName + " wins the round!"
+          self.players[1].victories += 1
+        else:
+          print self.objects.players[0].playerName + " wins the round!"
+          self.players[0].victories += 1
+          
+    #Turn limit victory checks
+    if self.turnNumber%self.turnLimit == 0:
+      warpHealth =-1
+      #Checking health of each player's warp gate
+      for ship in self.objects.ships:
+        if ship.type == "Warp Gate" and warpHealth == -1:
+          warpHealth = ship.health
+        elif ship.type == "Warp Gate" and warpHealth != -1:
+          if ship.health < warpHealth:
+            if ship.owner == 0:
+              print self.objects.players[1].playerName + " wins the round!"
+              self.objects.players[1].victories += 1
+            else:
+              print self.objects.players[0].playerName + " wins the round!"
+              self.objects.players[0].victories += 1
+          elif ship.health > warpHealth:
+            if ship.owner == 1:
+              print self.objects.players[1].playerName + " wins the round!"
+              self.objects.players[1].victories += 1
+            else:
+              print self.objects.players[0].playerName + " wins the round!"
+              self.objects.players[0].victories += 1
+          #If warp gates have equal health, we compare the overall value of the players
+          else:
+            player0Val = self.objects.players[0].energy
+            player1Val = self.objects.players[1].energy
+            for obj in self.objects.ships:
+              if obj.owner == 0:
+                player0Val += cfgUnits[obj.type]["cost"]
+              else:
+                player1Val += cfgUnits[obj.type]["cost"]
+            if player0Val > player1Val:
+              print self.objects.players[0].playerName + " wins the round!"
+              self.objects.players[0].victories += 1
+            elif player0Val < player1Val:
+              print self.objects.players[1].playerName + " wins the round!"
+              self.objects.players[1].victories += 1
+            else:
+              print "The round is a tie!"
+              self.objects.players[0].victories += 1             
+              self.objects.players[1].victories += 1
+     #TODO Make better declarewinner statement
+    count = 0
+    for player in self.objects.players:
+      if player.victories == self.victoriesNeeded:
+        self.declareWinner(self.players[count],"player.playerName +  has won the game!")
+        break
+      count+=1
+              
+                
 
   def declareWinner(self, winner, reason=''):
   #TODO give reasons for winning, who has more round victories, etc..
