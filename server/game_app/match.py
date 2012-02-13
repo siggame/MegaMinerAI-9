@@ -73,6 +73,7 @@ class Match(DefaultGameWorld):
     return True
 
   def nextRound(self):
+    self.round += 1
     #Handles logic for starting a new round:
       #first get rid of all shiptypes and ships available that round, then put into a new subset of available ship types
     print "YOU ARE ENTERING A NEW ROUND", self.round
@@ -80,8 +81,10 @@ class Match(DefaultGameWorld):
       if isinstance(i,ShipType) or isinstance(i,Ship):
         self.removeObject(i)
     for player in self.objects.players:
-      #give players money, and give add warpgates. dirmod = directional modifier, where warp gate spawns for each player
-      player.energy = 100
+      #dirmod = directional modifier, where warp gate spawns for each player
+      
+      #Give players more energy initially each round
+      player.energy = 75+self.round*25
       dirmod = 1
       if player.id == 1:
         dirmod = -1   
@@ -98,7 +101,6 @@ class Match(DefaultGameWorld):
         cfgUnits["Warp Gate"]["maxHealth"]
         ])
     
-    self.round += 1
     #types are list of all ships, want to remove warp and mine from it before assigning what ships are available
     Types = cfgUnits.keys()
     Types.remove("Warp Gate")
@@ -115,6 +117,9 @@ class Match(DefaultGameWorld):
     pass
 
   def nextTurn(self):
+    for ship in self.objects.ships:
+      ship.endTurn()  
+      
     if self.turn == self.players[0]:
       self.turn = self.players[1]
       self.playerID = 1
