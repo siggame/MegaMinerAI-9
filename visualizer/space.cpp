@@ -1,6 +1,7 @@
 #include "space.h"
 #include "spaceAnimatable.h"
 #include "frame.h"
+#include "version.h"
 #include "animations.h"
 
 namespace visualizer
@@ -23,6 +24,9 @@ namespace visualizer
     i.returnFilename = false;
     i.spectateMode = true;
     i.pluginName = "MegaMinerAI9: Space Plugin";
+
+    gui->checkForUpdate( "Chess Update Available At:\n" \
+      "ftp://r99acm.device.mst.edu:2121/", BUILD_NO, VERSION_FILE );
 
     options->loadOptionFile( "./plugins/space/space.xml", "space" );
 
@@ -57,9 +61,7 @@ namespace visualizer
       delete m_game;
       m_game = 0;
       errorLog << gamelog;
-      THROW
-        (
-        GameException,
+      WARNING(
         "Cannot load gamelog, %s", 
         gamelog.c_str()
         );
