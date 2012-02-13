@@ -78,11 +78,23 @@ class Ship:
     return value
 
   def nextTurn(self):
+    #TODO: Make sure minelayers don't get attacks replenished
     if self.owner == self.game.playerID:
-      self.movementLeft = self.maxMovement
-    else:
-      self.movementLeft = 0
-
+      if self.movementLeft == -1 and self.attacksLeft == -1:
+        self.movementLeft = 0
+        self.attacksLeft = 0
+      else:
+        self.movementLeft = self.maxMovement  
+        self.attacksLeft = self.maxAttacks
+  def endTurn(self):
+    #Healing other ships in range of engineering ship      
+    if self.type == "Engineering":      
+      for unit in self.game.objects.ships:
+        if self.owner == self.game.playerID:
+          if self.inRange(self,unit):
+            unit.health+=unit.health*.5
+          
+           
   def move(self, x, y):
     print x, "  ", y
     #moved is the distance they've moved, where they were to where they're going
@@ -115,43 +127,55 @@ class Ship:
     return True
 
   def selfDestruct(self):
-    for target in self.objects.ships:
+    if self.owner == self.game.playerID:
+      return "The enemy ship refuses to blow itself up, sorry"
+    for target in self.game.objects.ships:
       if inRange (self.x, self.y, self.radius,target.x, target.y, target.radius):
         if target.owner != self.owner:
-          #TODO placeholder value
-          attack(target) 
+          attack(target)   
+          self.game.removeObject(self)
+          self.game.animations.append(['selfDestruct', self])
 
   def attack(self, target):
-    #TODO: A lot of things. 
-    #TODO: cannot attack same target >1 per turn. (can make a set of possible targets, and remove target each time)
-    #TODO: Figure out how to get things from the config
-    #if ConfigSectionMap("Fighter")['name'] == "fighter":
-      #print ConfigSectionMap("Fighter")['name']
+    #TODO: cannot attack same target >1 per turn.
+      #(can make a set of possible targets, and remove target each time)
     
     #make sure attack is not invalid
     if self.attacksLeft <= 0:
       return 'You have no attacks left'
+    if self.type == "Mine Layer" and self.id == target.id:
+      self.game.addObject(Ship,[self.game.playerID, self.x, self.y, 
+      cfgUnits["Mine"]["radius"], "Mine", 
+      cfgUnits["Mine"]["maxAttacks"], 
+      cfgUnits["Mine"]["maxMovement"], 
+      cfgUnits["Mine"]["maxMovement"], 
+      cfgUnits["Mine"]["maxAttacks"], 
+      cfgUnits["Mine"]["damage"], 
+      cfgUnits["Mine"]["radius"],
+      cfgUnits["Mine"]["maxHealth"], 
+      cfgUnits["Mine"]["maxHealth"]
+      ])
+      self.attacksLeft -= 1
     elif target.owner == self.owner:
       return 'No friendly fire please'
     elif not self.inRange (self, target):
       return "Target too far away"
                      
-    #TODO Make sure the type for mine layer matches up with the logic
-    #Handles attacks for the mine layer
-    #Minelayer attacks self to drop a mine at its center
-    if self.type == "mineLayer" and self.id == target.id:
-      ##TODO Plug in data here for the "Mine" ship
-      self.game.addObject(Ship(owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, health, maxHealth))
-      self.attacksLeft -= 1
     else:
       modifier = 1
       #Checking to see if a radar is in range of the target
-      for unit in self.objects.ships:
+      for unit in self.game.objects.ships:
         if unit.owner == self.owner:
-          if unit.type == "radar":
+          if unit.type == "Radar":
             if self.inRange(unit,target):
             #Increment the damage modifier for each radar in range
-              modifier+=unit.damage*.1
+              modifier+=.5
+      if self.type == "EMP":
+        for unit in self.game.objects.ships:
+          if unit.owner != self.owner:
+            if self.inRange(unit,target):
+              unit.attacksLeft = -1
+              unit.movementLeft = -1
       self.game.animations.append(['attack', self, target])
       target.health-=self.damage*modifer
       self.attacksLeft -= 1
