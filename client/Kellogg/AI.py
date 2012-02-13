@@ -19,6 +19,12 @@ class AI(BaseAI):
   def end(self):
     pass
 
+  def distance(fromX, toX, fromY, toY):
+    return int(math.ceil(math.sqrt((fromX-toX)**2 + (fromY-toY)**2)))
+    
+  def inRange(x1, y1, rad1, x2, y2, rad2):
+    return distance(x1, x2, y1, y2) <= rad1 + rad2
+      
   def run(self):
     ships = []
     enemy = []
@@ -33,26 +39,23 @@ class AI(BaseAI):
     randShip = random.randrange(0,4)
     newshiptype = self.shipTypes[randShip]
     for ship in self.shipTypes:
-       print "AAAA"
        if ship.getType() == "Warp Gate":
          warps.append(ship)
     for ship in self.ships:
-       print "BBBB"
-       print ship.getOwner(), " ", player
        if ship.getOwner() == player:
-         print "-------"
          ships.append(ship)
        else:
-         print "******"
          enemy.append(ship)
    
     for ship in ships:
-      print "CCCC"
       if ship.getType() == "Warp Gate": 
          warpX = ship.getX()
          warpY = ship.getY() 
          newshiptype.warpIn(warpX,warpY)
       else:
+       for foe in enemy:
+#         if self.inRange(x1, y1, rad1, x2, y2, rad2):
+           ship.attack(foe)    
        dirX = 0; dirY = 0
        if ship.getX() > 40:
           dirX = -1*ship.getMovementLeft()/4
