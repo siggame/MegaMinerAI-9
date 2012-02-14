@@ -19,15 +19,25 @@ namespace visualizer
   
     void DrawSpaceShip::animate( const float& /* t */, AnimData * /* d */, IGame* game )
     {
-        Color teamColor[] = { Color(1, 0, 0), Color(0, 0, 1) };
+        Color teamColor[] = { Color(0.666, 0, 0), Color(0, 0, 0.666) };
         
         SpaceShip &ship = *m_spaceShip;
         
-        game->renderer->setColor( Color( 1, 1, 1 ) );
+                // Build the ship type string and replace spaces with '-'
+        string shipType = ship.type;
+        for(int i = 0; i < shipType.length(); i++)
+        {
+            if(shipType[i] == ' ')
+            {
+                shipType[i] = '-';
+            }
+        }
+        
+        
+        game->renderer->setColor( Color(1, 1, 1) );
         
         //if( game->options->getNumber( "RotateBoard" ) )
-        game->renderer->drawTexturedQuad((float)ship.x - (float)ship.radius/2, (float)ship.y - (float)ship.radius/2, ship.radius, ship.radius, "ship");
-        
+        game->renderer->drawTexturedQuad((float)ship.x - (float)ship.radius, (float)ship.y - (float)ship.radius, ship.radius * 2, ship.radius * 2, shipType);
         game->renderer->setColor( teamColor[ship.owner] );
         game->renderer->drawCircle(ship.x, ship.y, ship.radius, 1);
     }
