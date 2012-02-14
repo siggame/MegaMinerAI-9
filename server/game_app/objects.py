@@ -94,10 +94,8 @@ class Ship:
         self.attacksLeft = 0
       else:
         self.movementLeft = self.maxMovement         
-        if self.type != "Mine Layer":
-          self.attacksLeft = self.maxAttacks
-        else:
-          pass
+        self.attacksLeft = self.maxAttacks
+        
  
        
   def endTurn(self):
@@ -121,7 +119,7 @@ class Ship:
       # self.game.stealthShips.append(self)
                     
   def move(self, x, y):
-#    print x, "  ", y
+    print x, "  ", y
     #moved is the distance they've moved, where they were to where they're going
     moved = distance(self.x, x, self.y, y)       
     #if they're trying to move outside the map
@@ -152,21 +150,22 @@ class Ship:
     return True
 
   def selfDestruct(self):
+    #TODO: NO SPLODEY FOR WARP GATES
     if self.owner == self.game.playerID:
       return "The enemy ship refuses to blow itself up, sorry"
     for target in self.game.objects.ships:
       if inRange (self.x, self.y, self.radius,target.x, target.y, target.radius):
         if target.owner != self.owner:
+          #MAKE NOT ATTACK - SOMETHING UNIQUE
           attack(target)   
           self.game.removeObject(self)
           self.game.animations.append(['selfDestruct', self])
 
   def attack(self, target):
-#    print "VIOLENCE SHALL ENSUE!!"
     #TODO: cannot attack same target >1 per turn.
       #(can make a set of possible targets, and remove target each time)
     modifier = 1
-    #make sure attack is not invalid
+    #TODO: MAKE SURE NO ATTACK MINES
     if self.attacksLeft <= 0:
       return 'You have no attacks left'
     if self.type == "Mine Layer" and self.id == target.id:

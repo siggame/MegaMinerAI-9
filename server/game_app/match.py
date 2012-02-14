@@ -27,7 +27,6 @@ class Match(DefaultGameWorld):
     self.scribe = Scribe(self.logPath())
     self.addPlayer(self.scribe, "spectator")
 
-    #TODO: INITIALIZE THESE!
     self.turnNumber = -1
     self.playerID = -1
     self.gameNumber = id
@@ -171,7 +170,7 @@ class Match(DefaultGameWorld):
     #Turn limit victory checks
     if self.turnNumber%self.turnLimit == 0:
       warpHealth =-1
-      #Checking health of each player's warp gate
+      #TODO: THIS LOGIC IS BROKEN! CHECK TO SEE IF A PLAYER DOES NOT HAVE A WARP GATE INSTEAD
       for ship in self.objects.ships:
         if ship.type == "Warp Gate" and warpHealth == -1:
           warpHealth = ship.health
