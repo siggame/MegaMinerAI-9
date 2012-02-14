@@ -45,44 +45,37 @@ class AI(BaseAI):
     for ship in self.ships:
        if ship.getOwner() == player:
          ships.append(ship)
-         print len(ships)
        else:
          enemy.append(ship)
-         print len(enemy)
     for ship in ships:
       if ship.getType() == "Warp Gate": 
-         warpX = ship.getX()
-         warpY = ship.getY() 
-         newshiptype.warpIn(warpX,warpY)
+         newshiptype.warpIn(ship.getX(),ship.getY())
       else:
-       attack_left = [1,1,1,1]
+       attack_list = [1,1,1,1]
        for foe in enemy:
          if self.inRange(ship.getX(),ship.getY(), ship.getRadius(), foe.getX(), foe.getY(), foe.getRadius()):
-           for i in attack_left:
+           for i in attack_list:
             print ship.getAttacksLeft(), "ATTACKS LEFT"
             ship.attack(foe)
+         elif ship.getType() == "Mine Layer":
+           ship.attack(ship)
        dirX = 0; dirY = 0
-       move_list = [1,1,1,1,1,1,1,1]
+       move_list = [1,1,1,1,1,1,1,1,1,1,1,1]
        for i in move_list:
-         if ship.getMovementLeft() > 50:
-           ship.move(ship.getX()+random.randrange(-10,10),ship.getY()+random.randrange(-10,10))
-         elif ship.getX() > 30:
-            dirX = -1*ship.getMovementLeft()/4
-            ship.move(ship.getX()+dirX,ship.getY())
-         elif ship.getX() < 30:
-            dirX = ship.getMovementLeft()/4
-            ship.move(ship.getX()+dirX,ship.getY()) 
-         elif ship.getX() == 30:
-           if ship.getY() > 30:
-             print "c"
-             dirY = -1*ship.getMovementLeft()/4
-             ship.move(ship.getX(),ship.getY()+dirY)
-           elif ship.getY() < 30:
-             print "d"
-             dirY = ship.getMovementLeft()/4
-             ship.move(ship.getX(),ship.getY()+dirY)
+         if ship.getMovementLeft() >= int(2*ship.getMovementLeft()/3):
+            ship.move(ship.getX()+random.randrange(-10,10),ship.getY()+random.randrange(-10,10))
+         if ship.getX() > 0:
+            dirX = -1*ship.getMovementLeft()/5
+         elif ship.getX() < 0:
+            dirX = ship.getMovementLeft()/5
+         if ship.getX() <= 20 or ship.getX() >= -20:
+           if ship.getY() > 10:
+             dirY = -1*ship.getMovementLeft()/5
+           elif ship.getY() < 10:
+             dirY = ship.getMovementLeft()/5
            else:
-             ship.move(ship.getX(),ship.getY()+1) 
+             ship.move(ship.getX(),ship.getY()+1)
+         ship.move(ship.getX()+dirX,ship.getY()+dirY) 
     return 1
 
   def __init__(self, conn):

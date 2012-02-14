@@ -94,8 +94,10 @@ class Ship:
         self.attacksLeft = 0
       else:
         self.movementLeft = self.maxMovement         
-        self.attacksLeft = self.maxAttacks
-        
+        if self.type != "Mine Layer":
+          self.attacksLeft = self.maxAttacks
+        else:
+          pass
  
        
   def endTurn(self):
@@ -119,7 +121,7 @@ class Ship:
       # self.game.stealthShips.append(self)
                     
   def move(self, x, y):
-    print x, "  ", y
+#    print x, "  ", y
     #moved is the distance they've moved, where they were to where they're going
     moved = distance(self.x, x, self.y, y)       
     #if they're trying to move outside the map
@@ -160,7 +162,7 @@ class Ship:
           self.game.animations.append(['selfDestruct', self])
 
   def attack(self, target):
-    print "VIOLENCE SHALL ENSUE!!"
+#    print "VIOLENCE SHALL ENSUE!!"
     #TODO: cannot attack same target >1 per turn.
       #(can make a set of possible targets, and remove target each time)
     modifier = 1
