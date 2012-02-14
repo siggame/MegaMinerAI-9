@@ -35,7 +35,7 @@ class Player:
         #self.energy += 50
 
   def talk(self, message):
-    #TODO: talk..look off past megaminers, very similar
+    #TODO: talk..look off past megaminers, very similar. NEED TALK ANIMATION
     #self.game.animations.append(['Player-Talk', self.id, message])
     #return True
     pass
@@ -119,13 +119,12 @@ class Ship:
       # self.game.stealthShips.append(self)
                     
   def move(self, x, y):
-#    print x, "  ", y
     #moved is the distance they've moved, where they were to where they're going
     moved = distance(self.x, x, self.y, y)       
     #if they're trying to move outside the map
     if x**2 + y**2 > self.game.mapRadius**2:
       return "You don't want to move out of the map, you'd be lost in Space"
-    #check if they can'at move that far
+    #check if they can't move that far
     elif self.movementLeft - moved < 0:
       return "You cannot move that far, your engines lack the power"#think of something clever here
     #have to move somewhere..yeah.
@@ -146,7 +145,9 @@ class Ship:
             self.health -= unit.damage
             self.game.removeObject(unit)
             if self.health <= 0:
-              print "PEW PEW, you're dead from stepping on a mine"
+               pass
+               #TODO: Makes mines kill enemy ships
+#              print "PEW PEW, you're dead from stepping on a mine"
 #              self.game.removeObject(self)
     return True
 
@@ -157,7 +158,8 @@ class Ship:
     for target in self.game.objects.ships:
       if inRange (self.x, self.y, self.radius,target.x, target.y, target.radius):
         if target.owner != self.owner:
-          #MAKE NOT ATTACK - SOMETHING UNIQUE
+          #TODO: MAKE NOT ATTACK - SOMETHING UNIQUE
+          #TODO: Make Kamakizes (too lazy to check spelling) really good at exploding
           attack(target)   
           self.game.removeObject(self)
           self.game.animations.append(['selfDestruct', self])
@@ -167,6 +169,8 @@ class Ship:
       #(can make a set of possible targets, and remove target each time)
     modifier = 1
     #TODO: MAKE SURE NO ATTACK MINES
+    if self.owner() != self.game.playerID:
+       return "You cannot make enemy ships attack"
     if self.attacksLeft <= 0:
       return 'You have no attacks left'
     if self.type == "Mine Layer" and self.id == target.id:

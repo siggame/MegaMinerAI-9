@@ -114,7 +114,7 @@ class Match(DefaultGameWorld):
       self.addObject(ShipType,[name,cost])
       Types.remove(Types[rand])
       i += 1
-    pass
+    #pass
 
   def nextTurn(self):
     for ship in self.objects.ships:
@@ -130,7 +130,7 @@ class Match(DefaultGameWorld):
       return "Game is over." 
     self.turnNumber += 1
     
-        
+   #TODO MOAR stealth ship stuff     
    # for ship in self.stealthShips:
     #  if ship.owner == self.playerID:
     #    self.addObject(Ship,[self.playerID,ship.x, ship.y, ship.radius, ship.type, ship.maxAttacks,
@@ -243,10 +243,10 @@ class Match(DefaultGameWorld):
   @derefArgs(Player, None)
   def talk(self, object, message):
     return object.talk(message, )
-#THERE WAS A COMMA AFTER ON 249, THREW BUG, REMOVED
+
   @derefArgs(Ship, None, None)
   def move(self, object, x, y):
-    return object.move(x, y)
+    return object.move(x, y,)
 
   @derefArgs(Ship)
   def selfDestruct(self, object):
