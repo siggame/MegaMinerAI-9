@@ -8,7 +8,7 @@ class AI(BaseAI):
   """The class implementing gameplay logic."""
   @staticmethod
   def username():
-    return "Shell AI"
+    return "Kellogg"
 
   @staticmethod
   def password():
