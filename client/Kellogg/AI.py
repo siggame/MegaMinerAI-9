@@ -2,6 +2,7 @@
 from BaseAI import BaseAI
 from GameObject import *
 import random
+import math
 
 class AI(BaseAI):
   """The class implementing gameplay logic."""
@@ -19,11 +20,11 @@ class AI(BaseAI):
   def end(self):
     pass
 
-  def distance(fromX, toX, fromY, toY):
+  def distance(self,fromX, toX, fromY, toY):
     return int(math.ceil(math.sqrt((fromX-toX)**2 + (fromY-toY)**2)))
     
-  def inRange(x1, y1, rad1, x2, y2, rad2):
-    return distance(x1, x2, y1, y2) <= rad1 + rad2
+  def inRange(self,x1, y1, rad1, x2, y2, rad2):
+    return self.distance(x1, x2, y1, y2) <= rad1 + rad2
       
   def run(self):
     ships = []
@@ -44,9 +45,10 @@ class AI(BaseAI):
     for ship in self.ships:
        if ship.getOwner() == player:
          ships.append(ship)
+         print len(ships)
        else:
          enemy.append(ship)
-   
+         print len(enemy)
     for ship in ships:
       if ship.getType() == "Warp Gate": 
          warpX = ship.getX()
@@ -54,23 +56,33 @@ class AI(BaseAI):
          newshiptype.warpIn(warpX,warpY)
       else:
        for foe in enemy:
-#         if self.inRange(x1, y1, rad1, x2, y2, rad2):
-           ship.attack(foe)    
+         if self.inRange(ship.getX(),ship.getY(), ship.getRadius(), foe.getX(), foe.getY(), foe.getRadius()):
+           print "AAA"
+           while ship.getAttacksLeft()>0:
+            print "BBB"
+            ship.attack(foe)    
        dirX = 0; dirY = 0
-       if ship.getX() > 40:
-          dirX = -1*ship.getMovementLeft()/4
-          ship.move(ship.getX()+dirX,ship.getY())
-       elif ship.getX() < 40:
-          dirX = ship.getMovementLeft()/4
-          ship.move(ship.getX()+dirX,ship.getY()) 
-       else:
-         if ship.getY() > 40:
-           dirY = -1*ship.getMovementLeft()/4
-           ship.move(ship.getX(),ship.getY()+dirY)
-         elif ship.getY() <= 40:
-           dirY = ship.getMovementLeft()/4
-           ship.move(ship.getX(),ship.getY()+dirY) 
-      
+       move_list = [1,1,1,1,1]
+       for i in move_list:
+         if ship.getX() > 30:
+            dirX = -1*ship.getMovementLeft()/4
+            ship.move(ship.getX()+dirX,ship.getY())
+         elif ship.getX() < 30:
+            dirX = ship.getMovementLeft()/4
+            ship.move(ship.getX()+dirX,ship.getY()) 
+         elif ship.getX() == 30:
+           if ship.getY() > 30:
+             print "c"
+             dirY = -1*ship.getMovementLeft()/4
+             ship.move(ship.getX(),ship.getY()+dirY)
+           elif ship.getY() < 30:
+             print "d"
+             dirY = ship.getMovementLeft()/4
+             ship.move(ship.getX(),ship.getY()+dirY) 
+           else:
+             ship.move(ship.getX(),ship.getY()+1)
+         else:
+           ship.move(ship.getX()+1,ship.getY()) 
     return 1
 
   def __init__(self, conn):
