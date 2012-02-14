@@ -36,8 +36,9 @@ class Player:
 
   def talk(self, message):
     #TODO: talk..look off past megaminers, very similar
+    #self.game.animations.append(['Player-Talk', self.id, message])
+    #return True
     pass
-
 
 
 class Ship:
@@ -78,23 +79,45 @@ class Ship:
     return value
 
   def nextTurn(self):
+  
+    #Adding stealth ships back to the game objects for current player
+    #TODO: Fix stealth ship logic
+    # for ship in self.game.stealthShips:
+      # if self.owner == ship.owner:
+        # if ship.id == self.id:
+          # self.game.removeObject(self)
+          
     #TODO: Make sure minelayers don't get attacks replenished
     if self.owner == self.game.playerID:
       if self.movementLeft == -1 and self.attacksLeft == -1:
         self.movementLeft = 0
         self.attacksLeft = 0
       else:
-        self.movementLeft = self.maxMovement  
+        self.movementLeft = self.maxMovement         
         self.attacksLeft = self.maxAttacks
+        
+ 
+       
   def endTurn(self):
     #Healing other ships in range of engineering ship      
     if self.type == "Engineering":      
       for unit in self.game.objects.ships:
         if self.owner == self.game.playerID:
-          if self.inRange(self,unit):
+          if self.inRange(unit):
             unit.health+=unit.health*.5
-          
-           
+            
+    #TODO: Fix stealth sip logic    
+    # if self.type == "Stealth" and len(self.game.stealthShips)>0:
+      # if self.attacksLeft == self.maxAttacks and not [ship for ship in self.game.stealthShips if ship.id == self.id][0]:
+        # self.game.animations.append(['stealth', self])
+        # self.game.stealthShips.append(self)
+      # elif self.attacksLeft < self.maxAttacks and [ship for ship in self.game.stealthShips if ship.id == self.id][0]:
+        # self.game.animations.append(['deStealth', self])
+        # self.game.stealthShips.remove(self)
+    # elif self.type == "Stealth" and len(self.game.stealthShips)== 0 and self.attacksLeft == self.maxAttacks:
+      # self.game.animations.append(['stealth', self])
+      # self.game.stealthShips.append(self)
+                    
   def move(self, x, y):
     print x, "  ", y
     #moved is the distance they've moved, where they were to where they're going
@@ -159,9 +182,8 @@ class Ship:
     elif target.owner == self.owner:
       return 'No friendly fire please'
     elif not self.inRange (self, target):
-      return "Target too far away"
-                     
-    else:
+      return "Target too far away"           
+    else:       
       modifier = 1
       #Checking to see if a radar is in range of the target
       for unit in self.game.objects.ships:
@@ -176,6 +198,7 @@ class Ship:
             if self.inRange(unit,target):
               unit.attacksLeft = -1
               unit.movementLeft = -1
+        
       self.game.animations.append(['attack', self, target])
       target.health-=self.damage*modifer
       self.attacksLeft -= 1
