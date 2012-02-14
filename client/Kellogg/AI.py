@@ -55,16 +55,18 @@ class AI(BaseAI):
          warpY = ship.getY() 
          newshiptype.warpIn(warpX,warpY)
       else:
+       attack_left = [1,1,1,1]
        for foe in enemy:
          if self.inRange(ship.getX(),ship.getY(), ship.getRadius(), foe.getX(), foe.getY(), foe.getRadius()):
-           print "AAA"
-           while ship.getAttacksLeft()>0:
-            print "BBB"
-            ship.attack(foe)    
+           for i in attack_left:
+            print ship.getAttacksLeft(), "ATTACKS LEFT"
+            ship.attack(foe)
        dirX = 0; dirY = 0
-       move_list = [1,1,1,1,1]
+       move_list = [1,1,1,1,1,1,1,1]
        for i in move_list:
-         if ship.getX() > 30:
+         if ship.getMovementLeft() > 50:
+           ship.move(ship.getX()+random.randrange(-10,10),ship.getY()+random.randrange(-10,10))
+         elif ship.getX() > 30:
             dirX = -1*ship.getMovementLeft()/4
             ship.move(ship.getX()+dirX,ship.getY())
          elif ship.getX() < 30:
@@ -78,11 +80,9 @@ class AI(BaseAI):
            elif ship.getY() < 30:
              print "d"
              dirY = ship.getMovementLeft()/4
-             ship.move(ship.getX(),ship.getY()+dirY) 
+             ship.move(ship.getX(),ship.getY()+dirY)
            else:
-             ship.move(ship.getX(),ship.getY()+1)
-         else:
-           ship.move(ship.getX()+1,ship.getY()) 
+             ship.move(ship.getX(),ship.getY()+1) 
     return 1
 
   def __init__(self, conn):

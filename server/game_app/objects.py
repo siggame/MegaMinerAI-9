@@ -160,9 +160,10 @@ class Ship:
           self.game.animations.append(['selfDestruct', self])
 
   def attack(self, target):
+    print "VIOLENCE SHALL ENSUE!!"
     #TODO: cannot attack same target >1 per turn.
       #(can make a set of possible targets, and remove target each time)
-    
+    modifier = 1
     #make sure attack is not invalid
     if self.attacksLeft <= 0:
       return 'You have no attacks left'
@@ -181,29 +182,29 @@ class Ship:
       self.attacksLeft -= 1
     elif target.owner == self.owner:
       return 'No friendly fire please'
-    elif not self.inRange (self, target):
+    elif not self.inRange(target):
       return "Target too far away"           
     else:       
-      modifier = 1
       #Checking to see if a radar is in range of the target
       for unit in self.game.objects.ships:
         if unit.owner == self.owner:
           if unit.type == "Radar":
-            if self.inRange(unit,target):
+            if unit.inRange(target):
             #Increment the damage modifier for each radar in range
               modifier+=.5
       if self.type == "EMP":
         for unit in self.game.objects.ships:
           if unit.owner != self.owner:
-            if self.inRange(unit,target):
+            if self.inRange(unit):
               unit.attacksLeft = -1
               unit.movementLeft = -1
         
       self.game.animations.append(['attack', self, target])
-      target.health-=self.damage*modifer
+      target.health-=self.damage*modifier
       self.attacksLeft -= 1
       if target.health <= 0:
         self.game.removeObject(target)
+    return True 
     
   def inRange(self, target):
     return inRange(self.x, self.y, self.range, target.x, target.y, target.range)
