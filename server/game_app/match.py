@@ -243,10 +243,10 @@ class Match(DefaultGameWorld):
   @derefArgs(Player, None)
   def talk(self, object, message):
     return object.talk(message, )
-
+#THERE WAS A COMMA AFTER ON 249, THREW BUG, REMOVED
   @derefArgs(Ship, None, None)
   def move(self, object, x, y):
-    return object.move(x, y, )
+    return object.move(x, y)
 
   @derefArgs(Ship)
   def selfDestruct(self, object):

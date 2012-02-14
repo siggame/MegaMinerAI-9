@@ -119,7 +119,7 @@ class Ship:
       # self.game.stealthShips.append(self)
                     
   def move(self, x, y):
-    print x, "  ", y
+#    print x, "  ", y
     #moved is the distance they've moved, where they were to where they're going
     moved = distance(self.x, x, self.y, y)       
     #if they're trying to move outside the map
@@ -146,7 +146,8 @@ class Ship:
             self.health -= unit.damage
             self.game.removeObject(unit)
             if self.health <= 0:
-              self.game.removeObject(self)
+              print "PEW PEW, you're dead from stepping on a mine"
+#              self.game.removeObject(self)
     return True
 
   def selfDestruct(self):

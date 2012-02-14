@@ -40,8 +40,8 @@ class AI(BaseAI):
     randShip = random.randrange(0,4)
     newshiptype = self.shipTypes[randShip]
     for ship in self.shipTypes:
-       if ship.getType() == "Warp Gate":
-         warps.append(ship)
+       if ship.getType() == "Stealth":
+         print "WARNING: STEALTH SHIPS ARE AVAILABLE"
     for ship in self.ships:
        if ship.getOwner() == player:
          ships.append(ship)
@@ -50,20 +50,21 @@ class AI(BaseAI):
     for ship in ships:
       if ship.getType() == "Warp Gate": 
          newshiptype.warpIn(ship.getX(),ship.getY())
-      else:
-       attack_list = [1,1,1,1]
+      elif ship.getType() != "Mine":
+       attack_list = [1,1,1]
        for foe in enemy:
          if self.inRange(ship.getX(),ship.getY(), ship.getRadius(), foe.getX(), foe.getY(), foe.getRadius()):
            for i in attack_list:
-            print ship.getAttacksLeft(), "ATTACKS LEFT"
             ship.attack(foe)
-         elif ship.getType() == "Mine Layer":
+         elif ship.getType() == "Mine Layer" and self.distance(ship.getX(),ship.getY(),foe.getX(),foe.getY())<=ship.getRange():
            ship.attack(ship)
-       dirX = 0; dirY = 0
-       move_list = [1,1,1,1,1,1,1,1,1,1,1,1]
+       dirX = 0; dirY = 0; randX = 0; randY = 0
+       move_list = [1,1,1,1]
+       randX = random.randrange(-10,10)
+       randY = random.randrange(-10,10)
        for i in move_list:
-         if ship.getMovementLeft() >= int(2*ship.getMovementLeft()/3):
-            ship.move(ship.getX()+random.randrange(-10,10),ship.getY()+random.randrange(-10,10))
+         if ship.getMovementLeft <= 0:
+            break
          if ship.getX() > 0:
             dirX = -1*ship.getMovementLeft()/5
          elif ship.getX() < 0:
@@ -75,7 +76,10 @@ class AI(BaseAI):
              dirY = ship.getMovementLeft()/5
            else:
              ship.move(ship.getX(),ship.getY()+1)
-         ship.move(ship.getX()+dirX,ship.getY()+dirY) 
+         if self.distance(ship.getX(),ship.getY(),ship.getX()+dirX+randX,ship.getY()+dirY+randY) <= ship.getMovementLeft():
+           ship.move(ship.getX()+dirX,ship.getY()+dirY)
+       if self.turnNumber()%100 >= 95:
+         ship.selfDestruct()
     return 1
 
   def __init__(self, conn):
