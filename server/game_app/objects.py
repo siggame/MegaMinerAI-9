@@ -148,7 +148,7 @@ class Ship:
       #(can make a set of possible targets, and remove target each time)
     modifier = 1
     #TODO: MAKE SURE NO ATTACK MINES
-    if self.owner() != self.game.playerID:
+    if self.owner != self.game.playerID:
        return "You cannot make enemy ships attack"
     if self.attacksLeft <= 0:
       return 'You have no attacks left'
