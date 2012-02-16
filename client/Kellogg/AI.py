@@ -60,7 +60,7 @@ class AI(BaseAI):
        randY = random.randrange(-10,10)
        print "HEY"""
        i = 0
-       while ship.getMovementLeft() > 0:
+       if 1 == 1 :#while ship.getMovementLeft() > 0:
          print "while loop print ",ship.getMovementLeft()
          comment = """ if ship.getX() > 0:
             dirX = -1*ship.getMovementLeft()/5

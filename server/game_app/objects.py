@@ -79,7 +79,7 @@ class Ship:
     return value
 
   def nextTurn(self):
-  
+    print "Calling next turn from object"  
     #Adding stealth ships back to the game objects for current player
     #TODO: Fix stealth ship logic
     # for ship in self.game.stealthShips:
@@ -99,6 +99,7 @@ class Ship:
  
        
   def endTurn(self):
+    print "calling end turn"
     #Healing other ships in range of engineering ship      
     if self.type == "Engineering":      
       for unit in self.game.objects.ships:
@@ -135,19 +136,21 @@ class Ship:
     self.game.animations.append(['move', self.x, self.y, x, y, self]) #move animation for those visualizer guys
     self.x = x
     self.y = y
+    print self.movementLeft
     self.movementLeft -= moved
+    print self.movementLeft
+    
     #Check to see if they moved onto a mine, TWAS A TRAP!
-    for unit in self.game.objects.ships:
-      if unit.owner != self.owner: 
-        if unit.type == "Mine": 
-          if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):
+#    for unit in self.game.objects.ships:
+#      if unit.owner != self.owner: 
+#        if unit.type == "Mine": 
+#          if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):
             #If a mine in range, hit the unit that moved there and destroy the mine
-            self.health -= unit.damage
-            self.game.removeObject(unit)
-            if self.health <= 0:
-               pass
+#            self.health -= unit.damage
+#            self.game.removeObject(unit)
+ #           if self.health <= 0:
+ #              pass
                #TODO: Makes mines kill enemy ships
-#              print "PEW PEW, you're dead from stepping on a mine"
 #              self.game.removeObject(self)
     return True
 
@@ -163,7 +166,8 @@ class Ship:
           attack(target)   
           self.game.removeObject(self)
           self.game.animations.append(['selfDestruct', self])
-
+    return True
+    
   def attack(self, target):
     #TODO: cannot attack same target >1 per turn.
       #(can make a set of possible targets, and remove target each time)
@@ -186,6 +190,7 @@ class Ship:
       cfgUnits["Mine"]["maxHealth"]
       ])
       self.attacksLeft -= 1
+      return True
     elif target.owner == self.owner:
       return 'No friendly fire please'
     elif not self.inRange(target):
@@ -270,7 +275,7 @@ class ShipType:
       cfgUnits[self.type]["maxHealth"]
       ])
       player.energy -= self.cost
-  
+    return True
     
 
 

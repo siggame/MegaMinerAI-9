@@ -114,12 +114,15 @@ class Match(DefaultGameWorld):
       self.addObject(ShipType,[name,cost])
       Types.remove(Types[rand])
       i += 1
-    #pass
+    return True
 
   def nextTurn(self):
+    print "calling next turn from match"
+    print "playerID = ",self.playerID
     for ship in self.objects.ships:
+      print "ending all ships turns"
       ship.endTurn()  
-      
+    self.turnNumber+=1  
     if self.turn == self.players[0]:
       self.turn = self.players[1]
       self.playerID = 1
@@ -128,7 +131,7 @@ class Match(DefaultGameWorld):
       self.playerID = 0
     else:
       return "Game is over." 
-    self.turnNumber += 1
+ #   self.turnNumber += 1
     
    #TODO MOAR stealth ship stuff     
    # for ship in self.stealthShips:
@@ -138,6 +141,7 @@ class Match(DefaultGameWorld):
     #    ship.maxHealth,ship.maxHealth])
       
     for obj in self.objects.values():
+      print "calling each objects next turn, from match.py 144, ships list "#,len(self.ships)
       obj.nextTurn()
     self.checkWinner()
     #determine when a new round should start. NEVER MOD BY 0, makes computer not happy. >_<
@@ -153,7 +157,15 @@ class Match(DefaultGameWorld):
       self.sendStatus(self.spectators)
     self.animations = ["animations"]
     return True
-
+  #TODO:
+    #plan is to call checkround winner after each round, check
+    #win conditions and award a player a victory. each round call checkwinner
+    #checkwinner: If one player has over half the amount possible victories 
+    #(3/5,4/7 etc) call declare winner, if tie, handle tie conditions.
+    #divides work from checking round winner and checking game winner  
+  def checkRoundWinner(self):
+    pass
+    
   def checkWinner(self):
     player1 = self.objects.players[0]
     player2 = self.objects.players[1]
@@ -208,7 +220,7 @@ class Match(DefaultGameWorld):
               print "The round is a tie!"
               self.objects.players[0].victories += 1             
               self.objects.players[1].victories += 1
-     #TODO Make better declarewinner statement
+     #TODO Fix/Make better declarewinner statement
     count = 0
     for player in self.objects.players:
       if player.victories == self.victoriesNeeded:
@@ -220,6 +232,7 @@ class Match(DefaultGameWorld):
 
   def declareWinner(self, winner, reason=''):
   #TODO give reasons for winning, who has more round victories, etc..
+    print "Justin predicts winner is ",self.getPlayerIndex(self.winner)
     print "Player", self.getPlayerIndex(self.winner), "wins game", self.id
     self.winner = winner
 
