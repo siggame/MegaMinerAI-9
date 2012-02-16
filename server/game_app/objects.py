@@ -109,23 +109,22 @@ class Ship:
       return "Must move somewhere"
     
     #successful move, yay! 
-    self.game.animations.append(['move', self.x, self.y, x, y, self]) #move animation for those visualizer guys
+    self.game.animations.append(['move', self.x, self.y, x, y, self.id]) #move animation for those visualizer guys
     self.x = x
     self.y = y
-    print self.movementLeft
     self.movementLeft -= moved
-    print self.movementLeft
     
     #Check to see if they moved onto a mine, TWAS A TRAP!
-#    for unit in self.game.objects.ships:
-#      if unit.owner != self.owner: 
-#        if unit.type == "Mine": 
-#          if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):
+    for unit in self.game.objects.ships:
+      if unit.owner != self.owner: 
+        if unit.type == "Mine": 
+          if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):
             #If a mine in range, hit the unit that moved there and destroy the mine
-#            self.health -= unit.damage
-#            self.game.removeObject(unit)
- #           if self.health <= 0:
- #              pass
+            self.health -= unit.damage
+            self.game.removeObject(unit)
+            self.game.animatoins.append(['attack',unit.id,self.id])
+            if self.health <= 0:
+               pass
                #TODO: Makes mines kill enemy ships
 #              self.game.removeObject(self)
     return True
@@ -139,9 +138,9 @@ class Ship:
         if target.owner != self.owner:
           #TODO: MAKE NOT ATTACK - SOMETHING UNIQUE
           #TODO: Make Kamakizes (too lazy to check spelling) really good at exploding
-          attack(target)   
+          self.attack(target)   
           self.game.removeObject(self)
-          self.game.animations.append(['selfDestruct', self])
+          self.game.animations.append(['selfDestruct', self.id])
     return True
     
   def attack(self, target):
@@ -185,8 +184,10 @@ class Ship:
             if self.inRange(unit):
               unit.attacksLeft = -1
               unit.movementLeft = -1
-        
-      self.game.animations.append(['attack', self, target])
+              self.attacksLeft = -1
+              self.movementLeft = -1
+              
+      self.game.animations.append(['attack', self.id, target.id])
       target.health-=self.damage*modifier
       self.attacksLeft -= 1
       if target.health <= 0:
