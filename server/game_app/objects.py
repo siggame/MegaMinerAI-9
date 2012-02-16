@@ -16,6 +16,7 @@ class Player:
     self.time = time
     self.victories = victories
     self.energy = energy
+    self.warping = []
 
   def toList(self):
     value = [
@@ -54,6 +55,7 @@ class Ship:
     self.range = range
     self.health = health
     self.maxHealth = maxHealth
+    self.stealthed = False
 
   def toList(self):
     value = [
@@ -75,14 +77,15 @@ class Ship:
     return value
 
   def nextTurn(self):
-    print "Calling next turn from object"  
-    #Adding stealth ships back to the game objects for current player
-    #TODO: Fix stealth ship logic
-    # for ship in self.game.stealthShips:
-      # if self.owner == ship.owner:
-        # if ship.id == self.id:
-          # self.game.removeObject(self)
-          
+    #Healing other ships in range of engineering ship      
+    if self.owner != self.game.playerID and self.type == "Engineering":
+      for unit in self.game.objects.ships:
+        if self.owner == unit.owner:
+          if self.inRange(unit):
+            unit.health += unit.maxHealth * self.damage / 100.0
+            if unit.health > unit.maxHealth:
+              unit.health = unit.maxHealth
+
     #TODO: Make sure minelayers don't get attacks replenished
     if self.owner == self.game.playerID:
       if self.movementLeft == -1 and self.attacksLeft == -1:
@@ -91,29 +94,6 @@ class Ship:
       else:
         self.movementLeft = self.maxMovement         
         self.attacksLeft = self.maxAttacks
-        
- 
-       
-  def endTurn(self):
-    print "calling end turn"
-    #Healing other ships in range of engineering ship      
-    if self.type == "Engineering":      
-      for unit in self.game.objects.ships:
-        if self.owner == self.game.playerID:
-          if self.inRange(unit):
-            unit.health+=unit.health*.5
-            
-    #TODO: Fix stealth sip logic    
-    # if self.type == "Stealth" and len(self.game.stealthShips)>0:
-      # if self.attacksLeft == self.maxAttacks and not [ship for ship in self.game.stealthShips if ship.id == self.id][0]:
-        # self.game.animations.append(['stealth', self])
-        # self.game.stealthShips.append(self)
-      # elif self.attacksLeft < self.maxAttacks and [ship for ship in self.game.stealthShips if ship.id == self.id][0]:
-        # self.game.animations.append(['deStealth', self])
-        # self.game.stealthShips.remove(self)
-    # elif self.type == "Stealth" and len(self.game.stealthShips)== 0 and self.attacksLeft == self.maxAttacks:
-      # self.game.animations.append(['stealth', self])
-      # self.game.stealthShips.append(self)
                     
   def move(self, x, y):
     #moved is the distance they've moved, where they were to where they're going

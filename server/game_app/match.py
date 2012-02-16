@@ -12,6 +12,8 @@ import random
 Scribe = scribe.Scribe
 #Initializes the cfgUnits file
 cfgUnits = networking.config.config.readConfig("config/units.cfg")
+for key in cfgUnits.keys():
+  cfgUnits[key]['type'] = key
 
 def loadClassDefaults(cfgFile = "config/defaults.cfg"):
   cfg = networking.config.config.readConfig(cfgFile)
@@ -33,7 +35,6 @@ class Match(DefaultGameWorld):
     self.round = -1
     self.victoriesNeeded = self.victories
     self.mapRadius = self.radius
-    self.stealthShips = []
 
   def addPlayer(self, connection, type="player"):
     connection.type = type
@@ -69,60 +70,49 @@ class Match(DefaultGameWorld):
    
     self.turn = self.players[-1]
     self.turnNumber = -1
+
+    self.ordering = ["radius", "type", "maxAttacks", "maxMovement", "maxMovement", "maxAttacks", "damage", 
+                     "range", "maxHealth", "maxHealth"]
+    self.warpGate = [cfgUnits["Warp Gate"][value] for value in self.ordering]
+    self.spawnableTypes = cfgUnits.keys()
+    self.spawnableTypes.remove("Warp Gate")
+    self.spawnableTypes.remove("Mine")
+    self.shipChain = []
+
+    self.nextRound()
     self.nextTurn()
     return True
 
   def nextRound(self):
     self.round += 1
+    self.turnNumber = 0
     #Handles logic for starting a new round:
       #first get rid of all shiptypes and ships available that round, then put into a new subset of available ship types
     print "YOU ARE ENTERING A NEW ROUND", self.round
-    for i in self.objects.values():
-      if isinstance(i,ShipType) or isinstance(i,Ship):
-        self.removeObject(i)
+
+    for obj in self.objects.values():
+      if isinstance(obj, ShipType) or isinstance(obj, Ship):
+        self.removeObject(obj)
+
     for player in self.objects.players:
-      #dirmod = directional modifier, where warp gate spawns for each player
-      
-      #Give players more energy initially each round
-      player.energy = 75+self.round*25
-      dirmod = 1
-      if player.id == 1:
-        dirmod = -1   
-      self.addObject(Ship,[player.id, (self.mapRadius/2)*dirmod, (self.mapRadius/2)*dirmod, 
-        cfgUnits["Warp Gate"]["radius"], 
-        "Warp Gate", 
-        cfgUnits["Warp Gate"]["maxAttacks"], 
-        cfgUnits["Warp Gate"]["maxMovement"], 
-        cfgUnits["Warp Gate"]["maxMovement"], 
-        cfgUnits["Warp Gate"]["maxAttacks"], 
-        cfgUnits["Warp Gate"]["damage"], 
-        cfgUnits["Warp Gate"]["range"],
-        cfgUnits["Warp Gate"]["maxHealth"], 
-        cfgUnits["Warp Gate"]["maxHealth"]
-        ])
+      #Give players energy initially each round
+      player.energy = self.startEnergy
+      player.warpGate = self.addObject(Ship, [player.id, (player.id * 2 - 1) * self.mapRadius / 2, 0] + self.warpGate).id
     
-    #types are list of all ships, want to remove warp and mine from it before assigning what ships are available
-    Types = cfgUnits.keys()
-    Types.remove("Warp Gate")
-    Types.remove("Mine") 
-    i = 0
-    #add random ship types from map, remove that ship type to avoid duplicates
-    while i < 4:
-      rand = random.randrange(0,len(Types))
-      name=Types[rand]
-      cost=cfgUnits[name]["cost"]     
-      self.addObject(ShipType,[name,cost])
-      Types.remove(Types[rand])
-      i += 1
+    # Ensure you have at least 4 ships in the chain
+    if len(self.shipChain) < 4:
+      # Add a random permutation of the types to the chain
+      random.shuffle(self.spawnableTypes)
+      self.shipChain += self.spawnableTypes
+    # use the next 4
+    using, self.shipChain = self.shipChain[:4], self.shipChain[4:]
+    for shipType in using:
+      self.addObject(ShipType, [shipType, cfgUnits[shipType]["cost"]])
+
     return True
 
   def nextTurn(self):
-    print "calling next turn from match"
-    print "playerID = ",self.playerID
-    for ship in self.objects.ships:
-      print "ending all ships turns"
-      ship.endTurn()  
-    self.turnNumber+=1  
+    self.turnNumber+=1
     if self.turn == self.players[0]:
       self.turn = self.players[1]
       self.playerID = 1
@@ -131,109 +121,70 @@ class Match(DefaultGameWorld):
       self.playerID = 0
     else:
       return "Game is over." 
- #   self.turnNumber += 1
-    
-   #TODO MOAR stealth ship stuff     
-   # for ship in self.stealthShips:
-    #  if ship.owner == self.playerID:
-    #    self.addObject(Ship,[self.playerID,ship.x, ship.y, ship.radius, ship.type, ship.maxAttacks,
-     #   ship.maxMovement,ship.maxMovement,ship.maxAttacks,ship.damage,ship.range,
-    #    ship.maxHealth,ship.maxHealth])
       
     for obj in self.objects.values():
-      print "calling each objects next turn, from match.py 144, ships list "#,len(self.ships)
       obj.nextTurn()
+
     self.checkWinner()
-    #determine when a new round should start. NEVER MOD BY 0, makes computer not happy. >_<
-    if self.turnNumber == 0:
-      self.nextRound()
-    else: 
-      if self.turnNumber%self.turnLimit == 0 and self.winner is None:
-        self.turnNumber = 0
-        self.nextRound()
+
     if self.winner is None:
       self.sendStatus([self.turn] +  self.spectators)
     else:
       self.sendStatus(self.spectators)
     self.animations = ["animations"]
     return True
-  #TODO:
-    #plan is to call checkround winner after each round, check
-    #win conditions and award a player a victory. each round call checkwinner
-    #checkwinner: If one player has over half the amount possible victories 
-    #(3/5,4/7 etc) call declare winner, if tie, handle tie conditions.
-    #divides work from checking round winner and checking game winner  
+
   def checkRoundWinner(self):
-    pass
-    
-  def checkWinner(self):
     player1 = self.objects.players[0]
     player2 = self.objects.players[1]
-    #Each turn victory check: Is a warp gate dead?
-    for ship in self.objects.ships:
-      if ship.type == "Warp Gate" and ship.health <= 0:
-        if ship.owner == 0:
-          print self.objects.players[1].playerName + " wins the round!"
-          self.players[1].victories += 1
+    gates = [player.warpGate for player in self.objects.players]
+    if len(gates) < 2:
+      if len(gates) == 1:
+        if player1.warpGate in self.objects:
+          player2.victories += 1
         else:
-          print self.objects.players[0].playerName + " wins the round!"
-          self.players[0].victories += 1
-          
-    #Turn limit victory checks
-    if self.turnNumber%self.turnLimit == 0:
-      warpHealth =-1
-      #TODO: THIS LOGIC IS BROKEN! CHECK TO SEE IF A PLAYER DOES NOT HAVE A WARP GATE INSTEAD
-      for ship in self.objects.ships:
-        if ship.type == "Warp Gate" and warpHealth == -1:
-          warpHealth = ship.health
-        elif ship.type == "Warp Gate" and warpHealth != -1:
-          if ship.health < warpHealth:
-            if ship.owner == 0:
-              print self.objects.players[1].playerName + " wins the round!"
-              self.objects.players[1].victories += 1
-            else:
-              print self.objects.players[0].playerName + " wins the round!"
-              self.objects.players[0].victories += 1
-          elif ship.health > warpHealth:
-            if ship.owner == 1:
-              print self.objects.players[1].playerName + " wins the round!"
-              self.objects.players[1].victories += 1
-            else:
-              print self.objects.players[0].playerName + " wins the round!"
-              self.objects.players[0].victories += 1
-          #If warp gates have equal health, we compare the overall value of the players
-          else:
-            player0Val = self.objects.players[0].energy
-            player1Val = self.objects.players[1].energy
-            for obj in self.objects.ships:
-              if obj.owner == 0:
-                player0Val += cfgUnits[obj.type]["cost"]
-              else:
-                player1Val += cfgUnits[obj.type]["cost"]
-            if player0Val > player1Val:
-              print self.objects.players[0].playerName + " wins the round!"
-              self.objects.players[0].victories += 1
-            elif player0Val < player1Val:
-              print self.objects.players[1].playerName + " wins the round!"
-              self.objects.players[1].victories += 1
-            else:
-              print "The round is a tie!"
-              self.objects.players[0].victories += 1             
-              self.objects.players[1].victories += 1
-     #TODO Fix/Make better declarewinner statement
-    count = 0
-    for player in self.objects.players:
-      if player.victories == self.victoriesNeeded:
-        self.declareWinner(self.players[count],"player.playerName +  has won the game!")
-        break
-      count+=1
-              
-                
+          player1.victories += 1
+      else: # Both win if they both die in one turn
+        player1.victories += 1
+        player2.victories += 1
+      self.nextRound()
+    elif self.turnNumber >= self.turnLimit:
+      # Warp gate health
+      if self.objects[player1.warpGate].health > self.objects[player2.warpGate].health:
+        player1.victories += 1
+      elif self.objects[player1.warpGate].health < self.objects[player2.warpGate].health:
+        player2.victories += 1
+      else:
+        # score
+        scores = [player1.energy, player2.energy]
+        for ship in self.objects.ships:
+          scores[ship.owner] += cfgUnits[ship.type]["cost"]
+        for player in self.objects.players:
+          for ship in player.warping:
+            scores[ship.owner] += cfgUnits[ship.type]["cost"]
+        if scores[0] > scores[1]:
+          player1.victories += 1
+        elif scores[0] < scores[1]:
+          player2.victories += 1
+        else:
+          player1.victories += 1
+          player2.victories += 1
+      self.nextRound()
+    
+  def checkWinner(self):
+    self.checkRoundWinner()
+    player1 = self.objects.players[0]
+    player2 = self.objects.players[1]
+    if player1.victories >= self.victories and player1.victories > player2.victories:
+      self.declareWinner(self.players[0], "Decisive")
+    elif player2.victories >= self.victories and player2.victories > player1.victories:
+      self.declareWinner(self.players[1], "Decisive")
+    elif player1.victories >= self.victories and player2.victories >= self.victories:
+      self.declareWinner(random.choice(self.players), "Luck")
 
   def declareWinner(self, winner, reason=''):
-  #TODO give reasons for winning, who has more round victories, etc..
-    print "Justin predicts winner is ",self.getPlayerIndex(self.winner)
-    print "Player", self.getPlayerIndex(self.winner), "wins game", self.id
+    #TODO give reasons for winning, who has more round victories, etc..
+    print "Game", self.id, "over"
     self.winner = winner
 
     msg = ["game-winner", self.id, self.winner.user, self.getPlayerIndex(self.winner), reason]
@@ -292,19 +243,20 @@ class Match(DefaultGameWorld):
 
   def sendStatus(self, players):
     for i in players:
-      i.writeSExpr(self.status())
+      i.writeSExpr(self.status(i))
       i.writeSExpr(self.animations)
     return True
 
 
-  def status(self):
+  def status(self, connection):
     msg = ["status"]
 
     msg.append(["game", self.turnNumber, self.playerID, self.gameNumber, self.round, self.victoriesNeeded, self.mapRadius])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])
-    typeLists.append(["Ship"] + [i.toList() for i in self.objects.values() if i.__class__ is Ship])
+    typeLists.append(["Ship"] + [i.toList() for i in self.objects.values() if i.__class__ is Ship and 
+                     (not i.stealthed or i.owner == self.playerID or connection.type != "player")])
     typeLists.append(["ShipType"] + [i.toList() for i in self.objects.values() if i.__class__ is ShipType])
 
     msg.extend(typeLists)
