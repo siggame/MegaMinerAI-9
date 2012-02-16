@@ -80,12 +80,13 @@ class Match(DefaultGameWorld):
     self.shipChain = []
 
     self.nextRound()
-    self.nextTurn()
+    #self.nextTurn()
     return True
 
   def nextRound(self):
     self.round += 1
-    self.turnNumber = 0
+    self.turnNumber = -1
+    self.turn = self.players[-1]
     #Handles logic for starting a new round:
       #first get rid of all shiptypes and ships available that round, then put into a new subset of available ship types
     print "YOU ARE ENTERING A NEW ROUND", self.round
@@ -108,7 +109,7 @@ class Match(DefaultGameWorld):
     using, self.shipChain = self.shipChain[:4], self.shipChain[4:]
     for shipType in using:
       self.addObject(ShipType, [shipType, cfgUnits[shipType]["cost"]])
-
+    self.nextTurn()
     return True
 
   def nextTurn(self):
@@ -136,8 +137,9 @@ class Match(DefaultGameWorld):
 
   def checkRoundWinner(self):
     player1 = self.objects.players[0]
-    player2 = self.objects.players[1]
+    player2 = self.objects.players[1]    
     gates = [player.warpGate for player in self.objects.players]
+    #gates = [player.warpGate for ship in self.objects.ships]
     if len(gates) < 2:
       if len(gates) == 1:
         if player1.warpGate in self.objects:

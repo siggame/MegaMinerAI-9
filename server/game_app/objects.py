@@ -17,6 +17,7 @@ class Player:
     self.victories = victories
     self.energy = energy
     self.warping = []
+    self.warpGate = 0
 
   def toList(self):
     value = [
@@ -96,6 +97,8 @@ class Ship:
         self.attacksLeft = self.maxAttacks
                     
   def move(self, x, y):
+    if self.owner != self.game.playerID:
+      return "you cannot move your oppenents ships"
     #moved is the distance they've moved, where they were to where they're going
     moved = distance(self.x, x, self.y, y)       
     #if they're trying to move outside the map
@@ -148,7 +151,7 @@ class Ship:
       #(can make a set of possible targets, and remove target each time)
     modifier = 1
     #TODO: MAKE SURE NO ATTACK MINES
-    if self.owner() != self.game.playerID:
+    if self.owner != self.game.playerID:
        return "You cannot make enemy ships attack"
     if self.attacksLeft <= 0:
       return 'You have no attacks left'
@@ -230,7 +233,8 @@ class ShipType:
           warpX = ship.x
           warpY = ship.y
     if self.game.playerID != player.id:
-      return "You cannot warp in ships on your opponent's turn"
+      print self.game.playerID, player.id
+      return "You cannot warp in ships on your opponent's turn",
     if x**2 + y**2 > self.game.mapRadius**2:
       return "That ship would be lost in space...forever"
     elif player.energy < self.cost:
