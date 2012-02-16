@@ -12,6 +12,11 @@
 extern "C" {
 #endif
 
+DLLEXPORT int shipTypeGetId(_ShipType* ptr);
+DLLEXPORT char* shipTypeGetType(_ShipType* ptr);
+DLLEXPORT int shipTypeGetCost(_ShipType* ptr);
+
+
 DLLEXPORT int playerGetId(_Player* ptr);
 DLLEXPORT char* playerGetPlayerName(_Player* ptr);
 DLLEXPORT float playerGetTime(_Player* ptr);
@@ -33,11 +38,6 @@ DLLEXPORT int shipGetDamage(_Ship* ptr);
 DLLEXPORT int shipGetRange(_Ship* ptr);
 DLLEXPORT int shipGetHealth(_Ship* ptr);
 DLLEXPORT int shipGetMaxHealth(_Ship* ptr);
-
-
-DLLEXPORT int shipTypeGetId(_ShipType* ptr);
-DLLEXPORT char* shipTypeGetType(_ShipType* ptr);
-DLLEXPORT int shipTypeGetCost(_ShipType* ptr);
 
 
 

@@ -7,9 +7,9 @@ import com.sun.jna.Pointer;
 ///The provided AI class does just that.
 public abstract class BaseAI
 {
+  static ShipType[] shipTypes;
   static Player[] players;
   static Ship[] ships;
-  static ShipType[] shipTypes;
   Pointer connection;
   static int iteration;
   boolean initialized;
@@ -43,6 +43,12 @@ public abstract class BaseAI
   {
     iteration++;
     int count = 0;
+    count = Client.INSTANCE.getShipTypeCount(connection);
+    shipTypes = new ShipType[count];
+    for(int i = 0; i < count; i++)
+    {
+      shipTypes[i] = new ShipType(Client.INSTANCE.getShipType(connection, i));
+    }
     count = Client.INSTANCE.getPlayerCount(connection);
     players = new Player[count];
     for(int i = 0; i < count; i++)
@@ -54,12 +60,6 @@ public abstract class BaseAI
     for(int i = 0; i < count; i++)
     {
       ships[i] = new Ship(Client.INSTANCE.getShip(connection, i));
-    }
-    count = Client.INSTANCE.getShipTypeCount(connection);
-    shipTypes = new ShipType[count];
-    for(int i = 0; i < count; i++)
-    {
-      shipTypes[i] = new ShipType(Client.INSTANCE.getShipType(connection, i));
     }
 
     if(!initialized)

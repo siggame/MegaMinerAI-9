@@ -13,18 +13,18 @@ class BaseAI:
   iteration = 0
   runGenerator = None
   connection = None
+  shipTypes = []
   players = []
   ships = []
-  shipTypes = []
 
   def startTurn(self):
+    from GameObject import ShipType
     from GameObject import Player
     from GameObject import Ship
-    from GameObject import ShipType
 
+    BaseAI.shipTypes = [ShipType(library.getShipType(self.connection, i)) for i in xrange(library.getShipTypeCount(self.connection))]
     BaseAI.players = [Player(library.getPlayer(self.connection, i)) for i in xrange(library.getPlayerCount(self.connection))]
     BaseAI.ships = [Ship(library.getShip(self.connection, i)) for i in xrange(library.getShipCount(self.connection))]
-    BaseAI.shipTypes = [ShipType(library.getShipType(self.connection, i)) for i in xrange(library.getShipTypeCount(self.connection))]
 
     if not self.initialized:
       self.initialized = True

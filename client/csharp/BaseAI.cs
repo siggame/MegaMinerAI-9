@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 ///The provided AI class does just that.
 public abstract class BaseAI
 {
+  public static ShipType[] shipTypes;
   public static Player[] players;
   public static Ship[] ships;
-  public static ShipType[] shipTypes;
   IntPtr connection;
   public static int iteration;
   bool initialized;
@@ -44,6 +44,12 @@ public abstract class BaseAI
   {
     iteration++;
     int count = 0;
+    count = Client.getShipTypeCount(connection);
+    shipTypes = new ShipType[count];
+    for(int i = 0; i < count; i++)
+    {
+      shipTypes[i] = new ShipType(Client.getShipType(connection, i));
+    }
     count = Client.getPlayerCount(connection);
     players = new Player[count];
     for(int i = 0; i < count; i++)
@@ -55,12 +61,6 @@ public abstract class BaseAI
     for(int i = 0; i < count; i++)
     {
       ships[i] = new Ship(Client.getShip(connection, i));
-    }
-    count = Client.getShipTypeCount(connection);
-    shipTypes = new ShipType[count];
-    for(int i = 0; i < count; i++)
-    {
-      shipTypes[i] = new ShipType(Client.getShipType(connection, i));
     }
 
     if(!initialized)

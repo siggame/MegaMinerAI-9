@@ -1,5 +1,17 @@
 #include "getters.h"
 
+DLLEXPORT int shipTypeGetId(_ShipType* ptr)
+{
+  return ptr->id;
+}
+DLLEXPORT char* shipTypeGetType(_ShipType* ptr)
+{
+  return ptr->type;
+}
+DLLEXPORT int shipTypeGetCost(_ShipType* ptr)
+{
+  return ptr->cost;
+}
 DLLEXPORT int playerGetId(_Player* ptr)
 {
   return ptr->id;
@@ -75,17 +87,5 @@ DLLEXPORT int shipGetHealth(_Ship* ptr)
 DLLEXPORT int shipGetMaxHealth(_Ship* ptr)
 {
   return ptr->maxHealth;
-}
-DLLEXPORT int shipTypeGetId(_ShipType* ptr)
-{
-  return ptr->id;
-}
-DLLEXPORT char* shipTypeGetType(_ShipType* ptr)
-{
-  return ptr->type;
-}
-DLLEXPORT int shipTypeGetCost(_ShipType* ptr)
-{
-  return ptr->cost;
 }
 

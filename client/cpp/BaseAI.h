@@ -8,9 +8,9 @@
 #include <ctime>
 #include "game.h"
 
+#include "ShipType.h"
 #include "Player.h"
 #include "Ship.h"
-#include "ShipType.h"
 
 /// \brief A basic AI interface.
 
@@ -21,9 +21,9 @@ class BaseAI
 {
 protected:
   Connection* c;
+  std::vector<ShipType> shipTypes;
   std::vector<Player> players;
   std::vector<Ship> ships;
-  std::vector<ShipType> shipTypes;
 public:
   ///How many turns it has been since the beginning of the game
   int turnNumber();
