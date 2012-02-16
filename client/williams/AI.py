@@ -1,6 +1,13 @@
 #-*-python-*-
 from BaseAI import BaseAI
 from GameObject import *
+import math
+
+myShips = []
+theirShips = []
+
+def distance(fromX, toX, fromY, toY):
+  return int(math.ceil(math.sqrt((fromX-toX)**2 + (fromY-toY)**2)))
 
 class AI(BaseAI):
   """The class implementing gameplay logic."""
@@ -17,14 +24,61 @@ class AI(BaseAI):
 
   def end(self):
     pass
+    
+    
+  def getRange(self, x1, y1, rad1, x2, y2, rad2):
+    return distance(x1, x2, y1, y2) <= rad1 + rad2
+    
+  def moveToNearest(self,ship):
+    distance = 9000; closestX = 0; closestY = 0
+    for enemy in theirShips:
+      if distance > (((ship.getX() - enemy.getX())**2) + ((ship.getY()- enemy.getY())**2))**.5:
+        distance = (((ship.getX() - enemy.getX())**2) + ((ship.getY()- enemy.getY())**2))**.5
+        closestX = enemy.getX()
+        closest = enemy.getY()
+    self.moveTo(ship,closestX,closestY)
+      
+    
+  def moveTo(self,ship,x,y):
+    distance = (((ship.getX() - x)**2) + ((ship.getY()- y)**2))**.5
+    distRatio = ship.getMovementLeft() / (1+distance)
+    if distance < 15:
+      pass
+    elif distRatio > 1:
+      ship.move(x,y)
+    else:
+      distRatio /= 2
+      startX = int(ship.getX()*(1-distRatio))
+      startY = int(ship.getY()*(1-distRatio))
+      endX = int(x*distRatio)
+      endY = int(y*distRatio)
+      ship.move(startX + endX, startY + endY)
+    for enemy in self.ships:
+      if ship.getAttacksLeft() >= 1 and ship.getOwner() != enemy.getOwner():
+        if self.getRange(ship.getX(),ship.getY(),ship.getRange(),enemy.getX(),enemy.getY(),enemy.getRadius()):
+          if ship.getType() == "Mine Layer":
+            ship.attack(ship)
+            pass
+          else:
+            if ship.getType() != "Mine":
+              ship.attack(enemy)          
 
   def run(self):
     #Find out who I am
+    
     player = 0
     for i in self.players:
       if i.getId() == self.playerID():
         player = i.getId() 
-        
+    
+    del myShips[:]  
+    del theirShips[:]  
+    for ship in self.ships:
+      if ship.getOwner() == player:
+        myShips.append(ship)
+      else:
+        theirShips.append(ship)
+    
     #Locate my warp ship
     FriendlyWarpGate = []
     EnemyWarpGate = []
@@ -58,28 +112,38 @@ class AI(BaseAI):
           shipType.warpIn(FriendlyWarpGate[0].getX()-FriendlyWarpGate[0].getRange(),FriendlyWarpGate[0].getY())
       
       print "Trying to move enemy ships and make them attack themselves"
-      for ship in self.ships:
-        if ship.getOwner() != player:
-          ship.move(ship.getX()+5, ship.getY()+5)
-          ship.attack(ship)
+      for ship in theirShips:
+        ship.move(ship.getX()+5, ship.getY()+5)
+        ship.attack(ship)
           
-      print "Move all ships an invalid amount, then max range diagonally towards the enemy warp gate"
-      distance = 0;distRatio = 0; startX = 0; startY = 0; endX = 0; endY = 0
-      for ship in self.ships:
-        if ship.getOwner() == player:
-          distance = (((ship.getX() - EnemyWarpGate[0].getX())**2) + ((ship.getY() - EnemyWarpGate[0].getY())**2))**.5
-          distRatio = ship.getMovementLeft() / distance
-          startX = int(ship.getX()*distRatio)
-          startY = int(ship.getY()*distRatio)
-          endX = int(EnemyWarpGate[0].getX()*(1-distRatio))
-          endY = int(EnemyWarpGate[0].getY()*(1-distRatio))
-          print startX," ", endX," ",startY," ",endY
-          ship.move(startX - endX - 1, startY - endY - 1)
-          
-      
-    
-        
-  
+     
+    distance = 0;distRatio = 0; startX = 0; startY = 0; endX = 0; endY = 0
+    area = 1
+    for ship in myShips:
+      if len(theirShips) > 1 and len(EnemyWarpGate) > 0:
+        if ship.getType() != "Warp Gate" and ship.getType() != "Mine":
+          if area < 75:
+            if area%7 == 0:
+              self.moveTo(ship,-250,250)
+            elif area%7 == 1:
+              self.moveTo(ship,250,-250)
+            elif area%7 == 2:
+              self.moveTo(ship,0,0)
+            elif area%7 == 3:
+              self.moveTo(ship, 100,100)
+            elif area%7 == 4:
+              self.moveTo(ship,-100,-100)
+            elif area%7 == 5:
+              self.moveTo(ship,200,-100)
+            elif area%7 == 6:
+              self.moveTo(ship,-100,200)
+          else:
+            self.moveToNearest(ship)
+      else: 
+        if len(EnemyWarpGate) > 0:
+          self.moveTo(ship,EnemyWarpGate[0].getX(),EnemyWarpGate[0].getY())
+      area += 1
+                   
     return 1
 
   def __init__(self, conn):
