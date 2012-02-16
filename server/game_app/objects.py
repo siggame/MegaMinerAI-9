@@ -29,10 +29,6 @@ class Player:
 
   def nextTurn(self):
     pass
-    # If it's your turn and it isn't after the last turn, you get some energy (Maybe)
-    #if self.id == self.game.playerID:
-      #if self.game.turnNumber < self.game.turnLimit:
-        #self.energy += 50
 
   def talk(self, message):
     #TODO: talk..look off past megaminers, very similar. NEED TALK ANIMATION
