@@ -70,8 +70,7 @@ class Match(DefaultGameWorld):
    
     self.turn = self.players[-1]
     self.turnNumber = -1
-    self.nextRound()
-    self.nextTurn()
+
     self.ordering = ["radius", "type", "maxAttacks", "maxMovement", "maxMovement", "maxAttacks", "damage", 
                      "range", "maxHealth", "maxHealth"]
     self.warpGate = [cfgUnits["Warp Gate"][value] for value in self.ordering]
@@ -79,10 +78,14 @@ class Match(DefaultGameWorld):
     self.spawnableTypes.remove("Warp Gate")
     self.spawnableTypes.remove("Mine")
     self.shipChain = []
+
+    self.nextRound()
+    self.nextTurn()
     return True
 
   def nextRound(self):
     self.round += 1
+    self.turnNumber = 0
     #Handles logic for starting a new round:
       #first get rid of all shiptypes and ships available that round, then put into a new subset of available ship types
     print "YOU ARE ENTERING A NEW ROUND", self.round
@@ -104,7 +107,7 @@ class Match(DefaultGameWorld):
     # use the next 4
     using, self.shipChain = self.shipChain[:4], self.shipChain[4:]
     for shipType in using:
-      self.addObject(shipType, [shipType, cfgUnits[shipType]["cost"]])
+      self.addObject(ShipType, [shipType, cfgUnits[shipType]["cost"]])
 
     return True
 
@@ -173,14 +176,15 @@ class Match(DefaultGameWorld):
     player1 = self.objects.players[0]
     player2 = self.objects.players[1]
     if player1.victories >= self.victories and player1.victories > player2.victories:
-      self.declareWinner(player1, "Decisive")
+      self.declareWinner(self.players[0], "Decisive")
     elif player2.victories >= self.victories and player2.victories > player1.victories:
-      self.declareWinner(player2, "Decisive")
+      self.declareWinner(self.players[1], "Decisive")
     elif player1.victories >= self.victories and player2.victories >= self.victories:
-      self.declareWinner(random.choice(self.objects.players), "Luck")
+      self.declareWinner(random.choice(self.players), "Luck")
 
   def declareWinner(self, winner, reason=''):
     #TODO give reasons for winning, who has more round victories, etc..
+    print "Game", self.id, "over"
     self.winner = winner
 
     msg = ["game-winner", self.id, self.winner.user, self.getPlayerIndex(self.winner), reason]
@@ -252,7 +256,7 @@ class Match(DefaultGameWorld):
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])
     typeLists.append(["Ship"] + [i.toList() for i in self.objects.values() if i.__class__ is Ship and 
-                     (not i.stealthed or i.owner == self.playerID or connection.type != "player"])
+                     (not i.stealthed or i.owner == self.playerID or connection.type != "player")])
     typeLists.append(["ShipType"] + [i.toList() for i in self.objects.values() if i.__class__ is ShipType])
 
     msg.extend(typeLists)

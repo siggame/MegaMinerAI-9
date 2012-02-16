@@ -81,7 +81,6 @@ class Ship:
     return value
 
   def nextTurn(self):
-    print "Calling next turn from object"  
     #Healing other ships in range of engineering ship      
     if self.owner != self.game.playerID and self.type == "Engineering":
       for unit in self.game.objects.ships:
