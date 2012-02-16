@@ -6,9 +6,9 @@ submit: Main.class
 	@echo "$(shell cd ..;sh submit.sh c)"
 
 
-libclient.so: ../c/*.cpp ../c/*.h
-	$(MAKE) -C ../c/ libclient.so
-	cp -f ../c/libclient.so libclient.so
+libclient.so: ../library/*.cpp ../library/*.h
+	$(MAKE) -C ../library/ libclient.so
+	cp -f ../library/libclient.so libclient.so
 
 Main.class: $(JAVAFILES) libclient.so
 	javac -cp jna.jar:. $(JAVAFILES)

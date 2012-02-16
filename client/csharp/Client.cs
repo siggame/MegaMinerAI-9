@@ -25,6 +25,8 @@ public class Client {
 
     //commands
   [DllImport("client")]
+  public static extern int shipTypeWarpIn(IntPtr self, int x, int y);
+  [DllImport("client")]
   public static extern int playerTalk(IntPtr self, string message);
   [DllImport("client")]
   public static extern int shipMove(IntPtr self, int x, int y);
@@ -32,8 +34,6 @@ public class Client {
   public static extern int shipSelfDestruct(IntPtr self);
   [DllImport("client")]
   public static extern int shipAttack(IntPtr self, IntPtr target);
-  [DllImport("client")]
-  public static extern int shipTypeWarpIn(IntPtr self, int x, int y);
 
     //accessors
   [DllImport("client")]
@@ -50,6 +50,10 @@ public class Client {
   public static extern int getMapRadius(IntPtr connection);
 
   [DllImport("client")]
+  public static extern IntPtr getShipType(IntPtr connection, int num);
+  [DllImport("client")]
+  public static extern int getShipTypeCount(IntPtr connection);
+  [DllImport("client")]
   public static extern IntPtr getPlayer(IntPtr connection, int num);
   [DllImport("client")]
   public static extern int getPlayerCount(IntPtr connection);
@@ -57,13 +61,16 @@ public class Client {
   public static extern IntPtr getShip(IntPtr connection, int num);
   [DllImport("client")]
   public static extern int getShipCount(IntPtr connection);
-  [DllImport("client")]
-  public static extern IntPtr getShipType(IntPtr connection, int num);
-  [DllImport("client")]
-  public static extern int getShipTypeCount(IntPtr connection);
 
 
     //getters
+  [DllImport("client")]
+  public static extern int shipTypeGetId(IntPtr ptr);
+  [DllImport("client")]
+  public static extern string shipTypeGetType(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipTypeGetCost(IntPtr ptr);
+
   [DllImport("client")]
   public static extern int playerGetId(IntPtr ptr);
   [DllImport("client")]
@@ -103,13 +110,6 @@ public class Client {
   public static extern int shipGetHealth(IntPtr ptr);
   [DllImport("client")]
   public static extern int shipGetMaxHealth(IntPtr ptr);
-
-  [DllImport("client")]
-  public static extern int shipTypeGetId(IntPtr ptr);
-  [DllImport("client")]
-  public static extern string shipTypeGetType(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int shipTypeGetCost(IntPtr ptr);
 
 
     //properties

@@ -11,7 +11,7 @@ CXXFLAGS += -g
 
 override CPPFLAGS += -Isexp
 
-all: client
+all: libclient.so libclient.a
 
 submit: client
 	@echo "$(shell cd ..;sh submit.sh c)"
@@ -26,11 +26,11 @@ clean:
 	rm -f $(objects) client libclient_network.o libclient_game.o libclient_getters.o libclient_util.o libclient.so
 	$(MAKE) -C sexp clean
 
-client: $(objects) sexp/sexp.a
-	$(CXX) $(LDFLAGS) $(LOADLIBES) $(LDLIBS) $^ -g -o client
-
 libclient.so: libclient_network.o libclient_game.o libclient_getters.o libclient_util.o sexp/libclient_sexp.a
 	$(CXX) -shared -Wl,-soname,libclient.so $(LDFLAGS) $(LOADLIBES) $(LDLIBS) $^ -o libclient.so
+client.a: $(objects)
+	ar cr $@ $^
+	ranlib $@
 
 sexp/sexp.a sexp/libclient_sexp.a:
 	$(MAKE) -C $(dir $@) $(notdir $@)

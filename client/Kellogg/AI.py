@@ -15,7 +15,10 @@ class AI(BaseAI):
     return "password"
 
   def init(self):
-    pass
+    for ship in self.shipTypes:
+      if ship.getType() == "Stealth":
+        print "WARNING: STEALTH SHIPS ARE AVAILABLE"
+
 
   def end(self):
     pass
@@ -27,55 +30,49 @@ class AI(BaseAI):
     return self.distance(x1, x2, y1, y2) <= rad1 + rad2
       
   def run(self):
-    ships = []
+                            
+    myships = []
     enemy = []
-    warpX = 0
-    warpY = 0
-    enemy_base = []
-    warps = []
-    player = 0
-    for i in self.players:
-      if i.getId() == self.playerID():
-        player = i.getId() 
     randShip = random.randrange(0,4)
     newshiptype = self.shipTypes[randShip]
-    for ship in self.shipTypes:
-       if ship.getType() == "Warp Gate":
-         warps.append(ship)
     for ship in self.ships:
-       if ship.getOwner() == player:
-         ships.append(ship)
-       else:
+       if ship.getOwner() == self.playerID():
+         myships.append(ship)
+       elif ship.getOwner() != self.playerID():
          enemy.append(ship)
-    for ship in ships:
-      if ship.getType() == "Warp Gate": 
+    for ship in self.ships:
+       if ship.getType() == "Warp Gate": 
+         print "TRYING TO WARP"
          newshiptype.warpIn(ship.getX(),ship.getY())
-      else:
-       attack_list = [1,1,1,1]
+       attack_list = [1,1,1]
        for foe in enemy:
-         if self.inRange(ship.getX(),ship.getY(), ship.getRadius(), foe.getX(), foe.getY(), foe.getRadius()):
+        if ship.getAttacksLeft()>0:
+         if ship.getType() == "Mine Layer" and self.distance(ship.getX(),ship.getY(),foe.getX(),foe.getY())<=ship.getRange():
+           ship.attack(ship)                   
+         elif self.inRange(ship.getX(),ship.getY(), ship.getRadius(), foe.getX(), foe.getY(), foe.getRadius()):
            for i in attack_list:
-            print ship.getAttacksLeft(), "ATTACKS LEFT"
             ship.attack(foe)
-         elif ship.getType() == "Mine Layer":
-           ship.attack(ship)
-       dirX = 0; dirY = 0
-       move_list = [1,1,1,1,1,1,1,1,1,1,1,1]
-       for i in move_list:
-         if ship.getMovementLeft() >= int(2*ship.getMovementLeft()/3):
-            ship.move(ship.getX()+random.randrange(-10,10),ship.getY()+random.randrange(-10,10))
+       dirX = 0; dirY = 0; randX = 0; randY = 0
+       move_list = [1,1,1,1]
+       randX = random.randrange(-10,10)
+       randY = random.randrange(-10,10)
+       move = ship.getMaxMovement()
+       while move > 0:
+         print "trying to move"
          if ship.getX() > 0:
             dirX = -1*ship.getMovementLeft()/5
          elif ship.getX() < 0:
             dirX = ship.getMovementLeft()/5
-         if ship.getX() <= 20 or ship.getX() >= -20:
-           if ship.getY() > 10:
-             dirY = -1*ship.getMovementLeft()/5
-           elif ship.getY() < 10:
-             dirY = ship.getMovementLeft()/5
-           else:
-             ship.move(ship.getX(),ship.getY()+1)
-         ship.move(ship.getX()+dirX,ship.getY()+dirY) 
+         if ship.getY() > 10:
+           dirY = -1*ship.getMovementLeft()/5
+         elif ship.getY() < 10:
+           dirY = ship.getMovementLeft()/5
+         dis = self.distance(ship.getX(),ship.getY(),ship.getX()+dirX,ship.getY()+dirY)
+         if dis <= ship.getMovementLeft() and  dis >0:
+           ship.move(ship.getX()+dirX,ship.getY()+dirY)
+         move -= dis
+       if self.turnNumber()%100 >= 95:
+         ship.selfDestruct()
     return 1
 
   def __init__(self, conn):

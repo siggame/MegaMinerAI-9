@@ -60,12 +60,12 @@ DLLEXPORT Connection* createConnection()
   c->round = 0;
   c->victoriesNeeded = 0;
   c->mapRadius = 0;
+  c->ShipTypes = NULL;
+  c->ShipTypeCount = 0;
   c->Players = NULL;
   c->PlayerCount = 0;
   c->Ships = NULL;
   c->ShipCount = 0;
-  c->ShipTypes = NULL;
-  c->ShipTypeCount = 0;
   return c;
 }
 
@@ -74,6 +74,14 @@ DLLEXPORT void destroyConnection(Connection* c)
   #ifdef ENABLE_THREADS
   pthread_mutex_destroy(&c->mutex);
   #endif
+  if(c->ShipTypes)
+  {
+    for(int i = 0; i < c->ShipTypeCount; i++)
+    {
+      delete[] c->ShipTypes[i].type;
+    }
+    delete[] c->ShipTypes;
+  }
   if(c->Players)
   {
     for(int i = 0; i < c->PlayerCount; i++)
@@ -89,14 +97,6 @@ DLLEXPORT void destroyConnection(Connection* c)
       delete[] c->Ships[i].type;
     }
     delete[] c->Ships;
-  }
-  if(c->ShipTypes)
-  {
-    for(int i = 0; i < c->ShipTypeCount; i++)
-    {
-      delete[] c->ShipTypes[i].type;
-    }
-    delete[] c->ShipTypes;
   }
   delete c;
 }
@@ -171,7 +171,7 @@ DLLEXPORT int joinGame(Connection* c, int gameNum, const char* playerType)
 
   if(strcmp(expression->list->val, "join-accepted") != 0)
   {
-    cerr << "Game " << c->gameNumber << " doesn't exist." << endl;
+    cerr << "Cannot join game "<< c->gameNumber << ": " << expression->list->next->val << endl;
     destroy_sexp(expression);
     return 0;
   }
@@ -195,6 +195,20 @@ DLLEXPORT void getStatus(Connection* c)
   LOCK( &c->mutex );
   send_string(c->socket, "(game-status)");
   UNLOCK( &c->mutex );
+}
+
+
+DLLEXPORT int shiptypeWarpIn(_ShipType* object, int x, int y)
+{
+  stringstream expr;
+  expr << "(game-warp-in " << object->id
+       << " " << x
+       << " " << y
+       << ")";
+  LOCK( &object->_c->mutex);
+  send_string(object->_c->socket, expr.str().c_str());
+  UNLOCK( &object->_c->mutex);
+  return 1;
 }
 
 
@@ -248,21 +262,24 @@ DLLEXPORT int shipAttack(_Ship* object, _Ship* target)
 }
 
 
-DLLEXPORT int shiptypeWarpIn(_ShipType* object, int x, int y)
-{
-  stringstream expr;
-  expr << "(game-warp-in " << object->id
-       << " " << x
-       << " " << y
-       << ")";
-  LOCK( &object->_c->mutex);
-  send_string(object->_c->socket, expr.str().c_str());
-  UNLOCK( &object->_c->mutex);
-  return 1;
-}
-
-
 //Utility functions for parsing data
+void parseShipType(Connection* c, _ShipType* object, sexp_t* expression)
+{
+  sexp_t* sub;
+  sub = expression->list;
+
+  object->_c = c;
+
+  object->id = atoi(sub->val);
+  sub = sub->next;
+  object->type = new char[strlen(sub->val)+1];
+  strncpy(object->type, sub->val, strlen(sub->val));
+  object->type[strlen(sub->val)] = 0;
+  sub = sub->next;
+  object->cost = atoi(sub->val);
+  sub = sub->next;
+
+}
 void parsePlayer(Connection* c, _Player* object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -320,23 +337,6 @@ void parseShip(Connection* c, _Ship* object, sexp_t* expression)
   object->health = atoi(sub->val);
   sub = sub->next;
   object->maxHealth = atoi(sub->val);
-  sub = sub->next;
-
-}
-void parseShipType(Connection* c, _ShipType* object, sexp_t* expression)
-{
-  sexp_t* sub;
-  sub = expression->list;
-
-  object->_c = c;
-
-  object->id = atoi(sub->val);
-  sub = sub->next;
-  object->type = new char[strlen(sub->val)+1];
-  strncpy(object->type, sub->val, strlen(sub->val));
-  object->type[strlen(sub->val)] = 0;
-  sub = sub->next;
-  object->cost = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -428,6 +428,24 @@ DLLEXPORT int networkLoop(Connection* c)
           sub = sub->next;
 
         }
+        else if(string(sub->val) == "ShipType")
+        {
+          if(c->ShipTypes)
+          {
+            for(int i = 0; i < c->ShipTypeCount; i++)
+            {
+              delete[] c->ShipTypes[i].type;
+            }
+            delete[] c->ShipTypes;
+          }
+          c->ShipTypeCount =  sexp_list_length(expression)-1; //-1 for the header
+          c->ShipTypes = new _ShipType[c->ShipTypeCount];
+          for(int i = 0; i < c->ShipTypeCount; i++)
+          {
+            sub = sub->next;
+            parseShipType(c, c->ShipTypes+i, sub);
+          }
+        }
         else if(string(sub->val) == "Player")
         {
           if(c->Players)
@@ -464,24 +482,6 @@ DLLEXPORT int networkLoop(Connection* c)
             parseShip(c, c->Ships+i, sub);
           }
         }
-        else if(string(sub->val) == "ShipType")
-        {
-          if(c->ShipTypes)
-          {
-            for(int i = 0; i < c->ShipTypeCount; i++)
-            {
-              delete[] c->ShipTypes[i].type;
-            }
-            delete[] c->ShipTypes;
-          }
-          c->ShipTypeCount =  sexp_list_length(expression)-1; //-1 for the header
-          c->ShipTypes = new _ShipType[c->ShipTypeCount];
-          for(int i = 0; i < c->ShipTypeCount; i++)
-          {
-            sub = sub->next;
-            parseShipType(c, c->ShipTypes+i, sub);
-          }
-        }
       }
       destroy_sexp(base);
       return 1;
@@ -494,6 +494,15 @@ DLLEXPORT int networkLoop(Connection* c)
     }
     destroy_sexp(base);
   }
+}
+
+DLLEXPORT _ShipType* getShipType(Connection* c, int num)
+{
+  return c->ShipTypes + num;
+}
+DLLEXPORT int getShipTypeCount(Connection* c)
+{
+  return c->ShipTypeCount;
 }
 
 DLLEXPORT _Player* getPlayer(Connection* c, int num)
@@ -512,15 +521,6 @@ DLLEXPORT _Ship* getShip(Connection* c, int num)
 DLLEXPORT int getShipCount(Connection* c)
 {
   return c->ShipCount;
-}
-
-DLLEXPORT _ShipType* getShipType(Connection* c, int num)
-{
-  return c->ShipTypes + num;
-}
-DLLEXPORT int getShipTypeCount(Connection* c)
-{
-  return c->ShipTypeCount;
 }
 
 

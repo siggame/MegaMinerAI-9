@@ -1,4 +1,4 @@
-CSFILES=$(shell ls *.CS 2> /dev/null)
+CSFILES=$(shell ls *.cs 2> /dev/null)
 
 all: libclient.so client.exe
 
@@ -6,9 +6,9 @@ submit: Main.class
 	@echo "$(shell cd ..;sh submit.sh c)"
 
 
-libclient.so: ../c/*.cpp ../c/*.h
-	$(MAKE) -C ../c/ libclient.so
-	cp -f ../c/libclient.so libclient.so
+libclient.so: ../library/*.cpp ../library/*.h
+	$(MAKE) -C ../library/ libclient.so
+	cp -f ../library/libclient.so libclient.so
 
 client.exe: $(CSFILES) libclient.so
 	gmcs -out:client.exe  $(CSFILES)

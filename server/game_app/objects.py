@@ -16,6 +16,7 @@ class Player:
     self.time = time
     self.victories = victories
     self.energy = energy
+    self.warping = []
 
   def toList(self):
     value = [
@@ -29,13 +30,9 @@ class Player:
 
   def nextTurn(self):
     pass
-    # If it's your turn and it isn't after the last turn, you get some energy (Maybe)
-    #if self.id == self.game.playerID:
-      #if self.game.turnNumber < self.game.turnLimit:
-        #self.energy += 50
 
   def talk(self, message):
-    #TODO: talk..look off past megaminers, very similar
+    #TODO: talk..look off past megaminers, very similar. NEED TALK ANIMATION
     #self.game.animations.append(['Player-Talk', self.id, message])
     #return True
     pass
@@ -58,6 +55,7 @@ class Ship:
     self.range = range
     self.health = health
     self.maxHealth = maxHealth
+    self.stealthed = False
 
   def toList(self):
     value = [
@@ -79,14 +77,15 @@ class Ship:
     return value
 
   def nextTurn(self):
-  
-    #Adding stealth ships back to the game objects for current player
-    #TODO: Fix stealth ship logic
-    # for ship in self.game.stealthShips:
-      # if self.owner == ship.owner:
-        # if ship.id == self.id:
-          # self.game.removeObject(self)
-          
+    #Healing other ships in range of engineering ship      
+    if self.owner != self.game.playerID and self.type == "Engineering":
+      for unit in self.game.objects.ships:
+        if self.owner == unit.owner:
+          if self.inRange(unit):
+            unit.health += unit.maxHealth * self.damage / 100.0
+            if unit.health > unit.maxHealth:
+              unit.health = unit.maxHealth
+
     #TODO: Make sure minelayers don't get attacks replenished
     if self.owner == self.game.playerID:
       if self.movementLeft == -1 and self.attacksLeft == -1:
@@ -95,37 +94,14 @@ class Ship:
       else:
         self.movementLeft = self.maxMovement         
         self.attacksLeft = self.maxAttacks
-        
- 
-       
-  def endTurn(self):
-    #Healing other ships in range of engineering ship      
-    if self.type == "Engineering":      
-      for unit in self.game.objects.ships:
-        if self.owner == self.game.playerID:
-          if self.inRange(unit):
-            unit.health+=unit.health*.5
-            
-    #TODO: Fix stealth sip logic    
-    # if self.type == "Stealth" and len(self.game.stealthShips)>0:
-      # if self.attacksLeft == self.maxAttacks and not [ship for ship in self.game.stealthShips if ship.id == self.id][0]:
-        # self.game.animations.append(['stealth', self])
-        # self.game.stealthShips.append(self)
-      # elif self.attacksLeft < self.maxAttacks and [ship for ship in self.game.stealthShips if ship.id == self.id][0]:
-        # self.game.animations.append(['deStealth', self])
-        # self.game.stealthShips.remove(self)
-    # elif self.type == "Stealth" and len(self.game.stealthShips)== 0 and self.attacksLeft == self.maxAttacks:
-      # self.game.animations.append(['stealth', self])
-      # self.game.stealthShips.append(self)
                     
   def move(self, x, y):
-    print x, "  ", y
     #moved is the distance they've moved, where they were to where they're going
     moved = distance(self.x, x, self.y, y)       
     #if they're trying to move outside the map
     if x**2 + y**2 > self.game.mapRadius**2:
       return "You don't want to move out of the map, you'd be lost in Space"
-    #check if they can'at move that far
+    #check if they can't move that far
     elif self.movementLeft - moved < 0:
       return "You cannot move that far, your engines lack the power"#think of something clever here
     #have to move somewhere..yeah.
@@ -133,10 +109,11 @@ class Ship:
       return "Must move somewhere"
     
     #successful move, yay! 
-    self.game.animations.append(['move', self.x, self.y, x, y, self]) #move animation for those visualizer guys
+    self.game.animations.append(['move', self.x, self.y, x, y, self.id]) #move animation for those visualizer guys
     self.x = x
     self.y = y
     self.movementLeft -= moved
+    
     #Check to see if they moved onto a mine, TWAS A TRAP!
     for unit in self.game.objects.ships:
       if unit.owner != self.owner: 
@@ -145,8 +122,11 @@ class Ship:
             #If a mine in range, hit the unit that moved there and destroy the mine
             self.health -= unit.damage
             self.game.removeObject(unit)
+            self.game.animatoins.append(['attack',unit.id,self.id])
             if self.health <= 0:
-              self.game.removeObject(self)
+               pass
+               #TODO: Makes mines kill enemy ships
+#              self.game.removeObject(self)
     return True
 
   def selfDestruct(self):
@@ -156,16 +136,20 @@ class Ship:
     for target in self.game.objects.ships:
       if inRange (self.x, self.y, self.radius,target.x, target.y, target.radius):
         if target.owner != self.owner:
-          #MAKE NOT ATTACK - SOMETHING UNIQUE
-          attack(target)   
+          #TODO: MAKE NOT ATTACK - SOMETHING UNIQUE
+          #TODO: Make Kamakizes (too lazy to check spelling) really good at exploding
+          self.attack(target)   
           self.game.removeObject(self)
-          self.game.animations.append(['selfDestruct', self])
-
+          self.game.animations.append(['selfDestruct', self.id])
+    return True
+    
   def attack(self, target):
     #TODO: cannot attack same target >1 per turn.
       #(can make a set of possible targets, and remove target each time)
     modifier = 1
     #TODO: MAKE SURE NO ATTACK MINES
+    if self.owner() != self.game.playerID:
+       return "You cannot make enemy ships attack"
     if self.attacksLeft <= 0:
       return 'You have no attacks left'
     if self.type == "Mine Layer" and self.id == target.id:
@@ -181,6 +165,7 @@ class Ship:
       cfgUnits["Mine"]["maxHealth"]
       ])
       self.attacksLeft -= 1
+      return True
     elif target.owner == self.owner:
       return 'No friendly fire please'
     elif not self.inRange(target):
@@ -199,8 +184,10 @@ class Ship:
             if self.inRange(unit):
               unit.attacksLeft = -1
               unit.movementLeft = -1
-        
-      self.game.animations.append(['attack', self, target])
+              self.attacksLeft = -1
+              self.movementLeft = -1
+              
+      self.game.animations.append(['attack', self.id, target.id])
       target.health-=self.damage*modifier
       self.attacksLeft -= 1
       if target.health <= 0:
@@ -265,7 +252,7 @@ class ShipType:
       cfgUnits[self.type]["maxHealth"]
       ])
       player.energy -= self.cost
-  
+    return True
     
 
 

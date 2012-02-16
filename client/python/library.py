@@ -38,6 +38,9 @@ library.networkLoop.restype = c_int
 library.networkLoop.argtypes = [c_void_p]
 
 #Functions
+library.shiptypeWarpIn.restype = c_int
+library.shiptypeWarpIn.argtypes = [c_void_p, c_int, c_int]
+
 library.playerTalk.restype = c_int
 library.playerTalk.argtypes = [c_void_p, c_char_p]
 
@@ -49,9 +52,6 @@ library.shipSelfDestruct.argtypes = [c_void_p]
 
 library.shipAttack.restype = c_int
 library.shipAttack.argtypes = [c_void_p, c_void_p]
-
-library.shiptypeWarpIn.restype = c_int
-library.shiptypeWarpIn.argtypes = [c_void_p, c_int, c_int]
 
 # accessors
 
@@ -74,6 +74,12 @@ library.getVictoriesNeeded.argtypes = [c_void_p]
 library.getMapRadius.restype = c_int
 library.getMapRadius.argtypes = [c_void_p]
 
+library.getShipType.restype = c_void_p
+library.getShipType.argtypes = [c_void_p, c_int]
+
+library.getShipTypeCount.restype = c_int
+library.getShipTypeCount.argtypes = [c_void_p]
+
 library.getPlayer.restype = c_void_p
 library.getPlayer.argtypes = [c_void_p, c_int]
 
@@ -86,15 +92,18 @@ library.getShip.argtypes = [c_void_p, c_int]
 library.getShipCount.restype = c_int
 library.getShipCount.argtypes = [c_void_p]
 
-library.getShipType.restype = c_void_p
-library.getShipType.argtypes = [c_void_p, c_int]
-
-library.getShipTypeCount.restype = c_int
-library.getShipTypeCount.argtypes = [c_void_p]
-
 # getters
 
 #Data
+library.shipTypeGetId.restype = c_int
+library.shipTypeGetId.argtypes = [c_void_p]
+
+library.shipTypeGetType.restype = c_char_p
+library.shipTypeGetType.argtypes = [c_void_p]
+
+library.shipTypeGetCost.restype = c_int
+library.shipTypeGetCost.argtypes = [c_void_p]
+
 library.playerGetId.restype = c_int
 library.playerGetId.argtypes = [c_void_p]
 
@@ -151,15 +160,6 @@ library.shipGetHealth.argtypes = [c_void_p]
 
 library.shipGetMaxHealth.restype = c_int
 library.shipGetMaxHealth.argtypes = [c_void_p]
-
-library.shipTypeGetId.restype = c_int
-library.shipTypeGetId.argtypes = [c_void_p]
-
-library.shipTypeGetType.restype = c_char_p
-library.shipTypeGetType.argtypes = [c_void_p]
-
-library.shipTypeGetCost.restype = c_int
-library.shipTypeGetCost.argtypes = [c_void_p]
 
 
 #Properties

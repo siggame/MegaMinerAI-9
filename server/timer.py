@@ -23,7 +23,6 @@ def install():
       if self.objects.players[justWent].time <= 0:
         self.declareWinner(self.players[aboutToGo], 'Opponent timed out')
         games.remove(self)
-      print self.objects.players[0].time, self.objects.players[1].time
       # calls the turn update
       result = func(self)
       # gives the player who is about to go some more time

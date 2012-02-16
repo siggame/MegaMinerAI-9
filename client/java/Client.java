@@ -18,11 +18,11 @@ public interface Client extends Library {
 
 
     //commands
+  int shipTypeWarpIn(Pointer object, int x, int y);
   int playerTalk(Pointer object, String message);
   int shipMove(Pointer object, int x, int y);
   int shipSelfDestruct(Pointer object);
   int shipAttack(Pointer object, Pointer target);
-  int shipTypeWarpIn(Pointer object, int x, int y);
 
     //accessors
   int getTurnNumber(Pointer connection);
@@ -32,15 +32,19 @@ public interface Client extends Library {
   int getVictoriesNeeded(Pointer connection);
   int getMapRadius(Pointer connection);
 
+  Pointer getShipType(Pointer connection, int num);
+  int getShipTypeCount(Pointer connection);
   Pointer getPlayer(Pointer connection, int num);
   int getPlayerCount(Pointer connection);
   Pointer getShip(Pointer connection, int num);
   int getShipCount(Pointer connection);
-  Pointer getShipType(Pointer connection, int num);
-  int getShipTypeCount(Pointer connection);
 
 
     //getters
+  int shipTypeGetId(Pointer ptr);
+  String shipTypeGetType(Pointer ptr);
+  int shipTypeGetCost(Pointer ptr);
+
   int playerGetId(Pointer ptr);
   String playerGetPlayerName(Pointer ptr);
   float playerGetTime(Pointer ptr);
@@ -61,10 +65,6 @@ public interface Client extends Library {
   int shipGetRange(Pointer ptr);
   int shipGetHealth(Pointer ptr);
   int shipGetMaxHealth(Pointer ptr);
-
-  int shipTypeGetId(Pointer ptr);
-  String shipTypeGetType(Pointer ptr);
-  int shipTypeGetCost(Pointer ptr);
 
 
     //properties
