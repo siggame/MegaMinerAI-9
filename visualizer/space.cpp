@@ -47,17 +47,12 @@ namespace visualizer
   void Space::loadGamelog( std::string gamelog )
   {
     // BEGIN: Initial Setup
-    cout << "Load Space Gamelog" << endl;
-
     setup();
 
     m_game = new parser::Game;
     
-    cout << "done setting up" << endl;
-    
     if( !parser::parseGameFromString( *m_game, gamelog.c_str() ) )
     {
-        cout << "in if\n";
       delete m_game;
       m_game = 0;
       errorLog << gamelog;
@@ -65,12 +60,9 @@ namespace visualizer
         "Cannot load gamelog, %s", 
         gamelog.c_str()
         );
-        cout << "done in if\n";
     }
     // END: Initial Setup
-    cout << "abotu to load()\n";
     load();
-    cout << "abtou to return" << endl;
     return;
   } // Space::loadGamelog()
 
@@ -90,7 +82,6 @@ namespace visualizer
     for(int state = 0; state < m_game->states.size(); state++)
     {
         Frame turn;
-        cout << m_game->states[ state ].mapRadius << endl;
         
         // Add and draw the background
         SmartPointer<Background> background = new Background();
@@ -101,12 +92,50 @@ namespace visualizer
         for(std::map<int, parser::Ship>::iterator i = m_game->states[ state ].ships.begin(); i != m_game->states[ state ].ships.end(); i++)
         {
             SmartPointer<SpaceShip> ship = new SpaceShip();
-            
-            ship->x = i->second.x + m_mapRadius;
-            ship->y = i->second.y + m_mapRadius;
-            ship->radius = i->second.radius;
-            ship->type = i->second.type;
+
+            ship->id = i->second.id;
             ship->owner = i->second.owner;
+            ship->y = i->second.y + m_mapRadius;
+            ship->x = i->second.x + m_mapRadius;
+            ship->radius = i->second.radius;
+            if(i->second.type != NULL)
+            {
+                ship->type = i->second.type;
+            }
+            else
+            {
+                ship->type = "ship";
+                cout << "null type encountered on ship!\n";
+            }
+            
+            // Check for this ship's animations
+            for
+              (
+              std::vector< SmartPointer< parser::Animation > >::iterator j = m_game->states[ state ].animations[ ship->id ].begin();
+              j != m_game->states[ state ].animations[ ship->id ].end();
+              j++
+              )
+            {
+                switch( (*j)->type )
+                {
+                    case parser::ATTACK:
+                    {
+                        parser::attack &a = (parser::attack&)*(*j);
+                        
+                        SmartPointer<AttackData> attack = new AttackData();
+                        
+                        attack->attackerTeam = ship->owner;
+                        attack->attackerX = m_game->states[ state ].ships[ a.acting ].x + m_mapRadius;
+                        attack->attackerY = m_game->states[ state ].ships[ a.acting ].y + m_mapRadius;
+                        attack->victimX = m_game->states[ state ].ships[ a.target ].x + m_mapRadius;
+                        attack->victimY = m_game->states[ state ].ships[ a.target ].y + m_mapRadius;
+                        
+                        ship->addKeyFrame( new DrawShipAttack( attack ) );
+                        turn.addAnimatable( attack );
+
+                    } break;
+                }
+            }
             
             ship->addKeyFrame( new DrawSpaceShip( ship ) );
             turn.addAnimatable( ship );

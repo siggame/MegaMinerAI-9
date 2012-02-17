@@ -41,5 +41,21 @@ namespace visualizer
         game->renderer->setColor( teamColor[ship.owner] );
         game->renderer->drawCircle(ship.x, ship.y, ship.radius, 1);
     }
+    
+    void DrawShipAttack::animate( const float& t, AnimData *d, IGame* game )
+    {
+        Color teamColor[] = { Color((t/2) + 0.5, 0, 0), Color(0, 0, (t/2) + 0.5) };
+        
+        //AttackData *attack = (AttackData*)d;
+        AttackData &attack = *m_attackData;
+        
+        //cout << "attack: a(" << attack.attackerX << "," << attack.attackerY << ") to v(" << attack.victimX << "," << attack.victimY << ")" << endl;
+        
+        game->renderer->setColor( teamColor[attack.attackerTeam] );
+        game->renderer->drawLine(attack.attackerX, attack.attackerY, attack.victimX, attack.victimY, 2); 
+        
+        //if( t > startTime && t < endTime )
+        //else if ( t >= endTime )
+    } // DrawShipAttack::animate()
 
 }

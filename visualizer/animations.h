@@ -36,7 +36,24 @@ namespace visualizer
       private:
         SpaceShip* m_spaceShip;
         
-    }; // DrawSpacePiece
+    }; // DrawSpaceShip
+    
+    class DrawShipAttack: public Anim
+    {
+        public:
+            DrawShipAttack( AttackData* attack ) { m_attackData = attack; }
+            void animate( const float& t, AnimData *d, IGame* game );
+
+            float controlDuration() const
+            { return 1; }
+            float totalDuration() const
+            { return 1; }
+        private:
+            AttackData* m_attackData;
+
+    }; // ShipAttack
+    
+
 
 }
 

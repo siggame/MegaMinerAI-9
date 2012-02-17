@@ -12,6 +12,7 @@ namespace visualizer
   
     struct SpaceShip: public Animatable
     {
+        int id;
         int owner;
         int x;
         int y;
@@ -25,6 +26,15 @@ namespace visualizer
         int range;
         int health;
         int maxHealth;
+    };
+    
+    struct AttackData: public Animatable
+    {
+        int attackerX;
+        int attackerY;
+        int victimX;
+        int victimY;
+        int attackerTeam;
     };
 
 } // visualizer
