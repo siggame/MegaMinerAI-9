@@ -30,7 +30,6 @@ class AI(BaseAI):
     return self.distance(x1, x2, y1, y2) <= rad1 + rad2
       
   def run(self):
-                            
     myships = []
     enemy = []
     randShip = random.randrange(0,4)
@@ -40,9 +39,8 @@ class AI(BaseAI):
          myships.append(ship)
        elif ship.getOwner() != self.playerID():
          enemy.append(ship)
-    for ship in self.ships:
+    for ship in myships:
        if ship.getType() == "Warp Gate": 
-         print "TRYING TO WARP"
          newshiptype.warpIn(ship.getX(),ship.getY())
        attack_list = [1,1,1]
        for foe in enemy:
@@ -58,7 +56,6 @@ class AI(BaseAI):
        randY = random.randrange(-10,10)
        move = ship.getMaxMovement()
        while move > 0:
-         print "trying to move"
          if ship.getX() > 0:
             dirX = -1*ship.getMovementLeft()/5
          elif ship.getX() < 0:

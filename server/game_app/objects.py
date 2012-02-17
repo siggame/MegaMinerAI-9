@@ -78,6 +78,7 @@ class Ship:
     return value
 
   def nextTurn(self):
+    #TODO: MAKE UNITS WARP IN AT START OF NEXT TURN
     #Healing other ships in range of engineering ship      
     if self.owner != self.game.playerID and self.type == "Engineering":
       for unit in self.game.objects.ships:
@@ -119,17 +120,16 @@ class Ship:
     
     #Check to see if they moved onto a mine, TWAS A TRAP!
     for unit in self.game.objects.ships:
-      if unit.owner != self.owner: 
-        if unit.type == "Mine": 
-          if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):
-            #If a mine in range, hit the unit that moved there and destroy the mine
-            self.health -= unit.damage
-            self.game.removeObject(unit)
-            self.game.animatoins.append(['attack',unit.id,self.id])
-            if self.health <= 0:
-               pass
-               #TODO: Makes mines kill enemy ships
-#              self.game.removeObject(self)
+      if unit.owner != self.owner and unit.type == "Mine": 
+        if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):
+          #If a mine in range, hit the unit that moved there and destroy the mine
+          self.health -= unit.damage
+          self.game.removeObject(unit)
+          self.game.animations.append(['attack',unit.id,self.id])
+          if self.health <= 0:
+            pass
+            #TODO: Makes mines kill enemy ships
+#           self.game.removeObject(self)
     return True
 
   def selfDestruct(self):
@@ -147,6 +147,7 @@ class Ship:
     return True
     
   def attack(self, target):
+        
     #TODO: cannot attack same target >1 per turn.
       #(can make a set of possible targets, and remove target each time)
     modifier = 1
