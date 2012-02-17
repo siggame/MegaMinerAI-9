@@ -44,12 +44,14 @@ namespace visualizer
     
     void DrawShipAttack::animate( const float& t, AnimData *d, IGame* game )
     {
-        Color teamColor[] = { Color((t/2) + 0.5, 0, 0), Color(0, 0, (t/2) + 0.5) };
+        Color teamColor[] = { Color(1, 0, 0, t), Color(0, 0, 1, t) };
+        
+        cout << "time t: " << t << endl;
         
         //AttackData *attack = (AttackData*)d;
         AttackData &attack = *m_attackData;
         
-        //cout << "attack: a(" << attack.attackerX << "," << attack.attackerY << ") to v(" << attack.victimX << "," << attack.victimY << ")" << endl;
+        cout << "attack: a(" << attack.attackerX << "," << attack.attackerY << ") to v(" << attack.victimX << "," << attack.victimY << ")" << endl;
         
         game->renderer->setColor( teamColor[attack.attackerTeam] );
         game->renderer->drawLine(attack.attackerX, attack.attackerY, attack.victimX, attack.victimY, 2); 
