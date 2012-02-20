@@ -88,4 +88,8 @@ DLLEXPORT int shipGetMaxHealth(_Ship* ptr)
 {
   return ptr->maxHealth;
 }
+DLLEXPORT int shipGetSelfDestructDamage(_Ship* ptr)
+{
+  return ptr->selfDestructDamage;
+}
 

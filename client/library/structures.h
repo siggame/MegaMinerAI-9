@@ -43,6 +43,7 @@ struct _Ship
   int range;
   int health;
   int maxHealth;
+  int selfDestructDamage;
 };
 
 #endif

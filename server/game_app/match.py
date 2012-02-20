@@ -72,7 +72,7 @@ class Match(DefaultGameWorld):
     self.turnNumber = -1
 
     self.ordering = ["radius", "type", "maxAttacks", "maxMovement", "maxMovement", "maxAttacks", "damage", 
-                     "range", "maxHealth", "maxHealth"]
+                     "range", "maxHealth", "maxHealth", "selfDestructDamage"]
     self.warpGate = [cfgUnits["Warp Gate"][value] for value in self.ordering]
     self.spawnableTypes = cfgUnits.keys()
     self.spawnableTypes.remove("Warp Gate")
