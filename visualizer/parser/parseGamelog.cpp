@@ -24,6 +24,44 @@ char *ToLower( char *str )
 }
 
 
+static bool parseShipType(ShipType& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  sub = expression->list;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.id = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.type = new char[strlen(sub->val)+1];
+  strncpy(object.type, sub->val, strlen(sub->val));
+  object.type[strlen(sub->val)] = 0;
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.cost = atoi(sub->val);
+  sub = sub->next;
+
+  return true;
+
+}
 static bool parsePlayer(Player& object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -214,87 +252,19 @@ static bool parseShip(Ship& object, sexp_t* expression)
   object.maxHealth = atoi(sub->val);
   sub = sub->next;
 
-  return true;
-
-}
-static bool parseShipType(ShipType& object, sexp_t* expression)
-{
-  sexp_t* sub;
-  if ( !expression ) return false;
-  sub = expression->list;
-
   if ( !sub ) 
   {
-    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
     return false;
   }
 
-  object.id = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.type = new char[strlen(sub->val)+1];
-  strncpy(object.type, sub->val, strlen(sub->val));
-  object.type[strlen(sub->val)] = 0;
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.cost = atoi(sub->val);
+  object.selfDestructDamage = atoi(sub->val);
   sub = sub->next;
 
   return true;
 
 }
 
-static bool parseAttack(attack& object, sexp_t* expression)
-{
-  sexp_t* sub;
-  if ( !expression ) return false;
-  object.type = ATTACK;
-  sub = expression->list->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parseattack.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.acting = atoi(sub->val);
-  sub = sub->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parseattack.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.target = atoi(sub->val);
-  sub = sub->next;
-  return true;
-
-}
-static bool parseDeStealth(deStealth& object, sexp_t* expression)
-{
-  sexp_t* sub;
-  if ( !expression ) return false;
-  object.type = DESTEALTH;
-  sub = expression->list->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parsedeStealth.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.acting = atoi(sub->val);
-  sub = sub->next;
-  return true;
-
-}
 static bool parseMove(move& object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -355,6 +325,29 @@ static bool parseSelfDestruct(selfDestruct& object, sexp_t* expression)
   return true;
 
 }
+static bool parseAttack(attack& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  object.type = ATTACK;
+  sub = expression->list->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parseattack.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.acting = atoi(sub->val);
+  sub = sub->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parseattack.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.target = atoi(sub->val);
+  sub = sub->next;
+  return true;
+
+}
 static bool parseStealth(stealth& object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -364,6 +357,22 @@ static bool parseStealth(stealth& object, sexp_t* expression)
   if( !sub ) 
   {
     cerr << "Error in parsestealth.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.acting = atoi(sub->val);
+  sub = sub->next;
+  return true;
+
+}
+static bool parseDeStealth(deStealth& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  object.type = DESTEALTH;
+  sub = expression->list->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parsedeStealth.\n Parsing: " << *expression << endl;
     return false;
   }
   object.acting = atoi(sub->val);
@@ -408,6 +417,19 @@ static bool parseSexp(Game& game, sexp_t* expression)
           gs.mapRadius = atoi(sub->val);
           sub = sub->next;
       }
+      else if(string(sub->val) == "ShipType")
+      {
+        sub = sub->next;
+        bool flag = true;
+        while(sub && flag)
+        {
+          ShipType object;
+          flag = parseShipType(object, sub);
+          gs.shipTypes[object.id] = object;
+          sub = sub->next;
+        }
+        if ( !flag ) return false;
+      }
       else if(string(sub->val) == "Player")
       {
         sub = sub->next;
@@ -434,19 +456,6 @@ static bool parseSexp(Game& game, sexp_t* expression)
         }
         if ( !flag ) return false;
       }
-      else if(string(sub->val) == "ShipType")
-      {
-        sub = sub->next;
-        bool flag = true;
-        while(sub && flag)
-        {
-          ShipType object;
-          flag = parseShipType(object, sub);
-          gs.shipTypes[object.id] = object;
-          sub = sub->next;
-        }
-        if ( !flag ) return false;
-      }
     }
     game.states.push_back(gs);
   }
@@ -458,22 +467,6 @@ static bool parseSexp(Game& game, sexp_t* expression)
       expression = expression->next;
       sub = expression->list;
       if ( !sub ) return false;
-      if(string(ToLower( sub->val ) ) == "attack")
-      {
-        SmartPointer<attack> animation = new attack;
-        if ( !parseAttack(*animation, expression) )
-          return false;
-
-        animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
-      }
-      if(string(ToLower( sub->val ) ) == "de-stealth")
-      {
-        SmartPointer<deStealth> animation = new deStealth;
-        if ( !parseDeStealth(*animation, expression) )
-          return false;
-
-        animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
-      }
       if(string(ToLower( sub->val ) ) == "move")
       {
         SmartPointer<move> animation = new move;
@@ -490,10 +483,26 @@ static bool parseSexp(Game& game, sexp_t* expression)
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
       }
+      if(string(ToLower( sub->val ) ) == "attack")
+      {
+        SmartPointer<attack> animation = new attack;
+        if ( !parseAttack(*animation, expression) )
+          return false;
+
+        animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
+      }
       if(string(ToLower( sub->val ) ) == "stealth")
       {
         SmartPointer<stealth> animation = new stealth;
         if ( !parseStealth(*animation, expression) )
+          return false;
+
+        animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
+      }
+      if(string(ToLower( sub->val ) ) == "de-stealth")
+      {
+        SmartPointer<deStealth> animation = new deStealth;
+        if ( !parseDeStealth(*animation, expression) )
           return false;
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
