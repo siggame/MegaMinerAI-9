@@ -25,9 +25,6 @@ namespace visualizer
     i.spectateMode = true;
     i.pluginName = "MegaMinerAI9: Space Plugin";
 
-    gui->checkForUpdate( "Space", "./plugins/space/checkList.md5", VERSION_FILE );
-
-    options->loadOptionFile( "./plugins/space/space.xml", "space" );
 
     return i;
   } // PluginInfo Space::getPluginInfo()
@@ -35,6 +32,8 @@ namespace visualizer
   void Space::setup()
   {
 
+    gui->checkForUpdate( "Space", "./plugins/space/checkList.md5", VERSION_FILE );
+    options->loadOptionFile( "./plugins/space/space.xml", "space" );
     /*renderer->setCamera( 0, 0, 8, 8 );
       renderer->setGridDimensions( 8, 8 );
 
