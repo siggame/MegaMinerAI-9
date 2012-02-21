@@ -97,6 +97,11 @@ namespace visualizer
         ship->y = i->second.y + m_mapRadius;
         ship->x = i->second.x + m_mapRadius;
         ship->radius = i->second.radius;
+
+        turn[ship->id]["x"] = ship->x;
+        turn[ship->id]["y"] = ship->y;
+        turn[ship->id]["radius"] = ship->radius;
+
         if(i->second.type != NULL)
         {
           ship->type = i->second.type;
