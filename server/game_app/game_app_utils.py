@@ -89,7 +89,8 @@ def requireTypes(*types):
     def wrappedFunc(*args):
       newargs = []
       if len(args) != len(types):
-        return "Expected %d arguements (Received %d)"%(len(types),         len(args))
+        return "Expected %d arguements (Received %d)"%(len(types), \
+        len(args))
       for i in xrange(len(args)):
         if types[i] is None:
           newargs.append(args[i])

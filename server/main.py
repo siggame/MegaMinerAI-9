@@ -15,7 +15,6 @@ import sys
 
 class GameApp(AccountsAppMixin, BaseApp):
   games = {}
-  nextid = 1
 
   def __init__(self, protocol):
     BaseApp.__init__(self, protocol)
@@ -31,13 +30,15 @@ class GameApp(AccountsAppMixin, BaseApp):
     if self.game is not None:
       return ("create-game-denied", "You are already in a game.")
     else:
-      print "Creating game %d"%(GameApp.nextid,)
+      nextid = 1
+      while nextid in GameApp.games:
+        nextid += 1
+      print "Creating game %d"%(nextid,)
       self.user = self.name
       self.screenName = self.name
-      self.game = Match(GameApp.nextid, self)
+      self.game = Match(nextid, self)
       self.game.addPlayer(self)
-      GameApp.games[GameApp.nextid] = self.game
-      GameApp.nextid += 1
+      GameApp.games[nextid] = self.game
       return ("create-game", self.game.id)
 
   @protocolmethod
@@ -69,7 +70,10 @@ class GameApp(AccountsAppMixin, BaseApp):
           return ["join-game-denied", "Game is full"]
       return ["join-accepted", gameNumber]
     except KeyError:
-      return ["join-game-denied", "No such game"]
+      self.game = Match(gameNumber, self)
+      self.game.addPlayer(self)
+      GameApp.games[gameNumber] = self.game
+      return ["create-game", self.game.id]
 
   @protocolmethod
   @errorBuffer
@@ -112,6 +116,16 @@ class GameApp(AccountsAppMixin, BaseApp):
   @protocolmethod
   @errorBuffer
   @requireTurn
+  @requireTypes(None, int, int, int)
+  def gameWarpIn(self, shipType, x, y):
+    """Sends in a new ship of this type"""
+    if self.game.turn is not self:
+      return "Not your turn."
+    return self.game.warpIn(shipType, x, y)
+
+  @protocolmethod
+  @errorBuffer
+  @requireTurn
   @requireTypes(None, int, str)
   def gameTalk(self, player, message):
     """Allows a player to display messages on the screen"""
@@ -148,16 +162,6 @@ class GameApp(AccountsAppMixin, BaseApp):
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.attack(ship, target)
-
-  @protocolmethod
-  @errorBuffer
-  @requireTurn
-  @requireTypes(None, int, int, int)
-  def gameWarpIn(self, shipType, x, y):
-    """Sends in a new ship of this type"""
-    if self.game.turn is not self:
-      return "Not your turn."
-    return self.game.warpIn(shipType, x, y)
 
 
   @protocolmethod

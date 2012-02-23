@@ -39,6 +39,7 @@ Ship = Model('Ship',
 	  Variable('range', int, 'the range of its attacks'),
 	  Variable('health', int, 'the total health of the ship'),
 	  Variable('maxHealth', int, 'the max health possible for the ship'),
+	  Variable('selfDestructDamage', int, 'the amount of damage done when this ship blows up'),
     ],
   doc='A space ship!',
   functions=[ 

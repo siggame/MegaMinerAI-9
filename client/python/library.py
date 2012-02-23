@@ -161,5 +161,8 @@ library.shipGetHealth.argtypes = [c_void_p]
 library.shipGetMaxHealth.restype = c_int
 library.shipGetMaxHealth.argtypes = [c_void_p]
 
+library.shipGetSelfDestructDamage.restype = c_int
+library.shipGetSelfDestructDamage.argtypes = [c_void_p]
+
 
 #Properties

@@ -40,7 +40,7 @@ class Player:
 
 
 class Ship:
-  def __init__(self, game, id, owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, range, health, maxHealth):
+  def __init__(self, game, id, owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, range, health, maxHealth, selfDestructDamage):
     self.game = game
     self.id = id
     self.owner = owner
@@ -56,6 +56,7 @@ class Ship:
     self.range = range
     self.health = health
     self.maxHealth = maxHealth
+    self.selfDestructDamage = selfDestructDamage
     self.stealthed = False
 
   def toList(self):
@@ -74,6 +75,7 @@ class Ship:
       self.range,
       self.health,
       self.maxHealth,
+      self.selfDestructDamage,
       ]
     return value
 
@@ -166,7 +168,8 @@ class Ship:
       cfgUnits["Mine"]["damage"], 
       cfgUnits["Mine"]["radius"],
       cfgUnits["Mine"]["maxHealth"], 
-      cfgUnits["Mine"]["maxHealth"]
+      cfgUnits["Mine"]["maxHealth"],
+      cfgUnits["Mine"]["selfDestructDamage"],
       ])
       self.attacksLeft -= 1
       return True
@@ -255,7 +258,8 @@ class ShipType:
       cfgUnits[self.type]["damage"], 
       cfgUnits[self.type]["radius"],
       cfgUnits[self.type]["maxHealth"], 
-      cfgUnits[self.type]["maxHealth"]
+      cfgUnits[self.type]["maxHealth"],
+      cfgUnits[self.type]["selfDestructDamage"]
       ])
       player.energy -= self.cost
     return True

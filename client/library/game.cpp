@@ -169,18 +169,26 @@ DLLEXPORT int joinGame(Connection* c, int gameNum, const char* playerType)
   expression = extract_sexpr(reply);
   delete[] reply;
 
-  if(strcmp(expression->list->val, "join-accepted") != 0)
+  if(strcmp(expression->list->val, "join-accepted") == 0)
+  {
+    destroy_sexp(expression);
+    c->playerID = 1;
+    send_string(c->socket, "(game-start)");
+    return 1;
+  }
+  else if(strcmp(expression->list->val, "create-game") == 0)
+  {
+    std::cout << "Game did not exist, creating game " << c->gameNumber << endl;
+    destroy_sexp(expression);
+    c->playerID = 0;
+    return 1;
+  }
+  else
   {
     cerr << "Cannot join game "<< c->gameNumber << ": " << expression->list->next->val << endl;
     destroy_sexp(expression);
     return 0;
   }
-  destroy_sexp(expression);
-
-  c->playerID = 1;
-  send_string(c->socket, "(game-start)");
-
-  return 1;
 }
 
 DLLEXPORT void endTurn(Connection* c)
@@ -337,6 +345,8 @@ void parseShip(Connection* c, _Ship* object, sexp_t* expression)
   object->health = atoi(sub->val);
   sub = sub->next;
   object->maxHealth = atoi(sub->val);
+  sub = sub->next;
+  object->selfDestructDamage = atoi(sub->val);
   sub = sub->next;
 
 }
