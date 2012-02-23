@@ -100,13 +100,13 @@ class Match(DefaultGameWorld):
       player.energy = self.startEnergy
       player.warpGate = self.addObject(Ship, [player.id, (player.id * 2 - 1) * self.mapRadius / 2, 0] + self.warpGate).id
     
-    # Ensure you have at least 4 ships in the chain
-    if len(self.shipChain) < 4:
+    # Ensure you have at least 5 ships in the chain
+    if len(self.shipChain) < self.shipsPerRound:
       # Add a random permutation of the types to the chain
       random.shuffle(self.spawnableTypes)
       self.shipChain += self.spawnableTypes
-    # use the next 4
-    using, self.shipChain = self.shipChain[:4], self.shipChain[4:]
+    # use the next 5
+    using, self.shipChain = self.shipChain[:self.shipsPerRound], self.shipChain[self.shipsPerRound:]
     for shipType in using:
       self.addObject(ShipType, [shipType, cfgUnits[shipType]["cost"]])
     self.nextTurn()

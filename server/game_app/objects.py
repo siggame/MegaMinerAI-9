@@ -33,10 +33,8 @@ class Player:
     pass
 
   def talk(self, message):
-    #TODO: talk..look off past megaminers, very similar. NEED TALK ANIMATION
-    #self.game.animations.append(['Player-Talk', self.id, message])
-    #return True
-    pass
+    self.game.animations.append(['playerTalk', self.id, message])
+    return True
 
 
 class Ship:
@@ -78,12 +76,21 @@ class Ship:
       self.selfDestructDamage,
       ]
     return value
+    
+  def allInRange(self, owner, range = None):
+    result = []
+    if range == None:
+      range = self.range
+    for ship in self.game.objects.Ships:
+      if ship.owner == owner and inRange(self.x, self.y, range, ship.x, ship.y, ship.radius):
+        result.append(ship)
+    return result
 
   def nextTurn(self):
     #TODO: MAKE UNITS WARP IN AT START OF NEXT TURN
 
     #Healing other ships in range of engineering ship      
-    if self.owner != self.game.playerID and self.type == "Engineering":
+    if self.owner != self.game.playerID and self.type == "Support":
       for unit in self.game.objects.ships:
         if self.owner == unit.owner:
           if self.inRange(unit):
@@ -124,15 +131,13 @@ class Ship:
     #Check to see if they moved onto a mine, TWAS A TRAP!
     for unit in self.game.objects.ships:
       if unit.owner != self.owner and unit.type == "Mine": 
-        if inRange(x,y,self.radius,unit.x,unit.y,unit.radius):
-          #If a mine in range, hit the unit that moved there and destroy the mine
-          self.health -= unit.damage
+        if inRange(x,y,self.radius,unit.x,unit.y,unit.range):
+          for attacked in ship.allInRange(self.owner):
+            attacked.health -= unit.damage
+            self.game.animations.append(['attack', unit, attacked])
+            if attacked.health <= 0:
+              self.game.removeObject(attacked)
           self.game.removeObject(unit)
-          self.game.animations.append(['attack',unit.id,self.id])
-          if self.health <= 0:
-            pass
-            #TODO: Makes mines kill enemy ships
-#           self.game.removeObject(self)
     return True
 
   def selfDestruct(self):
@@ -173,6 +178,7 @@ class Ship:
       cfgUnits["Mine"]["selfDestructDamage"],
       ])
       self.attacksLeft -= 1
+      self.maxAttacks -= 1
       return True
     elif target.owner == self.owner:
       return 'No friendly fire please'
@@ -182,18 +188,17 @@ class Ship:
       #Checking to see if a radar is in range of the target
       for unit in self.game.objects.ships:
         if unit.owner == self.owner:
-          if unit.type == "Radar":
+          if unit.type == "Support":
             if unit.inRange(target):
             #Increment the damage modifier for each radar in range
               modifier+=.5
       if self.type == "EMP":
+        self.maxAttacks -= 1
         for unit in self.game.objects.ships:
           if unit.owner != self.owner:
             if self.inRange(unit):
               unit.attacksLeft = -1
               unit.movementLeft = -1
-              self.attacksLeft = -1
-              self.movementLeft = -1
               
       self.game.animations.append(['attack', self.id, target.id])
       target.health-=self.damage*modifier

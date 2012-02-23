@@ -86,6 +86,13 @@ stealth = Animation('stealth',
     Variable('acting', Ship),
     ],
   )
+  
+playerTalk = Animation('playerTalk',
+  data=[
+    Variable('acting', Player),
+    Variable('message', str),
+    ],
+  )
 
 deStealth = Animation('deStealth',
   data=[
