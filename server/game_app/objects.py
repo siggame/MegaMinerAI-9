@@ -221,6 +221,7 @@ class ShipType:
     pass
 
   def warpIn(self, x, y):
+    #TODO make units warp in at start of next turn
     #check to see whose turn it is, hint: it's player's turn
     if self.game.turnNumber == 0:
       player = self.game.objects.players[0]
@@ -234,7 +235,7 @@ class ShipType:
           warpX = ship.x
           warpY = ship.y
     if self.game.playerID != player.id:
-      print self.game.playerID, player.id
+      #print self.game.playerID, player.id
       return "You cannot warp in ships on your opponent's turn",
     if x**2 + y**2 > self.game.mapRadius**2:
       return "That ship would be lost in space...forever"
@@ -244,7 +245,7 @@ class ShipType:
       return "You must spawn that ship closer to your Warp Gate"
     else:    
       #spawn the unit with its stats, from units.cfg in config directory
-      print self.type, "ship spawned for player", self.game.playerID
+#      print self.type, "ship spawned for player", self.game.playerID
       self.game.addObject(Ship,[self.game.playerID, x, y, 
       cfgUnits[self.type]["radius"], self.type, 
       cfgUnits[self.type]["maxAttacks"], 
