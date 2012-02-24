@@ -1,7 +1,7 @@
 sources = $(wildcard *.cpp)
 headers = $(wildcard *.h)
 objects = $(sources:%.cpp=%.o)
-deps = $(sources:%.cpp=%.d)
+dependency = Makefile.dependencies
 CFLAGS += -g -I../library
 CXXFLAGS += -g -I../library
 
@@ -13,7 +13,7 @@ submit: client
 .PHONY: clean all subdirs
 
 clean:
-	rm -f $(objects) client
+	rm -f $(objects) client $(dependency)
 
 client: $(objects) ../library/client.a ../library/sexp/sexp.a
 	$(CXX) $(LDFLAGS) $(LOADLIBES) $(LDLIBS) $^ -g -o client
@@ -24,4 +24,7 @@ client: $(objects) ../library/client.a ../library/sexp/sexp.a
 ../library/sexp/sexp.a:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
--include $(deps)
+$(dependency): $(sources) $(headers)
+	$(CXX) -MM $(sources) $(CXXFLAGS) > $@
+
+-include $(dependency)
