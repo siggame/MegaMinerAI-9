@@ -21,7 +21,7 @@ def install():
       # charge the player that just went for the time they took
       self.objects.players[justWent].time -= timeSpent
       if self.objects.players[justWent].time <= 0:
-        self.declareWinner(self.players[aboutToGo], 'Opponent timed out')
+        self.declareWinner(self.players[aboutToGo], 'Player %d ran out of time'%(justWent + 1))
         games.remove(self)
       # calls the turn update
       result = func(self)
@@ -42,10 +42,10 @@ def install():
         elapsed = currentTime - i.turnStartTime
         if i.turn == i.players[0]:
           if p[0].time < elapsed:
-            i.declareWinner(i.players[1], 'Opponent timed out')
+            i.declareWinner(i.players[1], 'Player 1 ran out of time')
         elif i.turn == i.players[1]:
           if p[1].time < elapsed:
-            i.declareWinner(i.players[0], 'Opponent timed out')
+            i.declareWinner(i.players[0], 'Player 2 ran out of time')
         else:
           games.remove(i)
       else:
