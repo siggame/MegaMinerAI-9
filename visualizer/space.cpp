@@ -6,8 +6,6 @@
 
 namespace visualizer
 {
-  Log errorLog( "chess.log" ); 
-
   Space::Space()
   {
   } // Space::Space()
@@ -53,7 +51,6 @@ namespace visualizer
     {
       delete m_game;
       m_game = 0;
-      errorLog << gamelog;
       WARNING(
           "Cannot load gamelog, %s", 
           gamelog.c_str()
@@ -108,7 +105,7 @@ namespace visualizer
         else
         {
           ship->type = "ship";
-          cout << "null type encountered on ship!\n";
+          WARNING( "null type encountered on ship!" );
         }
 
         // Check for this ship's animations
