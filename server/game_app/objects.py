@@ -1,7 +1,10 @@
 import math
 import networking.config.config
 #Initializes the cfgUnits file
+#Initializes the cfgUnits file
 cfgUnits = networking.config.config.readConfig("config/units.cfg")
+for key in cfgUnits.keys():
+  cfgUnits[key]['type'] = key
 def distance(fromX, toX, fromY, toY):
   return int(math.ceil(math.sqrt((fromX-toX)**2 + (fromY-toY)**2)))
 
@@ -81,24 +84,25 @@ class Ship:
     result = []
     if range == None:
       range = self.range
-    for ship in self.game.objects.Ships:
+    for ship in self.game.objects.ships:
       if ship.owner == owner and inRange(self.x, self.y, range, ship.x, ship.y, ship.radius):
         result.append(ship)
     return result
 
   def nextTurn(self):
-    #TODO: MAKE UNITS WARP IN AT START OF NEXT TURN
+    #Ships warp in at the beginning of that player's turn
+    for warp in self.game.objects.players[self.game.playerID].warping:
+      shipStats = [cfgUnits[warp[0]][value] for value in self.game.ordering]   
+      self.game.addObject(Ship, [self.game.playerID, warp[1], warp[2]] + shipStats)
+      self.game.objects.players[self.game.playerID].warping.remove(warp)
 
-    #Healing other ships in range of engineering ship      
+    #Healing other ships in range of support ship      
     if self.owner != self.game.playerID and self.type == "Support":
-      for unit in self.game.objects.ships:
-        if self.owner == unit.owner:
-          if self.inRange(unit):
-            unit.health += unit.maxHealth * self.damage / 100.0
-            if unit.health > unit.maxHealth:
-              unit.health = unit.maxHealth
+      for healed in self.allInRange(self.owner):
+        healed.health += healed.maxHealth * self.damage / 100.0
+        if healed.health > healed.maxHealth:
+          healed.health = healed.maxHealth
 
-    #TODO: Make sure minelayers don't get attacks replenished
     if self.owner == self.game.playerID:
       if self.movementLeft == -1 and self.attacksLeft == -1:
         self.movementLeft = 0
@@ -141,8 +145,7 @@ class Ship:
     return True
 
   def selfDestruct(self):
-    #TODO: NO SPLODEY FOR WARP GATES
-    if self.owner == self.game.playerID:
+    if self.owner != self.game.playerID:
       return "The enemy ship refuses to blow itself up, sorry"
     for target in self.game.objects.ships:
       if inRange (self.x, self.y, self.radius,target.x, target.y, target.radius):
@@ -254,19 +257,8 @@ class ShipType:
       return "You must spawn that ship closer to your Warp Gate"
     else:    
       #spawn the unit with its stats, from units.cfg in config directory
-#      print self.type, "ship spawned for player", self.game.playerID
-      self.game.addObject(Ship,[self.game.playerID, x, y, 
-      cfgUnits[self.type]["radius"], self.type, 
-      cfgUnits[self.type]["maxAttacks"], 
-      cfgUnits[self.type]["maxMovement"], 
-      cfgUnits[self.type]["maxMovement"], 
-      cfgUnits[self.type]["maxAttacks"], 
-      cfgUnits[self.type]["damage"], 
-      cfgUnits[self.type]["radius"],
-      cfgUnits[self.type]["maxHealth"], 
-      cfgUnits[self.type]["maxHealth"],
-      cfgUnits[self.type]["selfDestructDamage"]
-      ])
+      #Add unit to queue to be warped in at the beginning of this player's next turn
+      self.game.objects.players[self.game.playerID].warping.append([self.type,x,y])
       player.energy -= self.cost
     return True
     

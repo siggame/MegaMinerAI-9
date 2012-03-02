@@ -10,10 +10,7 @@ import scribe
 import random
 
 Scribe = scribe.Scribe
-#Initializes the cfgUnits file
-cfgUnits = networking.config.config.readConfig("config/units.cfg")
-for key in cfgUnits.keys():
-  cfgUnits[key]['type'] = key
+
 
 def loadClassDefaults(cfgFile = "config/defaults.cfg"):
   cfg = networking.config.config.readConfig(cfgFile)
@@ -139,6 +136,7 @@ class Match(DefaultGameWorld):
     player1 = self.objects.players[0]
     player2 = self.objects.players[1]    
     gates = [player.warpGate for player in self.objects.players]
+    print gates
     #gates = [player.warpGate for ship in self.objects.ships]
     if len(gates) < 2:
       if len(gates) == 1:
