@@ -93,8 +93,11 @@ class Ship:
   def nextTurn(self):
     #Ships warp in at the beginning of that player's turn
     for warp in self.game.objects.players[self.game.playerID].warping:
+      #Uses a list of ship values in the config to get all of the ships stats
       shipStats = [cfgUnits[warp[0]][value] for value in self.game.ordering]   
+      #Adds the ship with the retreived stats to the game
       self.game.addObject(Ship, [self.game.playerID, warp[1], warp[2]] + shipStats)
+      #Remove the created ship from the queue
       self.game.objects.players[self.game.playerID].warping.remove(warp)
 
     #Healing other ships in range of support ship      
@@ -148,48 +151,32 @@ class Ship:
     return True
 
   def selfDestruct(self):
-    #Done, need to check. TODO: NO SPLODEY FOR WARP GATES
     if self.type == "Warp Gate":
       return "You cannot explode your Warp Gate"
     if self.owner != self.game.playerID:
       return "The enemy ship refuses to blow itself up, sorry"
-    for target in self.game.objects.ships:
-      if inRange (self.x, self.y, self.radius,target.x, target.y, target.radius):
-        if target.owner != self.owner:
-          self.attack(target)   
-          self.game.removeObject(self)
-          self.game.animations.append(['selfDestruct', self.id])
+    for target in ship.allInRange(self.owner^1):   
+      self.attack(target)   
+      self.game.removeObject(self)
+      self.game.animations.append(['selfDestruct', self.id])
     return True
     
   def attack(self, target):
         
-    #TODO: cannot attack same target >1 per turn.
-      #(can make a set of possible targets, and remove target each time)
+    #TODO: Check ships can't attack same ship multiple times
     if target.type == "Mine":
       return "You cannot attack mines"
     modifier = 1
-    #DONE? need to check TODO: MAKE SURE NO ATTACK MINES
     if self.owner != self.game.playerID:
        return "You cannot make enemy ships attack"
     if self.attacksLeft <= 0:
-      return 'You have no attacks left'
+      return "Ship %i has no attacks left"%(self.id)
     if target.id in self.targeted:
       return "You have already commaned %i to attack %i"%(self.id, target.id)
-    if self.type == "Mine Layer" and self.id == target.id:
-      self.game.addObject(Ship,[self.game.playerID, self.x, self.y, 
-      cfgUnits["Mine"]["radius"], "Mine", 
-      cfgUnits["Mine"]["maxAttacks"], 
-      cfgUnits["Mine"]["maxMovement"], 
-      cfgUnits["Mine"]["maxMovement"], 
-      cfgUnits["Mine"]["maxAttacks"], 
-      cfgUnits["Mine"]["damage"], 
-      cfgUnits["Mine"]["radius"],
-      cfgUnits["Mine"]["maxHealth"], 
-      cfgUnits["Mine"]["maxHealth"],
-      cfgUnits["Mine"]["selfDestructDamage"],
-      ])
-      self.attacksLeft -= 1
-      self.maxAttacks -= 1
+    if self.type == "Mine Layer" and self.id == target.id:   
+      #Adding a new mine to the game
+      shipStats = [cfgUnits["Mine"][value] for value in self.game.ordering]   
+      self.game.addObject(Ship, [self.game.playerID, self.x, self.y] + shipStats)
       return True
     elif target.owner == self.owner:
       return 'No friendly fire please'
@@ -205,12 +192,9 @@ class Ship:
               modifier+=.5
       if self.type == "EMP":
         self.maxAttacks -= 1
-        for unit in self.game.objects.ships:
-          if unit.owner != self.owner:
-            if self.inRange(unit):
-              unit.attacksLeft = -1
-              unit.movementLeft = -1
-              
+        for victim in self.allInRange(target.owner):
+          unit.attacksLeft = -1
+          unit.movementLeft = -1             
       self.game.animations.append(['attack', self.id, target.id])
       target.health-=self.damage*modifier
       self.attacksLeft -= 1
