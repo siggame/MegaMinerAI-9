@@ -15,10 +15,23 @@ class AI(BaseAI):
     return "password"
 
   def init(self):
+    warp = []
+    battleship = []
+    juggernaut = []
+    miner = []
+    support = []
+    emp = []
+    stealth = []
+    crusier = []
+    weapons = []
+    interceptor = []
+    bomber = []
+    avail = []
     for ship in self.shipTypes:
       if ship.getType() == "Stealth":
         print "WARNING: STEALTH SHIPS ARE AVAILABLE"
-
+      avail.append(ship.getType())
+    print avail  
 
   def end(self):
     pass
@@ -30,31 +43,38 @@ class AI(BaseAI):
     return self.distance(x1, x2, y1, y2) <= rad1 + rad2
       
   def run(self):
+    print len(warp)
+    for type in self.shipTypes:
+      print type.getType()
     myships = []
     enemy = []
     randShip = random.randrange(0,4)
     newshiptype = self.shipTypes[randShip]
+ 
+    #distinguish my ships from enemy ships
     for ship in self.ships:
        if ship.getOwner() == self.playerID():
          myships.append(ship)
        elif ship.getOwner() != self.playerID():
          enemy.append(ship)
+    
     for ship in myships:
+       move = ship.getMaxMovement()
+       attack = ship.getMaxAttacks()
+       #warp in ships
        if ship.getType() == "Warp Gate": 
          newshiptype.warpIn(ship.getX(),ship.getY())
-       attack_list = [1,1,1]
+       #attacky stuff
        for foe in enemy:
-        if ship.getAttacksLeft()>0:
-         if ship.getType() == "Mine Layer" and self.distance(ship.getX(),ship.getY(),foe.getX(),foe.getY())<=ship.getRange():
-           ship.attack(ship)                   
-         elif self.inRange(ship.getX(),ship.getY(), ship.getRadius(), foe.getX(), foe.getY(), foe.getRadius()):
-           for i in attack_list:
-            ship.attack(foe)
+          if ship.getAttacksLeft()>0:
+           if ship.getType() == "Mine Layer" and self.distance(ship.getX(),ship.getY(),foe.getX(),foe.getY())<=ship.getRange():
+             ship.attack(ship)                   
+           elif self.inRange(ship.getX(),ship.getY(), ship.getRadius(), foe.getX(), foe.getY(), foe.getRadius()):
+             ship.attack(foe)
+       #movey stuff
        dirX = 0; dirY = 0; randX = 0; randY = 0
-       move_list = [1,1,1,1]
        randX = random.randrange(-10,10)
        randY = random.randrange(-10,10)
-       move = ship.getMaxMovement()
        while move > 0:
          if ship.getX() > 0:
             dirX = -1*ship.getMovementLeft()/5

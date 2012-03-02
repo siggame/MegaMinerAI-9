@@ -59,6 +59,7 @@ class Ship:
     self.maxHealth = maxHealth
     self.selfDestructDamage = selfDestructDamage
     self.stealthed = False
+    self.targeted = set()
 
   def toList(self):
     value = [
@@ -97,6 +98,8 @@ class Ship:
       self.game.objects.players[self.game.playerID].warping.remove(warp)
 
     #Healing other ships in range of support ship      
+    self.targeted = set()
+    #Healing other ships in range of engineering ship      
     if self.owner != self.game.playerID and self.type == "Support":
       for healed in self.allInRange(self.owner):
         healed.health += healed.maxHealth * self.damage / 100.0
@@ -145,13 +148,14 @@ class Ship:
     return True
 
   def selfDestruct(self):
+    #Done, need to check. TODO: NO SPLODEY FOR WARP GATES
+    if self.type == "Warp Gate":
+      return "You cannot explode your Warp Gate"
     if self.owner != self.game.playerID:
       return "The enemy ship refuses to blow itself up, sorry"
     for target in self.game.objects.ships:
       if inRange (self.x, self.y, self.radius,target.x, target.y, target.radius):
         if target.owner != self.owner:
-          #TODO: MAKE NOT ATTACK - SOMETHING UNIQUE
-          #TODO: Make Kamakizes (too lazy to check spelling) really good at exploding
           self.attack(target)   
           self.game.removeObject(self)
           self.game.animations.append(['selfDestruct', self.id])
@@ -161,12 +165,16 @@ class Ship:
         
     #TODO: cannot attack same target >1 per turn.
       #(can make a set of possible targets, and remove target each time)
+    if target.type == "Mine":
+      return "You cannot attack mines"
     modifier = 1
-    #TODO: MAKE SURE NO ATTACK MINES
+    #DONE? need to check TODO: MAKE SURE NO ATTACK MINES
     if self.owner != self.game.playerID:
        return "You cannot make enemy ships attack"
     if self.attacksLeft <= 0:
       return 'You have no attacks left'
+    if target.id in self.targeted:
+      return "You have already commaned %i to attack %i"%(self.id, target.id)
     if self.type == "Mine Layer" and self.id == target.id:
       self.game.addObject(Ship,[self.game.playerID, self.x, self.y, 
       cfgUnits["Mine"]["radius"], "Mine", 
@@ -208,6 +216,7 @@ class Ship:
       self.attacksLeft -= 1
       if target.health <= 0:
         self.game.removeObject(target)
+    self.targeted.add(target.id)
     return True 
     
   def inRange(self, target):
