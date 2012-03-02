@@ -98,7 +98,6 @@ class Ship:
             if unit.health > unit.maxHealth:
               unit.health = unit.maxHealth
 
-    #TODO: Make sure minelayers don't get attacks replenished
     if self.owner == self.game.playerID:
       if self.movementLeft == -1 and self.attacksLeft == -1:
         self.movementLeft = 0
@@ -141,14 +140,14 @@ class Ship:
     return True
 
   def selfDestruct(self):
-    #TODO: NO SPLODEY FOR WARP GATES
+    #Done, need to check. TODO: NO SPLODEY FOR WARP GATES
+    if self.type == "Warp Gate":
+      return "You cannot explode your Warp Gate"
     if self.owner == self.game.playerID:
       return "The enemy ship refuses to blow itself up, sorry"
     for target in self.game.objects.ships:
       if inRange (self.x, self.y, self.radius,target.x, target.y, target.radius):
         if target.owner != self.owner:
-          #TODO: MAKE NOT ATTACK - SOMETHING UNIQUE
-          #TODO: Make Kamakizes (too lazy to check spelling) really good at exploding
           self.attack(target)   
           self.game.removeObject(self)
           self.game.animations.append(['selfDestruct', self.id])
@@ -158,8 +157,10 @@ class Ship:
         
     #TODO: cannot attack same target >1 per turn.
       #(can make a set of possible targets, and remove target each time)
+    if target.type == "Mine":
+      return "You cannot attack mines"
     modifier = 1
-    #TODO: MAKE SURE NO ATTACK MINES
+    #DONE? need to check TODO: MAKE SURE NO ATTACK MINES
     if self.owner != self.game.playerID:
        return "You cannot make enemy ships attack"
     if self.attacksLeft <= 0:
