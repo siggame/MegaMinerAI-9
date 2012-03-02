@@ -141,9 +141,6 @@ class Match(DefaultGameWorld):
         gates.append(player1.warpGate)
       elif obj == player2.warpGate:  
         gates.append( player2.warpGate)     
-  #  gates = [player.warpGate for player in self.objects.players]
-    print gates
-    #gates = [player.warpGate for ship in self.objects.ships]
     if len(gates) < 2:
       if len(gates) == 1:
         if player1.warpGate in self.objects:
@@ -183,11 +180,13 @@ class Match(DefaultGameWorld):
     player1 = self.objects.players[0]
     player2 = self.objects.players[1]
     if player1.victories >= self.victories and player1.victories > player2.victories:
-      self.declareWinner(self.players[0], "Decisive")
+      self.declareWinner(self.players[0], "Player " + str(self.objects.players[0].id+1) + " has won the game " \
+      + str(self.objects.players[0].victories) + "-" + str(self.objects.players[1].victories))
     elif player2.victories >= self.victories and player2.victories > player1.victories:
-      self.declareWinner(self.players[1], "Decisive")
+      self.declareWinner(self.players[1], "Player " + str(self.objects.players[1].id+1) + " has won the game " \
+      + str(self.objects.players[1].victories) + "-" + str(self.objects.players[0].victories))
     elif player1.victories >= self.victories and player2.victories >= self.victories:
-      self.declareWinner(random.choice(self.players), "Luck")
+      self.declareWinner(random.choice(self.players), "The game is a tie")
 
   def declareWinner(self, winner, reason=''):
     #TODO give reasons for winning, who has more round victories, etc..
