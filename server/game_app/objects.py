@@ -108,7 +108,7 @@ class Ship:
         healed.health += healed.maxHealth * self.damage / 100.0
         if healed.health > healed.maxHealth:
           healed.health = healed.maxHealth
-
+          
     if self.owner == self.game.playerID:
       if self.movementLeft == -1 and self.attacksLeft == -1:
         self.movementLeft = 0
@@ -183,24 +183,27 @@ class Ship:
     elif not self.inRange(target):
       return "Target too far away"           
     else:       
-      #Checking to see if a radar is in range of the target
+      #Factor in damage buff for Support ships neat opponent
       for unit in self.game.objects.ships:
         if unit.owner == self.owner:
           if unit.type == "Support":
             if unit.inRange(target):
             #Increment the damage modifier for each radar in range
               modifier+=.5
+              
+      #Special attack for the EMP class
       if self.type == "EMP":
         self.maxAttacks -= 1
         for victim in self.allInRange(target.owner):
           unit.attacksLeft = -1
-          unit.movementLeft = -1             
+          unit.movementLeft = -1  
+          
       self.game.animations.append(['attack', self.id, target.id])
       target.health-=self.damage*modifier
       self.attacksLeft -= 1
       if target.health <= 0:
         self.game.removeObject(target)
-    self.targeted.add(target.id)
+      self.targeted.add(target.id)
     return True 
     
   def inRange(self, target):
