@@ -56,6 +56,7 @@ class Ship:
     self.maxHealth = maxHealth
     self.selfDestructDamage = selfDestructDamage
     self.stealthed = False
+    self.targeted = set()
 
   def toList(self):
     value = [
@@ -87,8 +88,7 @@ class Ship:
     return result
 
   def nextTurn(self):
-    #TODO: MAKE UNITS WARP IN AT START OF NEXT TURN
-
+    self.targeted = set()
     #Healing other ships in range of engineering ship      
     if self.owner != self.game.playerID and self.type == "Support":
       for unit in self.game.objects.ships:
@@ -165,6 +165,8 @@ class Ship:
        return "You cannot make enemy ships attack"
     if self.attacksLeft <= 0:
       return 'You have no attacks left'
+    if target.id in self.targeted:
+      return "You have already commaned %i to attack %i"%(self.id, target.id)
     if self.type == "Mine Layer" and self.id == target.id:
       self.game.addObject(Ship,[self.game.playerID, self.x, self.y, 
       cfgUnits["Mine"]["radius"], "Mine", 
@@ -206,6 +208,7 @@ class Ship:
       self.attacksLeft -= 1
       if target.health <= 0:
         self.game.removeObject(target)
+    self.targeted.add(target.id)
     return True 
     
   def inRange(self, target):
