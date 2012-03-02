@@ -134,8 +134,14 @@ class Match(DefaultGameWorld):
 
   def checkRoundWinner(self):
     player1 = self.objects.players[0]
-    player2 = self.objects.players[1]    
-    gates = [player.warpGate for player in self.objects.players]
+    player2 = self.objects.players[1]   
+    gates = []
+    for obj in self.objects:
+      if obj == player1.warpGate:
+        gates.append(player1.warpGate)
+      elif obj == player2.warpGate:  
+        gates.append( player2.warpGate)     
+  #  gates = [player.warpGate for player in self.objects.players]
     print gates
     #gates = [player.warpGate for ship in self.objects.ships]
     if len(gates) < 2:
@@ -169,7 +175,8 @@ class Match(DefaultGameWorld):
         else:
           player1.victories += 1
           player2.victories += 1
-      self.nextRound()
+      if player1.victories < self.victories and player2.victories < self.victories:
+        self.nextRound()
     
   def checkWinner(self):
     self.checkRoundWinner()
