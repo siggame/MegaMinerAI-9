@@ -105,7 +105,7 @@ namespace visualizer
         else
         {
           ship->type = "ship";
-          WARNING( "null type encountered on ship!" );
+          MESSAGE( "null type encountered on ship!" );
         }
 
         // Check for this ship's animations
