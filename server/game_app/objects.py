@@ -249,7 +249,7 @@ class ShipType:
       return "That ship would be lost in space...forever"
     elif player.energy < self.cost:
       return "You need to not be poor to buy that kind of ship"
-    elif not inRange(warpX,warpY,cfgUnits["Warp Gate"]["range"],x,y,0) and self.type != "FTL":
+    elif not inRange(warpX,warpY,cfgUnits["Warp Gate"]["range"],x,y,0):
       return "You must spawn that ship closer to your Warp Gate"
     else:    
       #spawn the unit with its stats, from units.cfg in config directory
