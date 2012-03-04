@@ -105,17 +105,18 @@ namespace visualizer
         else
         {
           ship->type = "ship";
-          WARNING( "null type encountered on ship!" );
+          //WARNING( "null type encountered on ship!" );
+          cout << "null type encountered on ship!\n";
         }
 
         // Check for this ship's animations
         for
-          (
+        (
            std::vector< SmartPointer< parser::Animation > >::iterator j = m_game->states[ state ].animations[ ship->id ].begin();
            j != m_game->states[ state ].animations[ ship->id ].end();
            j++
-          )
-          {
+        )
+        {
             switch( (*j)->type )
             {
               case parser::ATTACK:
@@ -135,7 +136,7 @@ namespace visualizer
 
                 } break;
             }
-          }
+        }
 
         ship->addKeyFrame( new DrawSpaceShip( ship ) );
         turn.addAnimatable( ship );

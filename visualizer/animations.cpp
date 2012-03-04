@@ -19,11 +19,13 @@ namespace visualizer
   
     void DrawSpaceShip::animate( const float& /* t */, AnimData * /* d */, IGame* game )
     {
+        // HOW TO USE OPTIONS: if( game->options->getNumber( "RotateBoard" ) )
+        
         Color teamColor[] = { Color(0.666, 0, 0), Color(0, 0, 0.666) };
         
         SpaceShip &ship = *m_spaceShip;
         
-                // Build the ship type string and replace spaces with '-'
+        // Build the ship type string and replace spaces with '-'
         string shipType = ship.type;
         for(int i = 0; i < shipType.length(); i++)
         {
@@ -33,25 +35,40 @@ namespace visualizer
             }
         }
         
+        // Build the Ship's Texture string in textures.r
+        stringstream shipTexture;
+        if(strcmp("ship",shipType.c_str()) == 0)
+        {
+            shipTexture << "Ship-Default";
+        }
+        else
+        {
+            shipTexture << "Ship-" << (ship.owner ? "Blue-" : "Red-") << shipType;
+        }
         
-        game->renderer->setColor( Color(1, 1, 1) );
+        // Set the color to white for drawing the ship
+        game->renderer->setColor( Color(1, 1, 1, 1) );
+        game->renderer->drawTexturedQuad((float)ship.x - (float)ship.radius/1.25f, (float)ship.y - (float)ship.radius/1.25f, ship.radius * 1.6f, ship.radius * 1.6f, shipTexture.str());
+        game->renderer->drawTexturedQuad((float)ship.x - (float)ship.radius, (float)ship.y - (float)ship.radius, ship.radius * 2.38f, ship.radius * 2.38f, (ship.owner ? "Blue-Shield" : "Red-Shield"));
         
-        //if( game->options->getNumber( "RotateBoard" ) )
-        game->renderer->drawTexturedQuad((float)ship.x - (float)ship.radius, (float)ship.y - (float)ship.radius, ship.radius * 2, ship.radius * 2, shipType);
+        // Set the color to the team color to draw the outline of the shield
         game->renderer->setColor( teamColor[ship.owner] );
         game->renderer->drawCircle(ship.x, ship.y, ship.radius, 1);
+        
+        game->renderer->drawLine(ship.x - 5, ship.y, ship.x + 5, ship.y, 1);
+        game->renderer->drawLine(ship.x, ship.y - 5, ship.x, ship.y + 5, 1);
     }
     
     void DrawShipAttack::animate( const float& t, AnimData *d, IGame* game )
     {
         Color teamColor[] = { Color(1, 0, 0, t), Color(0, 0, 1, t) };
         
-        cout << "time t: " << t << endl;
+        //cout << "time t: " << t << endl;
         
         //AttackData *attack = (AttackData*)d;
         AttackData &attack = *m_attackData;
         
-        cout << "attack: a(" << attack.attackerX << "," << attack.attackerY << ") to v(" << attack.victimX << "," << attack.victimY << ")" << endl;
+        //cout << "attack: a(" << attack.attackerX << "," << attack.attackerY << ") to v(" << attack.victimX << "," << attack.victimY << ")" << endl;
         
         game->renderer->setColor( teamColor[attack.attackerTeam] );
         game->renderer->drawLine(attack.attackerX, attack.attackerY, attack.victimX, attack.victimY, 2); 
