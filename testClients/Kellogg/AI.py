@@ -15,24 +15,86 @@ class AI(BaseAI):
     return "password"
 
   def init(self):
+    pass 
+    
+  def warp(self,player,ships):
     warp = []
+    for ship in ships:
+      if ship.getOwner() == player and ship.getType() == "Warp Gate":
+        warp.append(ship)
+    print "lenght of warp is ",len(warp)
+    return warp
+    
+  def battleship(self,player,ships):
     battleship = []
+    for ship in ships:
+      if ship.getOwner() == player and ship.getType() == "Battleship":
+        battleship.append(ship)
+    return battleship
+    
+  def juggernaut(self,player,ships):
     juggernaut = []
-    miner = []
-    support = []
-    emp = []
-    stealth = []
-    crusier = []
-    weapons = []
-    interceptor = []
-    bomber = []
-    avail = []
-    for ship in self.shipTypes:
-      if ship.getType() == "Stealth":
-        print "WARNING: STEALTH SHIPS ARE AVAILABLE"
-      avail.append(ship.getType())
-    print avail  
+    for ship in ships:
+      if ship.getOwner() == player and ship.getType() == "Juggernaut":
+        juggernaut.append(ship)
+    return juggernaut
+    
+  def mines(self,player,ships):
+    mines = []
+    for ship in ships:
+      if ship.getOwner() == player and ship.getType() == "Mine Layer":
+        mines.append(ship)
+    return mines  
 
+  def support(self,player,ships):
+    support = []
+    for ship in ships:
+      if ship.getOwner() == player and ship.getType() == "Support":
+        support.append(ship)
+    return support
+
+  def emp(self,player,ships):
+    emp = []
+    for ship in ships:
+      if ship.getOwner() == player and ship.getType() == "EMP":
+        emp.append(ship)
+    return emp
+        
+  def stealth(self,player,ships):
+    stealth = []
+    for ship in ships:
+      if ship.getOwner() == player and ship.getType() == "Stealth":
+        stealth.append(ship)
+    return stealth
+    
+  def cruiser(self,player,ships):
+    cruiser = []
+    for ship in ships:
+      if ship.getOwner() == player and ship.getType() == "Cruiser":
+        cruiser.append(ship)
+    return cruiser
+
+  def weapons(self,player,ships):
+    weapons = []
+    for ship in ships:
+      if ship.getOwner() == player and ship.getType() == "Weapons Platform":
+        weapons.append(ship)
+    return weapons
+    
+  def interceptor(self,player,ships):
+    intercept = []
+    for ship in ships:
+      if ship.getOwner() == player and ship.getType() == "Interceptor":
+        intercept.append(ship)
+    return intercept
+
+  def bomber(self,player,ships):
+    bomber = []
+    for ship in ships:
+      if ship.getOwner() == player and ship.getType() == "Bomber":
+        bomber.append(ship)
+    return bomber
+         
   def end(self):
     pass
 
@@ -42,10 +104,51 @@ class AI(BaseAI):
   def inRange(self,x1, y1, rad1, x2, y2, rad2):
     return self.distance(x1, x2, y1, y2) <= rad1 + rad2
       
+  
+#  def smartWarp(self,warpShip,type,energy,
+  
   def run(self):
-    print len(warp)
+    #Gah, so many ships
+    ships = []
+    types = []
+    warps = []
+    batShips = []
+    juggs = []
+    mineLayers = []
+    supports = []
+    emps = []
+    stealths = []
+    cruisers = []
+    weapPlats = []
+    interCeps = []
+    bombers = []
+        
     for type in self.shipTypes:
-      print type.getType()
+      types.append(type.getType)
+    ships = self.ships
+    player = self.playerID()
+    foe = (player+1)%2
+    types = []
+    for type in self.shipTypes:
+      types.append(type.getType()) 
+    types = types + ['Warp Gate']
+
+    funDict = {'Warp Gate':self.warp,'Battleship':self.battleship,'Juggernaut':self.juggernaut,'Mine Layer':self.mines,'Support':self.support,'EMP':self.emp,'Stealth':self.stealth,'Cruiser':self.cruiser,'Weapons Platform':self.weapons,'Interceptor':self.interceptor,'Bomber':self.bomber}
+    myListDict = {'Warp Gate':warps,'Battleship':batShips,'Juggernaut':juggs,'MineLayer':mineLayers,'Support':supports,'EMP':emps,'Stealth':stealths,'Cruiser':cruisers,'Weapons Platform':weapPlats,'Interceptor':interCeps,'Bomber':bombers}
+    for ty in types:
+      try:
+        myListDict[ty] = funDict[ty](player,ships)  
+      except KeyError:
+        print "something bad happened on 141"
+    print len(myListDict['Warp Gate'])
+    
+    for w in myListDict['Warp Gate']:
+      print w.getX(),w.getY()
+      w.move(w.getX()+10,w.getY()+10)
+
+
+#OLD CODE    
+    comment = """
     myships = []
     enemy = []
     randShip = random.randrange(0,4)
@@ -89,7 +192,7 @@ class AI(BaseAI):
            ship.move(ship.getX()+dirX,ship.getY()+dirY)
          move -= dis
        if self.turnNumber()%100 >= 95:
-         ship.selfDestruct()
+         ship.selfDestruct()"""
     return 1
 
   def __init__(self, conn):
