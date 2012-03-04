@@ -92,6 +92,8 @@ namespace visualizer
         ship->owner = i->second.owner;
         ship->y = i->second.y + m_mapRadius;
         ship->x = i->second.x + m_mapRadius;
+        ship->health = i->second.health;
+        ship->maxHealth = i->second.maxHealth;
         ship->radius = i->second.radius;
 
         turn[ship->id]["x"] = ship->x;
