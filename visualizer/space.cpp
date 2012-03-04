@@ -92,6 +92,8 @@ namespace visualizer
         ship->owner = i->second.owner;
         ship->y = i->second.y + m_mapRadius;
         ship->x = i->second.x + m_mapRadius;
+        ship->health = i->second.health;
+        ship->maxHealth = i->second.maxHealth;
         ship->radius = i->second.radius;
 
         turn[ship->id]["x"] = ship->x;
@@ -105,17 +107,18 @@ namespace visualizer
         else
         {
           ship->type = "ship";
-          MESSAGE( "null type encountered on ship!" );
+          //WARNING( "null type encountered on ship!" );
+          cout << "null type encountered on ship!\n";
         }
 
         // Check for this ship's animations
         for
-          (
+        (
            std::vector< SmartPointer< parser::Animation > >::iterator j = m_game->states[ state ].animations[ ship->id ].begin();
            j != m_game->states[ state ].animations[ ship->id ].end();
            j++
-          )
-          {
+        )
+        {
             switch( (*j)->type )
             {
               case parser::ATTACK:
@@ -135,7 +138,7 @@ namespace visualizer
 
                 } break;
             }
-          }
+        }
 
         ship->addKeyFrame( new DrawSpaceShip( ship ) );
         turn.addAnimatable( ship );
