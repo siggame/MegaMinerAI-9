@@ -104,11 +104,43 @@ class AI(BaseAI):
   def inRange(self,x1, y1, rad1, x2, y2, rad2):
     return self.distance(x1, x2, y1, y2) <= rad1 + rad2
       
+  def allInRange(self, source):
+    result = []
+    range = source.getRange(); owner = source.getOwner()
+    if source.getType() != 'Support':
+      for ship in self.Ships:
+          if ship.getOwner() != owner and self.inRange(source.getX(), source.getY(), range, ship.getX(), ship.getY(), ship.getRadius()):
+            result.append(ship)
+    elif source.getTyp() == 'Support':
+      for ship in self.Ships:
+        if ship.getOwner() == owner and self.inRange(source.getX(), source.getY(), range, ship.getX(), ship.getY(), ship.getRadius()):
+         result.append(ship)
+    else:
+      print source.getType(), "from allInRange, unrecognized type"                       
+    return result
+                                        
+  
   
   def smartWarp(self,warpShip,type,shipsOfType):
+     #TODO: make smart
      print "WARPING IN A ",type.getType()
      type.warpIn(warpShip.getX(),warpShip.getY())
-    
+ 
+  def bestUseAttack(self,ship):
+    targets = self.allInRange(ship)
+    health = 0
+    maxHealth = 0
+    damage = ship.getDamage()
+    maxAttacks = ship.getMaxAttacks()
+    while maxAttacks > 0:
+      for target in targets:
+        if target.getHealth() > health and target.getHealth() <= damage:# and target.getMaxHealth() > maxHealth:
+          guy = target
+          health = target.getHealth()
+      ship.attack(guy)
+      targets.remove(guy)
+      maxAttacks-=1
+ 
   def run(self):
     #Gah, so many ships
     types = []
