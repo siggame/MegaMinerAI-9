@@ -14,12 +14,13 @@ namespace visualizer
         game->renderer->drawTexturedQuad(0, 0, 2000, 2000, "background");
         game->renderer->drawLine(490, 500, 510, 500, 1);
         game->renderer->drawLine(500, 490, 500, 510, 1);
-        game->renderer->drawCircle(500, 500, 500, 1);
+        game->renderer->drawArc(500, 500, 500, 50 );
     }
   
     void DrawSpaceShip::animate( const float& /* t */, AnimData * /* d */, IGame* game )
     {
         Color teamColor[] = { Color(0.666, 0, 0), Color(0, 0, 0.666) };
+        Color health = Color(0, 0.666, 0);
         
         SpaceShip &ship = *m_spaceShip;
         
@@ -35,13 +36,25 @@ namespace visualizer
         
         
         game->renderer->setColor( Color(1, 1, 1) );
+        const float upAngle = -90;
+        const float healthSection = 100;
+        ship.maxHealth = ship.maxHealth ? ship.maxHealth : 1;
+        float healthLeft = float(ship.health)/ship.maxHealth;
+        float healthStart = upAngle-healthSection*healthLeft;
+        float healthEnd   = upAngle+healthSection*healthLeft;
+        cout << healthLeft << endl;
+
         
         //if( game->options->getNumber( "RotateBoard" ) )
         game->renderer->drawTexturedQuad((float)ship.x - (float)ship.radius, (float)ship.y - (float)ship.radius, ship.radius * 2, ship.radius * 2, shipType);
+
         game->renderer->setColor( teamColor[ship.owner] );
-        game->renderer->drawCircle(ship.x, ship.y, ship.radius, 1);
+        game->renderer->drawArc(ship.x, ship.y, ship.radius, 100, healthEnd, healthStart+360 );
+        game->renderer->setColor( health );
+        game->renderer->drawArc(ship.x, ship.y, ship.radius, 100, healthStart, healthEnd );
     }
     
+
     void DrawShipAttack::animate( const float& t, AnimData *d, IGame* game )
     {
         Color teamColor[] = { Color(1, 0, 0, t), Color(0, 0, 1, t) };
