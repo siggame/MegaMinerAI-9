@@ -4,6 +4,9 @@ from GameObject import *
 import math
 import random
 
+myShips = []
+theirShips = []
+
 class AI(BaseAI):
   """The class implementing gameplay logic."""
   @staticmethod
@@ -21,7 +24,7 @@ class AI(BaseAI):
     return self.distance(x1, x2, y1, y2) <= rad1 + rad2   
         
   #Returns the x and y position of the nearest enemy
-  def findNearest(self,ship,theirShips):
+  def findNearest(self,ship):
     distance = 10000; closestX = ship.getX(); closestY = ship.getY()
     for enemy in theirShips:
       if distance > self.distance(ship.getX(), enemy.getX(), ship.getY(),enemy.getY()):
@@ -44,10 +47,14 @@ class AI(BaseAI):
     return [startX + endX, startY + endY]
    
   #Moves ship away from the nearest enemy
-  def moveAway(self,ship,theirShips): 
-    nearest = self.findNearest(ship,theirShips)
+  def moveAway(self,ship): 
+    nearest = self.findNearest(ship)
     points = self.moveTo(ship, nearest[0],nearest[1])
     newPoints = [ship.getX() + (ship.getX() - points[0]), ship.getY() + (ship.getY() - points[1])]
+    # If unit would move outside of the map, reduce move until it is legal
+    while newPoints[0]**2 + newPoints[1]**2 > self.mapRadius()**2:
+      newPoints[0] -= 2
+      newPoints[1] -= 2
     ship.move(newPoints[0],newPoints[1])
 
   def attackFurthestUnit(self,ship,target):
@@ -119,7 +126,7 @@ class AI(BaseAI):
         energyLeft -= availShips["Stealth"].getCost()   
         
   #Attack all enemies in range with all attacks
-  def attackAllInRange(self,ship,theirShips):
+  def attackAllInRange(self,ship):
     attackList = []
     attacksLeft = ship.getAttacksLeft()
     #Construct a list of all enemies in range
@@ -129,15 +136,17 @@ class AI(BaseAI):
         attackList.append(enemy)
     #While I still have targets and attacks, attack!
     #TODO: Make ships prioritize special ships
-    for target in attackList
+    print "New attacker: " + ship.getType() + " " + str(ship.getAttacksLeft())
+    for target in attackList:
+      print target.getId()
       if attacksLeft > 0:
         ship.attack(target)
         #Remove them from possible targets if they died
-        if target.getHealth() < ship.getDamage():
+        if target.getHealth() <= ship.getDamage():
           theirShips.remove(target)  
         #Remove from list to prevent multi-hitting
         attacksLeft-=1
-    attackList = []
+    del attackList[0:len(attackList)]
     return attacksLeft
               
   def init(self):      
@@ -147,12 +156,13 @@ class AI(BaseAI):
     pass    
 
   def run(self): 
+    print self.turnNumber()
     #if self.turnNumber() == 4 or self.turnNumber() == 5:
       #for ship in self.ships:
         #print str(ship.getType()) + "-" + str(ship.getOwner())
     #Variable declarations
-    myShips = []
-    theirShips = []
+    del myShips[0:len(myShips)]
+    del theirShips[0:len(theirShips)]
     FriendlyWarpGate = []
     EnemyWarpGate = []     
     availShips = {"Battleship" : 0,"Juggernaut" : 0,"Mine Layer" : 0,"Support" : 0, \
@@ -164,7 +174,7 @@ class AI(BaseAI):
       for shipType in self.shipTypes:
         availShips[shipType.getType()] = shipType            
 
-    #Find out who I am  
+    #Find out who I am
     player = 0    
     for i in self.players:
       if i.getId() == self.playerID():
@@ -243,17 +253,17 @@ class AI(BaseAI):
     for ship in myShips:
       if ship.getType() == "Interceptor" or ship.getType() == "Bomber" or ship.getType() == "Cruiser" or ship.getType() == "Juggernaut":
         #Try to attack everything in range    
-        attacksLeft = self.attackAllInRange(ship,theirShips)
+        attacksLeft = self.attackAllInRange(ship)
         #If all attacks expended, move away from enemies
         if attacksLeft == 0: 
-          self.moveAway(ship,theirShips)        
+          self.moveAway(ship)        
         #Move towards enemies and try to attack again          
         else:
-          points = self.findNearest(ship,theirShips)
+          points = self.findNearest(ship)
           move = self.moveTo(ship,points[0],points[1])
           if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0:
             ship.move(move[0],move[1])
-          attacksLeft = self.attackAllInRange(ship,theirShips)         
+          attacksLeft = self.attackAllInRange(ship)         
       elif ship.getType() == "Weapons Platform": 
         pass
       elif ship.getType() == "Battleship":

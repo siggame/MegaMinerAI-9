@@ -146,9 +146,10 @@ class Ship:
           for attacked in ship.allInRange(self.owner):
             attacked.health -= unit.damage
             self.game.animations.append(['attack', unit, attacked])
-            if attacked.health <= 0:
+            if attacked.health <= 0 and attacked.id in selg.game.objects:
               self.game.removeObject(attacked)
-          self.game.removeObject(unit)
+          if self.id in self.game.objects:
+            self.game.removeObject(unit)
     return True
 
   def selfDestruct(self):
@@ -156,10 +157,11 @@ class Ship:
       return "You cannot explode your Warp Gate"
     if self.owner != self.game.playerID:
       return "The enemy ship refuses to blow itself up, sorry"
-    for target in ship.allInRange(self.owner^1):   
-      self.attack(target)   
-      self.game.removeObject(self)
-      self.game.animations.append(['selfDestruct', self.id])
+    for target in ship.allInRange(self.owner^1):     
+      if self.id in self.game.objects:
+        self.attack(target) 
+        self.game.removeObject(self)
+        self.game.animations.append(['selfDestruct', self.id])
     return True
     
   def attack(self, target):        
@@ -200,7 +202,7 @@ class Ship:
       self.game.animations.append(['attack', self.id, target.id])
       target.health-=self.damage*modifier
       self.attacksLeft -= 1
-      if target.health <= 0:
+      if target.health <= 0 and target.id in self.game.objects:
         self.game.removeObject(target)
       self.targeted.add(target.id)
     return True 
