@@ -136,30 +136,33 @@ class AI(BaseAI):
   
   def smartWarp(self,warpShip,type,shipsOfType):
      #TODO: make smart
-     print "WARPING IN A ",type.getType()
+#     print "WARPING IN A ",type.getType()
      type.warpIn(warpShip.getX(),warpShip.getY())
  
   def bestUseAttack(self,ship):
-    print "HERE IS THE SHIP TRYING TO ATTACK", ship.getType()
+ #   print "HERE IS THE SHIP TRYING TO ATTACK", ship.getType()
     targets = self.allInRange(ship)
     health = 0
-    minHealth = 10000
     damage = ship.getDamage()
-    maxAttacks = ship.getMaxAttacks()
     if len(targets)>0:
-      while maxAttacks > 0:
-        for target in targets:
-          if target.getHealth() > health and target.getHealth() <= damage:# and target.getMaxHealth() > maxHealth:
-            guy = target
-            health = target.getHealth()
-          elif target.getHealth() < minHealth:
-            guy = target
-            minHealth = target.getHealth()        
-        ship.attack(guy)
-        if guy in targets:
-          targets.remove(guy)
-        maxAttacks-=1
+      for target in targets:
+        if target.getHealth() > health and target.getHealth() <= damage:# and target.getMaxHealth() > maxHealth:
+          guy = target
+          health = target.getHealth()
+      ship.attack(guy)
+      if guy in targets:
+        targets.remove(guy)
+      maxAttacks-=1
  
+ 
+  def dumbAttack(self,ship):
+      attacks = ship.getMaxAttacks()
+      targets = self.allInRange(ship)
+      for target in targets: 
+        if attacks > 0:
+          ship.attack(target)
+          attacks-=1
+        
   def run(self):
     #Gah, so many ships
     types = []
@@ -217,8 +220,9 @@ class AI(BaseAI):
     for ty in types:
       for ship in myListDict[ty]:
         self.moveToTarget(ship,foeWarp)
-        self.bestUseAttack(ship)
-        
+        self.dumbAttack(ship)
+        if ship.getHealth() < 10 and ship.getType() != 'Warp Gate':
+          ship.selfDestruct()
 #OLD CODE    
     #myships = []
     #enemy = []
