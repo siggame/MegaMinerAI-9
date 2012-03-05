@@ -21,14 +21,32 @@ namespace visualizer
     }
   
     
+    void DrawPersistentShip::drawRotatedTexturedQuad( IGame* game, float x, float y, float length, float degrees, string texture)
+    {
+        /*game->renderer->push();
+       game->renderer->translate( 500, 500 );
+       game->renderer->rotate( 45, 0, 0, 1 );
+       game->renderer->drawQuad( -50, -50, 100, 100 );
+       game->renderer->pop();*/
+       
+       game->renderer->push();
+       game->renderer->translate( x + length/2, y + length/2 );
+       game->renderer->rotate( degrees, 0, 0, 1 );
+       game->renderer->drawTexturedQuad( -1 * length/2, -1 * length/2, length, length, texture );
+       game->renderer->pop();
+    }
+    
+    
     void DrawPersistentShip::animate( const float& t, AnimData * d, IGame* game )
     {
         // BEGIN: Variables we will need
+        int shipOwner = m_PersistentShip->owner;
         SpacePoint shipCenter = m_PersistentShip->LocationOn(m_Turn, t);
         shipCenter.x += *m_MapRadius;
         shipCenter.y += *m_MapRadius;
+        float shipHeading = (m_PersistentShip->HeadingOn(m_Turn, t) == 0 ? (shipOwner ? 90 : 270) : m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270);
         float shipStealth = m_PersistentShip->StealthOn(m_Turn, t);
-        int shipOwner = m_PersistentShip->owner;
+        
         float shipRadius = m_PersistentShip->radius;
         bool shipIsExploding = m_PersistentShip->ExplodingOn(m_Turn);
         
@@ -93,8 +111,9 @@ namespace visualizer
         {
             // Set the color to white for drawing the ship
             game->renderer->setColor( Color(1, 1, 1, shipStealth) );
-            game->renderer->drawTexturedQuad(shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipRadius * 1.6f, shipTexture.str());
-            game->renderer->drawTexturedQuad(shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2.38f, shipRadius * 2.38f, shipShieldTexture);
+            //game->renderer->drawTexturedQuad(shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipRadius * 1.6f, shipTexture.str());
+            drawRotatedTexturedQuad( game, shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipHeading, shipTexture.str());
+            game->renderer->drawTexturedQuad(shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2, shipRadius * 2, shipShieldTexture);
         }
     
         // Draw their health
@@ -113,8 +132,10 @@ namespace visualizer
     } // DrawPersistentShip::animation()
     
     
+    
     void DrawPlayerHUD::animate( const float& t, AnimData * d, IGame* game )
     {
+        
         game->renderer->setColor( m_PlayerHUD->id ? Color(1, 0, 0, 1) : Color(0, 0.4f, 1, 1) );
         // Draw the player's name
         game->renderer->drawText( m_PlayerHUD->NameX(), 20, "Roboto", m_PlayerHUD->name, 200 );

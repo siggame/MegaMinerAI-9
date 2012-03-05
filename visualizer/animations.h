@@ -35,7 +35,8 @@ namespace visualizer
         public:
             DrawPersistentShip( PersistentShip* persistentShip, int turn, int* mapRadius ) { m_PersistentShip = persistentShip; m_Turn = turn; m_MapRadius = mapRadius; }
             void animate( const float& t, AnimData *d, IGame* game );
-
+            void drawRotatedTexturedQuad( IGame* game, float x, float y, float length, float degrees, string texture);
+            
             float controlDuration() const
             { return 1; }
             float totalDuration() const
