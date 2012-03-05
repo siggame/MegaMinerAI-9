@@ -86,80 +86,6 @@ namespace visualizer
 
     timeManager->setNumTurns( m_game->states.size() );
     
-    for(int state = 0; state < m_game->states.size(); state++)
-    {
-      continue;  // because fuck the PO LISE (aka Gardner)
-      Frame turn;
-
-      // Add and draw the background
-      SmartPointer<Background> background = new Background();
-      background->addKeyFrame( new DrawBackground() );
-      turn.addAnimatable( background );
-
-      // Loop though each Ship in the current state
-      for(std::map<int, parser::Ship>::iterator i = m_game->states[ state ].ships.begin(); i != m_game->states[ state ].ships.end(); i++)
-      {
-        SmartPointer<SpaceShip> ship = new SpaceShip();
-
-        ship->id = i->second.id;
-        ship->owner = i->second.owner;
-        ship->y = i->second.y + m_mapRadius;
-        ship->x = i->second.x + m_mapRadius;
-        ship->health = i->second.health;
-        ship->maxHealth = i->second.maxHealth;
-        ship->radius = i->second.radius;
-
-        turn[ship->id]["x"] = ship->x;
-        turn[ship->id]["y"] = ship->y;
-        turn[ship->id]["radius"] = ship->radius;
-
-        if(i->second.type != NULL)
-        {
-          ship->type = i->second.type;
-        }
-        else
-        {
-          ship->type = "ship";
-          //WARNING( "null type encountered on ship!" );
-          cout << "null type encountered on ship!\n";
-        }
-
-        // Check for this ship's animations
-        for
-        (
-           std::vector< SmartPointer< parser::Animation > >::iterator j = m_game->states[ state ].animations[ ship->id ].begin();
-           j != m_game->states[ state ].animations[ ship->id ].end();
-           j++
-        )
-        {
-            switch( (*j)->type )
-            {
-              case parser::ATTACK:
-                {
-                  parser::attack &a = (parser::attack&)*(*j);
-
-                  SmartPointer<AttackData> attack = new AttackData();
-
-                  attack->attackerTeam = ship->owner;
-                  attack->attackerX = m_game->states[ state ].ships[ a.acting ].x + m_mapRadius;
-                  attack->attackerY = m_game->states[ state ].ships[ a.acting ].y + m_mapRadius;
-                  attack->victimX = m_game->states[ state ].ships[ a.target ].x + m_mapRadius;
-                  attack->victimY = m_game->states[ state ].ships[ a.target ].y + m_mapRadius;
-
-                  ship->addKeyFrame( new DrawShipAttack( attack ) );
-                  turn.addAnimatable( attack );
-
-                } break;
-            }
-        }
-
-        ship->addKeyFrame( new DrawSpaceShip( ship ) );
-        turn.addAnimatable( ship );
-      }
-
-      addFrame( turn );
-    }
-    
     // BEGIN: Look through the game logs and build the m_PersistentShips
     for(int state = 0; state < (int)m_game->states.size(); state++)
     {
@@ -191,25 +117,26 @@ namespace visualizer
                     // Attack animation
                     case parser::ATTACK:
                     {
-                        parser::attack &a = (parser::attack&)*(*j);
-
-                        /*SmartPointer<AttackData> attack = new AttackData();
-
-                        attack->attackerTeam = ship->owner;
-                        attack->attackerX = m_game->states[ state ].ships[ a.acting ].x + m_mapRadius;
-                        attack->attackerY = m_game->states[ state ].ships[ a.acting ].y + m_mapRadius;
-                        attack->victimX = m_game->states[ state ].ships[ a.target ].x + m_mapRadius;
-                        attack->victimY = m_game->states[ state ].ships[ a.target ].y + m_mapRadius;
-
-                        ship->addKeyFrame( new DrawShipAttack( attack ) );
-                        turn.addAnimatable( attack );*/
-                        
-                        m_PersistentShips[shipID]->AddAttack( m_game->states[ state ].ships[ a.target ], state );
+                        parser::attack &attack = (parser::attack&)*(*j);
+                        m_PersistentShips[shipID]->AddAttack( m_game->states[ state - 1 ].ships[ attack.target ], state );
                         
                     } break;
+                    case parser::STEALTH:
+                    {
+                        m_PersistentShips[shipID]->AddStealth( state );
+                    }
+                    case parser::DESTEALTH:
+                    {
+                        m_PersistentShips[shipID]->AddDeStealth( state );
+                    }
                 }
             }
         }
+    }
+    
+    for (std::map< int, PersistentShip* >::iterator iter = m_PersistentShips.begin(); iter != m_PersistentShips.end(); ++iter)
+    {
+        iter->second->Finalize();
     }
     // END: Look through the game logs and build the m_PersistentShips
     
