@@ -100,16 +100,14 @@ namespace visualizer
     
     void DrawPersistentShip::animate( const float& t, AnimData * d, IGame* game )
     {
-        Color teamColor[] = { Color(1, 0, 0), Color(0, 0, 1) };
-        Color attackColor[] = { Color(1, 0, 0, t), Color(0, 0, 1, t) };
-        Color healthColor = Color(0, 1, 0);
-        
         // BEGIN: Variables we will need
         SpacePoint shipCenter = m_PersistentShip->LocationOn(m_Turn, t);
         shipCenter.x += *m_MapRadius;
         shipCenter.y += *m_MapRadius;
+        float shipStealth = m_PersistentShip->StealthOn(m_Turn, t);
         int shipOwner = m_PersistentShip->owner;
         float shipRadius = m_PersistentShip->radius;
+        bool shipIsExploding = m_PersistentShip->ExplodingOn(m_Turn);
         
         vector< SpacePoint > shipAttacks = m_PersistentShip->AttacksOn( m_Turn );
         for(unsigned int i = 0; i < shipAttacks.size(); i++)
@@ -142,6 +140,10 @@ namespace visualizer
             shipTexture << "Ship-" << (m_PersistentShip->owner ? "Blue-" : "Red-") << shipType;
         }
         
+        // Build the Explosion Texture
+        stringstream shipExplosionTexture;
+        shipExplosionTexture << "explosion-" << (int)(t * 89.0f);
+        
         // Health Calculations
         const float upAngle = -90;
         const float healthSection = 100;
@@ -149,12 +151,28 @@ namespace visualizer
         float healthLeft = m_PersistentShip->HealthOn(m_Turn, t) / m_PersistentShip->maxHealth;
         float healthStart = upAngle-healthSection*healthLeft;
         float healthEnd   = upAngle+healthSection*healthLeft;
+        
+        // Colors:
+        Color teamColor[] = { Color(1, 0, 0, (shipIsExploding? 1 - t : shipStealth) ), Color(0, 0, 1, (shipIsExploding? 1 - t : shipStealth) ) };
+        Color attackColor[] = { Color(1, 0, 0, t), Color(0, 0, 1, t) };
+        Color healthColor = Color(0, 1, 0, (shipIsExploding? 1 - t : shipStealth) );
         // END: Variables we will need
         
-        // Set the color to white for drawing the ship
-        game->renderer->setColor( Color(1, 1, 1, 1) );
-        game->renderer->drawTexturedQuad(shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipRadius * 1.6f, shipTexture.str());
-        game->renderer->drawTexturedQuad(shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2.38f, shipRadius * 2.38f, shipShieldTexture);
+        
+        
+        
+        if(shipIsExploding)
+        {
+            game->renderer->setColor( Color(1, 1, 1) );
+            game->renderer->drawTexturedQuad(shipCenter.x - shipRadius * 2.4f, shipCenter.y - shipRadius * 2.4f, shipRadius * 5.0f, shipRadius * 5.0f, shipExplosionTexture.str());
+        }
+        else
+        {
+            // Set the color to white for drawing the ship
+            game->renderer->setColor( Color(1, 1, 1, shipStealth) );
+            game->renderer->drawTexturedQuad(shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipRadius * 1.6f, shipTexture.str());
+            game->renderer->drawTexturedQuad(shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2.38f, shipRadius * 2.38f, shipShieldTexture);
+        }
     
         // Draw their health
         game->renderer->setColor( teamColor[shipOwner] );
