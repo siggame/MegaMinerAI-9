@@ -237,7 +237,7 @@ DLLEXPORT int playerTalk(_Player* object, char* message)
 
 int distance(int fromx, int fromy, int tox, int toy)
 {
-  int dx = fromx-toy;
+  int dx = fromx-tox;
   int dy = fromy-toy;
   return ceil(sqrt(dx*dx + dy*dy));
 }
@@ -258,9 +258,9 @@ DLLEXPORT int shipMove(_Ship* object, int x, int y)
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
   // Game logic goes here
+  object->movementLeft -= distance(object->x, object->y, x, y);
   object->x = x;
   object->y = y;
-  object->movementLeft -= distance(object->x, object->y, x, y);
   return 1;
 }
 
