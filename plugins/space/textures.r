@@ -27,3 +27,4 @@ texture Ship-Blue-Support textures/ships/blue/support.png
 texture Ship-Blue-Stealth textures/ships/blue/stealth.png
 texture Ship-Blue-Warp-Gate textures/ships/blue/warp-gate.png
 texture Ship-Blue-Weapons-Platform textures/ships/blue/weapons-platform.png
+fshader testShader shaders/shockwave.frag

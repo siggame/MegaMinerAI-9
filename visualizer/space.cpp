@@ -32,6 +32,7 @@ namespace visualizer
 
     gui->checkForUpdate( "Space", "./plugins/space/checkList.md5", VERSION_FILE );
     options->loadOptionFile( "./plugins/space/space.xml", "space" );
+
     /*renderer->setCamera( 0, 0, 8, 8 );
       renderer->setGridDimensions( 8, 8 );
 
@@ -67,6 +68,11 @@ namespace visualizer
     renderer->setCamera( 0, 0, m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2);
     renderer->setGridDimensions( m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2 );
     resourceManager->loadResourceFile( "./plugins/space/textures.r" );
+
+    int p = programs["test"] = renderer->createShaderProgram();
+    renderer->attachShader( p, "testShader" );
+    renderer->buildShaderProgram( p );
+
     animationEngine->registerGame( this, this );
 
     m_mapRadius =  m_game->states[ 0 ].mapRadius;

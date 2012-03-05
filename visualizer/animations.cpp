@@ -73,7 +73,9 @@ namespace visualizer
         game->renderer->setColor( teamColor[ship.owner] );
         game->renderer->drawArc(ship.x, ship.y, ship.radius, 100, healthEnd, healthStart+360 );
         game->renderer->setColor( health );
+        game->renderer->useShader( ((Space*)game)->programs["test"] );
         game->renderer->drawArc(ship.x, ship.y, ship.radius, 100, healthStart, healthEnd );
+        game->renderer->useShader( 0 );
     }
     
 
