@@ -123,16 +123,17 @@ class AI(BaseAI):
   
   def moveToTarget(self,ship,target):
     maxMove = ship.getMaxMovement()
-    dx = -(ship.getX()-target.getX())
-    dy = -(ship.getY()-target.getY())
+    dx = target.getX()-ship.getX()
+    dy = target.getY()-ship.getY()
     dist = abs(dx)+abs(dy)
     if dist > maxMove:
-      dx = dx/10
+      dx = int(math.copysign(maxMove/2,dx))
       dy = dy/10
     ship.move(ship.getX()+dx,ship.getY()+dy)
     maxMove-=dist
                                              
-  
+  def moveInRange(self,ship):
+    pass
   
   def smartWarp(self,warpShip,type,shipsOfType):
      #TODO: make smart
@@ -140,21 +141,20 @@ class AI(BaseAI):
      type.warpIn(warpShip.getX(),warpShip.getY())
  
   def bestUseAttack(self,ship):
- #   print "HERE IS THE SHIP TRYING TO ATTACK", ship.getType()
     targets = self.allInRange(ship)
-    health = 0
-    damage = ship.getDamage()
+    result = []
     if len(targets)>0:
+      health = 0
+      damage = ship.getDamage()
+      aNewList = sorted(targets, key=lambda x: x.getHealth())
+      guy = aNewList[0]    
       for target in targets:
         if target.getHealth() > health and target.getHealth() <= damage:# and target.getMaxHealth() > maxHealth:
           guy = target
           health = target.getHealth()
-      ship.attack(guy)
-      if guy in targets:
-        targets.remove(guy)
-      maxAttacks-=1
- 
- 
+      result.append(guy) 
+    return result
+    
   def dumbAttack(self,ship):
       attacks = ship.getMaxAttacks()
       targets = self.allInRange(ship)
@@ -220,8 +220,10 @@ class AI(BaseAI):
     for ty in types:
       for ship in myListDict[ty]:
         self.moveToTarget(ship,foeWarp)
-        self.dumbAttack(ship)
-        if ship.getHealth() < 10 and ship.getType() != 'Warp Gate':
+        attackList = self.bestUseAttack(ship)
+        if len(attackList) > 0:
+          ship.attack(attackList[0])
+        if ship.getHealth() < ship.getMaxHealth()/4 and ship.getType() != 'Warp Gate':
           ship.selfDestruct()
 #OLD CODE    
     #myships = []
