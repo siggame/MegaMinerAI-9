@@ -73,6 +73,11 @@ namespace visualizer
     renderer->setCamera( 0, 0, m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2);
     renderer->setGridDimensions( m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2 );
     resourceManager->loadResourceFile( "./plugins/space/textures.r" );
+
+    int p = programs["test"] = renderer->createShaderProgram();
+    renderer->attachShader( p, "testShader" );
+    renderer->buildShaderProgram( p );
+
     animationEngine->registerGame( this, this );
 
     m_mapRadius =  m_game->states[ 0 ].mapRadius;
@@ -83,7 +88,7 @@ namespace visualizer
     
     for(int state = 0; state < m_game->states.size(); state++)
     {
-      continue;
+      continue;  // because fuck the PO LISE (aka Gardner)
       Frame turn;
 
       // Add and draw the background

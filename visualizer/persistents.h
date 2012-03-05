@@ -2,6 +2,9 @@
 #define PERSISTENTS_H
 
 #include "parser/structures.h"
+#include <vector>
+#include <math.h>
+#include <map>
 
 namespace visualizer
 {
