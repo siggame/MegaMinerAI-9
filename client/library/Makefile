@@ -11,7 +11,7 @@ CXXFLAGS += -g
 
 override CPPFLAGS += -Isexp
 
-all: libclient.so libclient.a
+all: libclient.so client.a
 
 submit: client
 	@echo "$(shell cd ..;sh submit.sh c)"

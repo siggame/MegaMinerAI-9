@@ -10,6 +10,7 @@
 #include <sstream>
 #include <fstream>
 #include <memory>
+#include <cmath>
 
 #include "game.h"
 #include "network.h"
@@ -169,18 +170,26 @@ DLLEXPORT int joinGame(Connection* c, int gameNum, const char* playerType)
   expression = extract_sexpr(reply);
   delete[] reply;
 
-  if(strcmp(expression->list->val, "join-accepted") != 0)
+  if(strcmp(expression->list->val, "join-accepted") == 0)
+  {
+    destroy_sexp(expression);
+    c->playerID = 1;
+    send_string(c->socket, "(game-start)");
+    return 1;
+  }
+  else if(strcmp(expression->list->val, "create-game") == 0)
+  {
+    std::cout << "Game did not exist, creating game " << c->gameNumber << endl;
+    destroy_sexp(expression);
+    c->playerID = 0;
+    return 1;
+  }
+  else
   {
     cerr << "Cannot join game "<< c->gameNumber << ": " << expression->list->next->val << endl;
     destroy_sexp(expression);
     return 0;
   }
-  destroy_sexp(expression);
-
-  c->playerID = 1;
-  send_string(c->socket, "(game-start)");
-
-  return 1;
 }
 
 DLLEXPORT void endTurn(Connection* c)
@@ -208,6 +217,8 @@ DLLEXPORT int shiptypeWarpIn(_ShipType* object, int x, int y)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  // Game logic goes here
+  object->_c->Players[object->_c->playerID].energy -= object->cost;
   return 1;
 }
 
@@ -224,6 +235,17 @@ DLLEXPORT int playerTalk(_Player* object, char* message)
   return 1;
 }
 
+int distance(int fromx, int fromy, int tox, int toy)
+{
+  int dx = fromx-toy;
+  int dy = fromy-toy;
+  return ceil(sqrt(dx*dx + dy*dy));
+}
+
+bool inRange(int fromx, int fromy, int fromr, int tox, int toy, int tor)
+{
+  return distance(fromx, fromy, tox, toy) <= fromr + tor;
+}
 
 DLLEXPORT int shipMove(_Ship* object, int x, int y)
 {
@@ -235,6 +257,10 @@ DLLEXPORT int shipMove(_Ship* object, int x, int y)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  // Game logic goes here
+  object->x = x;
+  object->y = y;
+  object->movementLeft -= distance(object->x, object->y, x, y);
   return 1;
 }
 
@@ -246,6 +272,7 @@ DLLEXPORT int shipSelfDestruct(_Ship* object)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  // TODO Game logic goes here
   return 1;
 }
 
@@ -258,6 +285,9 @@ DLLEXPORT int shipAttack(_Ship* object, _Ship* target)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  // Game logic goes here
+  object->attacksLeft -= 1;
+  target->health -= object->damage;
   return 1;
 }
 
@@ -337,6 +367,8 @@ void parseShip(Connection* c, _Ship* object, sexp_t* expression)
   object->health = atoi(sub->val);
   sub = sub->next;
   object->maxHealth = atoi(sub->val);
+  sub = sub->next;
+  object->selfDestructDamage = atoi(sub->val);
   sub = sub->next;
 
 }
