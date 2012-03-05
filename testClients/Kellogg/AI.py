@@ -108,17 +108,30 @@ class AI(BaseAI):
     result = []
     range = source.getRange(); owner = source.getOwner()
     if source.getType() != 'Support':
-      for ship in self.Ships:
+      for ship in self.ships:
           if ship.getOwner() != owner and self.inRange(source.getX(), source.getY(), range, ship.getX(), ship.getY(), ship.getRadius()):
             result.append(ship)
-    elif source.getTyp() == 'Support':
-      for ship in self.Ships:
+    elif source.getType() == 'Support':
+      for ship in self.ships:
         if ship.getOwner() == owner and self.inRange(source.getX(), source.getY(), range, ship.getX(), ship.getY(), ship.getRadius()):
          result.append(ship)
     else:
       print source.getType(), "from allInRange, unrecognized type"                       
     return result
-                                        
+  
+  
+  
+  def moveToTarget(self,ship,target):
+    maxMove = ship.getMaxMovement()
+    dx = -(ship.getX()-target.getX())
+    dy = -(ship.getY()-target.getY())
+    dist = abs(dx)+abs(dy)
+    if dist > maxMove:
+      dx = dx/10
+      dy = dy/10
+    ship.move(ship.getX()+dx,ship.getY()+dy)
+    maxMove-=dist
+                                             
   
   
   def smartWarp(self,warpShip,type,shipsOfType):
@@ -127,19 +140,25 @@ class AI(BaseAI):
      type.warpIn(warpShip.getX(),warpShip.getY())
  
   def bestUseAttack(self,ship):
+    print "HERE IS THE SHIP TRYING TO ATTACK", ship.getType()
     targets = self.allInRange(ship)
     health = 0
-    maxHealth = 0
+    minHealth = 10000
     damage = ship.getDamage()
     maxAttacks = ship.getMaxAttacks()
-    while maxAttacks > 0:
-      for target in targets:
-        if target.getHealth() > health and target.getHealth() <= damage:# and target.getMaxHealth() > maxHealth:
-          guy = target
-          health = target.getHealth()
-      ship.attack(guy)
-      targets.remove(guy)
-      maxAttacks-=1
+    if len(targets)>0:
+      while maxAttacks > 0:
+        for target in targets:
+          if target.getHealth() > health and target.getHealth() <= damage:# and target.getMaxHealth() > maxHealth:
+            guy = target
+            health = target.getHealth()
+          elif target.getHealth() < minHealth:
+            guy = target
+            minHealth = target.getHealth()        
+        ship.attack(guy)
+        if guy in targets:
+          targets.remove(guy)
+        maxAttacks-=1
  
   def run(self):
     #Gah, so many ships
@@ -155,6 +174,8 @@ class AI(BaseAI):
     weapPlats = []
     interCeps = []
     bombers = []
+    enemy = []
+    myShips = []
        
     shipTypes = self.shipTypes
     #get string of each ship type
@@ -169,6 +190,14 @@ class AI(BaseAI):
         foePlayer = pl
     types = types + ['Warp Gate']
 
+    
+    for ship in self.ships:
+      if ship.getType() == 'Warp Gate' and ship.getOwner() == foePlayer.getId():
+        enemy.append(ship)
+        foeWarp = ship
+      elif ship.getOwner == foePlayer.getId():
+        enemy.apend(ship)
+    
     funDict = {'Warp Gate':self.warp,'Battleship':self.battleship,'Juggernaut':self.juggernaut,'Mine Layer':self.mines,'Support':self.support,'EMP':self.emp,'Stealth':self.stealth,'Cruiser':self.cruiser,'Weapons Platform':self.weapons,'Interceptor':self.interceptor,'Bomber':self.bomber}
     myListDict = {'Warp Gate':warps,'Battleship':batShips,'Juggernaut':juggs,'Mine Layer':mineLayers,'Support':supports,'EMP':emps,'Stealth':stealths,'Cruiser':cruisers,'Weapons Platform':weapPlats,'Interceptor':interCeps,'Bomber':bombers}
     
@@ -177,16 +206,19 @@ class AI(BaseAI):
       try:
         myListDict[ty] = funDict[ty](myPlayer.getId(),ships)  
       except KeyError:
-        print "something bad happened on 141",ty
-#    print "HELLO THERE",myListDict['Warp Gate'],len(myListDict['Warp Gate'])
-    print "HERE'S THE LIST OF ALL MY SHIPS, SPLIT BY TYPE",myListDict
+        print "something bad happened making myListDict",ty
+   # print "HERE'S THE LIST OF ALL MY SHIPS, SPLIT BY TYPE",myListDict
     
     for w in myListDict['Warp Gate']:
       w.move(w.getX()+10,w.getY()+10)
       for type in shipTypes:
         if type.getCost() <= myPlayer.getEnergy():
           self.smartWarp(w,type,myListDict[type.getType()])
-
+    for ty in types:
+      for ship in myListDict[ty]:
+        self.moveToTarget(ship,foeWarp)
+        self.bestUseAttack(ship)
+        
 #OLD CODE    
     #myships = []
     #enemy = []
