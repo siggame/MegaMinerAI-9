@@ -3,6 +3,7 @@
 
 #include "spaceAnimatable.h"
 #include "irenderer.h"
+#include "persistents.h"
 
 namespace visualizer
 {
@@ -53,7 +54,24 @@ namespace visualizer
 
     }; // ShipAttack
     
+    
+    
+    class DrawPersistentShip: public Anim
+    {
+        public:
+            DrawPersistentShip( PersistentShip* persistentShip, int turn, int* mapRadius ) { m_PersistentShip = persistentShip; m_Turn = turn; m_MapRadius = mapRadius; }
+            void animate( const float& t, AnimData *d, IGame* game );
 
+            float controlDuration() const
+            { return 1; }
+            float totalDuration() const
+            { return 1; }
+        private:
+            PersistentShip* m_PersistentShip;
+            int m_Turn;
+            int* m_MapRadius;
+
+    }; // DrawPersistentShip
 
 }
 

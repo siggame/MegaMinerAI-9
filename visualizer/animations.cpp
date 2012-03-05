@@ -1,5 +1,6 @@
 #include "animations.h"
 #include "space.h"
+#include "persistents.h"
 #include <sstream>
 
 namespace visualizer
@@ -94,5 +95,62 @@ namespace visualizer
         //if( t > startTime && t < endTime )
         //else if ( t >= endTime )
     } // DrawShipAttack::animate()
+    
+    void DrawPersistentShip::animate( const float& t, AnimData * d, IGame* game )
+    {
+        Color teamColor[] = { Color(1, 0, 0), Color(0, 0, 1) };
+        Color healthColor = Color(0, 1, 0);
+        
+        // BEGIN: Variables we will need
+        SpacePoint shipCenter = m_PersistentShip->LocationAt(m_Turn, t);
+        shipCenter.x += *m_MapRadius;
+        shipCenter.y += *m_MapRadius;
+        int shipOwner = m_PersistentShip->owner;
+        float shipRadius = m_PersistentShip->radius;
+        
+        string shipShieldTexture = (m_PersistentShip->owner ? "Blue-Shield" : "Red-Shield");
+        
+        // Build the Ship's Texture string in textures.r
+        string shipType = m_PersistentShip->type;
+        for(int i = 0; i < shipType.length(); i++)
+        {
+            if(shipType[i] == ' ')
+            {
+                shipType[i] = '-';
+            }
+        }
+        
+        stringstream shipTexture;
+        if(strcmp( "default", m_PersistentShip->type.c_str() ) == 0)
+        {
+            shipTexture << "Ship-Default";
+        }
+        else
+        {
+            //shipTexture << "Ship-Default";
+            //cout << "Ship-" << (m_PersistentShip->owner ? "Blue-" : "Red-") << m_PersistentShip->type << endl;
+            shipTexture << "Ship-" << (m_PersistentShip->owner ? "Blue-" : "Red-") << shipType;
+        }
+        
+        // Health Calculations
+        const float upAngle = -90;
+        const float healthSection = 100;
+        m_PersistentShip->maxHealth = m_PersistentShip->maxHealth ? m_PersistentShip->maxHealth : 1;
+        float healthLeft = m_PersistentShip->HealthAt(m_Turn, t) / m_PersistentShip->maxHealth;
+        float healthStart = upAngle-healthSection*healthLeft;
+        float healthEnd   = upAngle+healthSection*healthLeft;
+        // END: Variables we will need
+        
+        // Set the color to white for drawing the ship
+        game->renderer->setColor( Color(1, 1, 1, 1) );
+        game->renderer->drawTexturedQuad(shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipRadius * 1.6f, shipTexture.str());
+        game->renderer->drawTexturedQuad(shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2.38f, shipRadius * 2.38f, shipShieldTexture);
+    
+        // Draw their health
+        game->renderer->setColor( teamColor[shipOwner] );
+        game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRadius, 100, healthEnd, healthStart+360 );
+        game->renderer->setColor( healthColor );
+        game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRadius, 100, healthStart, healthEnd );
+    } // DrawPersistentShip::animation()
 
 }
