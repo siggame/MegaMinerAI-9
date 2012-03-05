@@ -99,14 +99,22 @@ namespace visualizer
     void DrawPersistentShip::animate( const float& t, AnimData * d, IGame* game )
     {
         Color teamColor[] = { Color(1, 0, 0), Color(0, 0, 1) };
+        Color attackColor[] = { Color(1, 0, 0, t), Color(0, 0, 1, t) };
         Color healthColor = Color(0, 1, 0);
         
         // BEGIN: Variables we will need
-        SpacePoint shipCenter = m_PersistentShip->LocationAt(m_Turn, t);
+        SpacePoint shipCenter = m_PersistentShip->LocationOn(m_Turn, t);
         shipCenter.x += *m_MapRadius;
         shipCenter.y += *m_MapRadius;
         int shipOwner = m_PersistentShip->owner;
         float shipRadius = m_PersistentShip->radius;
+        
+        vector< SpacePoint > shipAttacks = m_PersistentShip->AttacksOn( m_Turn );
+        for(unsigned int i = 0; i < shipAttacks.size(); i++)
+        {
+            shipAttacks[i].x += *m_MapRadius;
+            shipAttacks[i].y += *m_MapRadius;
+        }
         
         string shipShieldTexture = (m_PersistentShip->owner ? "Blue-Shield" : "Red-Shield");
         
@@ -136,7 +144,7 @@ namespace visualizer
         const float upAngle = -90;
         const float healthSection = 100;
         m_PersistentShip->maxHealth = m_PersistentShip->maxHealth ? m_PersistentShip->maxHealth : 1;
-        float healthLeft = m_PersistentShip->HealthAt(m_Turn, t) / m_PersistentShip->maxHealth;
+        float healthLeft = m_PersistentShip->HealthOn(m_Turn, t) / m_PersistentShip->maxHealth;
         float healthStart = upAngle-healthSection*healthLeft;
         float healthEnd   = upAngle+healthSection*healthLeft;
         // END: Variables we will need
@@ -151,6 +159,14 @@ namespace visualizer
         game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRadius, 100, healthEnd, healthStart+360 );
         game->renderer->setColor( healthColor );
         game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRadius, 100, healthStart, healthEnd );
+        
+        // Draw Attacks
+        game->renderer->setColor( attackColor[shipOwner] );
+        for(unsigned int i = 0; i < shipAttacks.size(); i++)
+        {
+            game->renderer->drawLine(shipCenter.x, shipCenter.y, shipAttacks[i].x, shipAttacks[i].y, 2); 
+        }
+        
     } // DrawPersistentShip::animation()
 
 }

@@ -62,7 +62,7 @@ namespace visualizer
                 return ( turn >= createdAtTurn && turn < createdAtTurn + healths.size() );
             }
             
-            SpacePoint LocationAt(int turn, float t)
+            SpacePoint LocationOn(int turn, float t)
             {
                 turn -= createdAtTurn;
                 
@@ -76,7 +76,7 @@ namespace visualizer
                 return location;
             }
             
-            float HeadingAt(int turn, float t)
+            float HeadingOn(int turn, float t)
             {
                 // ATan2(dy , dx) where dy = y2 - y1 and dx = x2 - x1
                 turn -= createdAtTurn;
@@ -84,20 +84,43 @@ namespace visualizer
                 return atan2( points[turn].y - points[PreviousTurn(turn)].y, points[turn].x - points[PreviousTurn(turn)].x );
             }
             
-            float HealthAt(int turn, float t)
+            float HealthOn(int turn, float t)
             {
                 turn -= createdAtTurn;
                 
                 // h(t) = a + t(b - a)
                 return healths[PreviousTurn(turn)] + t * ( healths[turn] - healths[PreviousTurn(turn)] );
             }
+            
+            vector< SpacePoint > AttacksOn(int turn)
+            {
+                if( m_AttackLocations.find( turn ) == m_AttackLocations.end() )
+                    return vector< SpacePoint>();
+                else
+                    return m_AttackLocations[turn];
+            }
+            
+            void AddAttack( parser::Ship victim, int turn)
+            {
+                if(AttacksOn(turn).size() > 0)
+                {
+                    m_AttackLocations[turn] = vector< SpacePoint >(); 
+                }
+                
+                m_AttackLocations[turn].push_back( SpacePoint( victim.x, victim.y ) );
+            }
+            
+            
         private:
             int createdAtTurn;
+            map< int, vector< SpacePoint > > m_AttackLocations;
             
             int PreviousTurn(int turn)
             {
                 return (turn > 0 ? turn - 1 : 0);
             }
+            
+            
     };
 }
 

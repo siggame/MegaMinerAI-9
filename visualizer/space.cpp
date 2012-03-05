@@ -172,6 +172,38 @@ namespace visualizer
             // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
             m_PersistentShips[shipID]->points.push_back( SpacePoint( i->second.x, i->second.y ) );
             m_PersistentShips[shipID]->healths.push_back( i->second.health );
+            
+            // Check for this ship's animations in the gamelog
+            for
+            (
+               std::vector< SmartPointer< parser::Animation > >::iterator j = m_game->states[ state ].animations[ shipID ].begin();
+               j != m_game->states[ state ].animations[ shipID ].end();
+               j++
+            )
+            {
+                switch( (*j)->type )
+                {
+                    // Attack animation
+                    case parser::ATTACK:
+                    {
+                        parser::attack &a = (parser::attack&)*(*j);
+
+                        /*SmartPointer<AttackData> attack = new AttackData();
+
+                        attack->attackerTeam = ship->owner;
+                        attack->attackerX = m_game->states[ state ].ships[ a.acting ].x + m_mapRadius;
+                        attack->attackerY = m_game->states[ state ].ships[ a.acting ].y + m_mapRadius;
+                        attack->victimX = m_game->states[ state ].ships[ a.target ].x + m_mapRadius;
+                        attack->victimY = m_game->states[ state ].ships[ a.target ].y + m_mapRadius;
+
+                        ship->addKeyFrame( new DrawShipAttack( attack ) );
+                        turn.addAnimatable( attack );*/
+                        
+                        m_PersistentShips[shipID]->AddAttack( m_game->states[ state ].ships[ a.target ], state );
+                        
+                    } break;
+                }
+            }
         }
     }
     // END: Look through the game logs and build the m_PersistentShips
