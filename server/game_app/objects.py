@@ -5,6 +5,7 @@ import networking.config.config
 cfgUnits = networking.config.config.readConfig("config/units.cfg")
 for key in cfgUnits.keys():
   cfgUnits[key]['type'] = key
+
 def distance(fromX, toX, fromY, toY):
   return int(math.ceil(math.sqrt((fromX-toX)**2 + (fromY-toY)**2)))
 
@@ -161,9 +162,7 @@ class Ship:
       self.game.animations.append(['selfDestruct', self.id])
     return True
     
-  def attack(self, target):
-        
-    #TODO: Check ships can't attack same ship multiple times
+  def attack(self, target):        
     if target.type == "Mine":
       return "You cannot attack mines"
     modifier = 1
@@ -172,7 +171,7 @@ class Ship:
     if self.attacksLeft <= 0:
       return "Ship %i has no attacks left"%(self.id)
     if target.id in self.targeted:
-      return "You have already commaned %i to attack %i"%(self.id, target.id)
+      return "You have already commanded %i to attack %i"%(self.id, target.id)
     if self.type == "Mine Layer" and self.id == target.id:   
       #Adding a new mine to the game
       shipStats = [cfgUnits["Mine"][value] for value in self.game.ordering]   
