@@ -14,6 +14,7 @@ namespace visualizer
         void animate( const float& t, AnimData *d, IGame* game );
 
     };
+    
   
     class DrawBackground: public Anim
     {
@@ -28,33 +29,6 @@ namespace visualizer
 
     }; // DrawBackground
   
-    class DrawSpaceShip: public Anim
-    {
-      public:
-        DrawSpaceShip( SpaceShip* spaceShip ) { m_spaceShip = spaceShip; }
-
-        void animate( const float& t, AnimData* d, IGame* game );
-      private:
-        SpaceShip* m_spaceShip;
-        
-    }; // DrawSpaceShip
-    
-    class DrawShipAttack: public Anim
-    {
-        public:
-            DrawShipAttack( AttackData* attack ) { m_attackData = attack; }
-            void animate( const float& t, AnimData *d, IGame* game );
-
-            float controlDuration() const
-            { return 1; }
-            float totalDuration() const
-            { return 1; }
-        private:
-            AttackData* m_attackData;
-
-    }; // ShipAttack
-    
-    
     
     class DrawPersistentShip: public Anim
     {
@@ -71,6 +45,20 @@ namespace visualizer
             int m_Turn;
             int* m_MapRadius;
 
+    }; // DrawPersistentShip
+    
+    class DrawPlayerHUD: public Anim
+    {
+        public:
+            DrawPlayerHUD( PlayerHUD* hud ) { m_PlayerHUD = hud; }
+            void animate( const float& t, AnimData *d, IGame* game );
+
+            float controlDuration() const
+            { return 1; }
+            float totalDuration() const
+            { return 1; }
+        private:
+            PlayerHUD* m_PlayerHUD;
     }; // DrawPersistentShip
 
 }

@@ -152,6 +152,15 @@ namespace visualizer
         background->addKeyFrame( new DrawBackground() );
         turn.addAnimatable( background );
         
+        // Add each players information to the HUD and draw it
+        for(int playerid = 0; playerid < 2; playerid++)
+        {
+            SmartPointer<PlayerHUD> hud = new PlayerHUD( m_game->states[state].players[playerid], (m_game->winner == playerid) );
+            hud->addKeyFrame( new DrawPlayerHUD(hud) );
+            turn.addAnimatable( hud );
+        }     
+        
+        
         // For each of our PersistentShips
         for (std::map< int, PersistentShip* >::iterator iter = m_PersistentShips.begin(); iter != m_PersistentShips.end(); ++iter)
         {

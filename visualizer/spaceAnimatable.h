@@ -4,6 +4,7 @@
 #include "spaceAnimatable.h"
 #include "irenderer.h"
 #include "persistents.h"
+#include "parser/structures.h"
 
 #include "math.h"
 
@@ -16,32 +17,31 @@ namespace visualizer
     struct PersistentShipAnim: public Animatable
     {
     };
-  
-    struct SpaceShip: public Animatable
-    {
-        int id;
-        int owner;
-        int x;
-        int y;
-        int radius;
-        string type;
-        int attacksLeft;
-        int movementLeft;
-        int maxMovement;
-        int maxAttacks;
-        int damage;
-        int range;
-        int health;
-        int maxHealth;
-    };
     
-    struct AttackData: public Animatable
+    class PlayerHUD: public Animatable
     {
-        int attackerX;
-        int attackerY;
-        int victimX;
-        int victimY;
-        int attackerTeam;
+        public:
+            int id;
+            string name;
+            float time;
+            int victories;
+            int energy;
+            bool winner;
+        
+        PlayerHUD( parser::Player player, bool win )
+        {
+            id = player.id;
+            name = player.playerName;
+            time = player.time;
+            victories = player.victories;
+            energy = player.energy;
+            winner = win;
+        }
+        
+        int NameX() { return (id ? 770 : 10); }
+        int EnergyX() { return (id ? 810 : 10); }
+        int TimeX() { return (id ? 850 : 40); }
+        int VictoriesX() { return (id ? 840 : 10); }
     };
 
 } // visualizer

@@ -66,7 +66,7 @@ namespace visualizer
             
             bool ExistsAtTurn(int turn)
             {
-                return ( turn >= createdAtTurn && turn < createdAtTurn + healths.size() );
+                return ( turn >= createdAtTurn && turn < createdAtTurn + (int)healths.size() );
             }
             
             SpacePoint LocationOn(int turn, float t)
@@ -85,9 +85,9 @@ namespace visualizer
             
             float HeadingOn(int turn, float t)
             {
+                t = 0;
                 // ATan2(dy , dx) where dy = y2 - y1 and dx = x2 - x1
                 turn -= createdAtTurn;
-                
                 return atan2( points[turn].y - points[PreviousTurn(turn)].y, points[turn].x - points[PreviousTurn(turn)].x );
             }
             
