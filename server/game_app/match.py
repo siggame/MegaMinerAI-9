@@ -142,11 +142,13 @@ class Match(DefaultGameWorld):
       elif obj == player2.warpGate:  
         gates.append( player2.warpGate)     
     if len(gates) < 2:
+    #SWAPPED WHICH PLAYER WINS
       if len(gates) == 1:
         if player1.warpGate in self.objects:
-          player2.victories += 1
-        else:
           player1.victories += 1
+        else:
+          player2.victories += 1
+          #CHANGE END HERE
       else: # Both win if they both die in one turn
         player1.victories += 1
         player2.victories += 1
