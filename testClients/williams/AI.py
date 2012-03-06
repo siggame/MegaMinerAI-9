@@ -8,7 +8,7 @@ myShips = []
 theirShips = []
 shipHealth = {}
 priorityList = {"Battleship" : 8,"Juggernaut" : 4,"Mine Layer" : 6,"Support" : 5, "Warp Gate" : 0, \
-    "EMP" : 7,"Stealth" : 10,"Cruiser" : 3,"Weapons Platform" : 9,"Interceptor" : 1,"Bomber" : 2}
+    "EMP" : 7,"Stealth" : 10,"Cruiser" : 3,"Weapons Platform" : 9,"Interceptor" : 1,"Bomber" : 2, "Mine" : -1}
 
 
 class AI(BaseAI):
@@ -186,9 +186,10 @@ class AI(BaseAI):
   def highestPriorityEnemy(self,attackList):
     if len(attackList) > 0:
       target = attackList[0]      
-      for enemy in attackList:    
-        if priorityList[target.getType()] < priorityList[enemy.getType()]:
-          target = enemy  
+      for enemy in attackList:
+        if enemy.getType() != "Mine":      
+          if priorityList[target.getType()] < priorityList[enemy.getType()]:
+            target = enemy  
       return target
     else:
       return myShips[0]
@@ -203,10 +204,12 @@ class AI(BaseAI):
           found = True
       if found == True:
         move = self.moveTo(ship, target.getX(), target.getY()) 
-        ship.move(move[0],move[1])        
+        if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) <= ship.getMovementLeft():
+          ship.move(move[0],move[1])        
       else:
         move = self.moveTo(ship, FriendlyWarpGate[0].getX(), FriendlyWarpGate[0].getY()) 
-        ship.move(move[0],move[1])  
+        if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) <= ship.getMovementLeft():
+          ship.move(move[0],move[1])  
     
   #Attack all enemies in range with all attacks
   def attackAllInRange(self, ship, attacks, attackedList):
@@ -372,6 +375,9 @@ class AI(BaseAI):
         hasAttacked = False
         #Only attack if I can run away afterwards
         if self.getRange(ship.getX(), ship.getY(), ship.getRange(), target.getX(), target.getY(), target.getRadius()):
+          shipHealth[target.getId()] -= ship.getDamage()
+          if shipHealth[target.getId()] <= ship.getDamage() and target.getId() in theirShips:
+            theirShips.remove(target)
           ship.attack(target)
           self.moveAway(ship)
         else:
@@ -405,7 +411,7 @@ class AI(BaseAI):
                 if self.getRange(move[0], move[1], ship.getRange(), enemy.getX(), enemy.getY(), enemy.getRadius()):
                   ship.attack(ship)
         else:
-          blowUp(ship)
+          self.blowUp(ship)
       elif ship.getType() == "Warp Gate":  
         if availShips["Mine Layer"] != 0:      
           if player == 0:
@@ -415,7 +421,7 @@ class AI(BaseAI):
           else:
             move = self.moveTo(ship,self.mapRadius()-1, 0) 
             if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
-              ship.move([0],move[1])
+              ship.move(move[0],move[1])
         else:
           self.moveAway(ship)
     return 1
