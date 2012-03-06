@@ -4,6 +4,8 @@ from GameObject import *
 import random
 import math
 
+myShipsDict = {}
+
 class AI(BaseAI):
   """The class implementing gameplay logic."""
   @staticmethod
@@ -95,6 +97,39 @@ class AI(BaseAI):
         bomber.append(ship)
     return bomber
          
+  def warpControl(self,warps,enemy):
+    print "Warp Control"
+  
+  def batShipControl(self,batShips,enemy):
+    print "BatShip Control"
+  
+  def juggControl(self,jugg,enemys):
+    print "JuggControl"
+
+  def mineLayerControl(self,mineLayers,enemy):
+    print "MineLayerControl"
+    
+  def supportControl(self,supports,enemy):
+    print "Support Control"
+    
+  def empControl(self,emps,enemy):
+    print "emp control"
+    
+  def stealthControl(self,stealths,enemy):
+    print "Stealth Control"
+  
+  def cruiserControl(self,cruisers,enemy):
+    print "Cruiser Control"
+  
+  def weapPlatControl(self,weapPlats,enemy):
+    print "weapPlate Control"
+  
+  def intercepControl(self,interceps,enemy):
+    print "intercepControl"
+    
+  def bomberControl(self,bombers,enemy):
+    print "bomber Control"
+      
   def end(self):
     pass
 
@@ -104,22 +139,13 @@ class AI(BaseAI):
   def inRange(self,x1, y1, rad1, x2, y2, rad2):
     return self.distance(x1, x2, y1, y2) <= rad1 + rad2
       
-  def allInRange(self, source):
+  def allInRange(self, source, side):
     result = []
-    range = source.getRange(); owner = source.getOwner()
-    if source.getType() != 'Support':
-      for ship in self.ships:
-          if ship.getOwner() != owner and self.inRange(source.getX(), source.getY(), range, ship.getX(), ship.getY(), ship.getRadius()):
-            result.append(ship)
-    elif source.getType() == 'Support':
-      for ship in self.ships:
-        if ship.getOwner() == owner and self.inRange(source.getX(), source.getY(), range, ship.getX(), ship.getY(), ship.getRadius()):
-         result.append(ship)
-    else:
-      print source.getType(), "from allInRange, unrecognized type"                       
+    range = source.getRange()
+    for ship in self.ships:
+        if ship.getOwner() == side and self.inRange(source.getX(), source.getY(), range, ship.getX(), ship.getY(), ship.getRadius()):
+          result.append(ship)
     return result
-  
-  
   
   def moveToTarget(self,ship,target):
     maxMove = ship.getMaxMovement()
@@ -128,20 +154,34 @@ class AI(BaseAI):
     dist = abs(dx)+abs(dy)
     if dist > maxMove:
       dx = int(math.copysign(maxMove/2,dx))
-      dy = dy/10
+      dy = int(math.copysign(maxMove/2,dy))
     ship.move(ship.getX()+dx,ship.getY()+dy)
     maxMove-=dist
-                                             
-  def moveInRange(self,ship):
+       
+  def findCluster(self,ship):
     pass
   
-  def smartWarp(self,warpShip,type,shipsOfType):
+  def findNearest(self,ship,ships):
+    pass
+                
+  def moveInRange(self,ship,target):
+    maxMove = ship.getMaxMovement()
+#    while maxMove > 0 and not inRange(ship.getX(),ship.getY(),ship.getRange(),target.getX(),target.getY(),target.getRadius):
+    pass
+  
+  def moveOutRange(self,ship,target):
+    pass
+  
+  def smartWarp(self,warpShip,type):
      #TODO: make smart
 #     print "WARPING IN A ",type.getType()
      type.warpIn(warpShip.getX(),warpShip.getY())
  
+  #goes through all enemies in range, and returns the enemy whose current health is closest to, but less than, that ships damage. 
+  #If no such enemy fits this (i.e., no enemey has less health than damage), returns enemy with lowest health
   def bestUseAttack(self,ship):
-    targets = self.allInRange(ship)
+    foe = ship.getOwner()^1
+    targets = self.allInRange(ship,foe)
     result = []
     if len(targets)>0:
       health = 0
@@ -165,20 +205,8 @@ class AI(BaseAI):
         
   def run(self):
     #Gah, so many ships
-    types = []
-    warps = []
-    batShips = []
-    juggs = []
-    mineLayers = []
-    supports = []
-    emps = []
-    stealths = []
-    cruisers = []
-    weapPlats = []
-    interCeps = []
-    bombers = []
-    enemy = []
-    myShips = []
+    types=[]; warps=[]; batShips=[]; juggs=[]; mineLayers=[]; supports=[]; myships=[]
+    emps=[]; stealths=[]; cruisers=[]; weapPlats=[]; interceps=[]; bombers=[]; enemy=[]
        
     shipTypes = self.shipTypes
     #get string of each ship type
@@ -186,14 +214,15 @@ class AI(BaseAI):
       types.append(type.getType())
       
     ships = self.ships
+    #find out who I am
     for pl in self.players:
       if self.playerID() == pl.getId():
         myPlayer = pl
       else:
         foePlayer = pl
-    types = types + ['Warp Gate']
-
+    types+=['Warp Gate']
     
+    #find enemy warp gate and make list of enemy ships
     for ship in self.ships:
       if ship.getType() == 'Warp Gate' and ship.getOwner() == foePlayer.getId():
         enemy.append(ship)
@@ -201,29 +230,35 @@ class AI(BaseAI):
       elif ship.getOwner == foePlayer.getId():
         enemy.apend(ship)
     
+    #dictionary magic
     funDict = {'Warp Gate':self.warp,'Battleship':self.battleship,'Juggernaut':self.juggernaut,'Mine Layer':self.mines,'Support':self.support,'EMP':self.emp,'Stealth':self.stealth,'Cruiser':self.cruiser,'Weapons Platform':self.weapons,'Interceptor':self.interceptor,'Bomber':self.bomber}
-    myListDict = {'Warp Gate':warps,'Battleship':batShips,'Juggernaut':juggs,'Mine Layer':mineLayers,'Support':supports,'EMP':emps,'Stealth':stealths,'Cruiser':cruisers,'Weapons Platform':weapPlats,'Interceptor':interCeps,'Bomber':bombers}
-    
+    myListDict = {'Warp Gate':warps,'Battleship':batShips,'Juggernaut':juggs,'Mine Layer':mineLayers,'Support':supports,'EMP':emps,'Stealth':stealths,'Cruiser':cruisers,'Weapons Platform':weapPlats,'Interceptor':interceps,'Bomber':bombers}
+    controlDict = {'Warp Gate':self.warpControl,'Battleship':self.batShipControl,'Juggernaut':self.juggControl,'Mine Layer':self.mineLayerControl,'Support':self.supportControl,'EMP':self.empControl,'Stealth':self.stealthControl,'Cruiser':self.cruiserControl,'Weapons Platform':self.weapPlatControl,'Interceptor':self.intercepControl,'Bomber':self.bomberControl}
     
     for ty in types:
       try:
         myListDict[ty] = funDict[ty](myPlayer.getId(),ships)  
       except KeyError:
-        print "something bad happened making myListDict",ty
-   # print "HERE'S THE LIST OF ALL MY SHIPS, SPLIT BY TYPE",myListDict
-    
+        pass
+   
+    for ty in myListDict:
+       controlDict[ty](myListDict[ty],enemy)
+       
+    myShipsDict = myListDict
+    energy = myPlayer.getEnergy()
     for w in myListDict['Warp Gate']:
-      w.move(w.getX()+10,w.getY()+10)
+      w.move(w.getX()+10,w.getY()-10)
       for type in shipTypes:
-        if type.getCost() <= myPlayer.getEnergy():
-          self.smartWarp(w,type,myListDict[type.getType()])
+        if type.getCost() <= energy:
+          self.smartWarp(w,type)
+          energy -= type.getCost()
     for ty in types:
       for ship in myListDict[ty]:
         self.moveToTarget(ship,foeWarp)
         attackList = self.bestUseAttack(ship)
-        if len(attackList) > 0:
+        if len(attackList) > 0 and ship.getAttacksLeft() > 0:
           ship.attack(attackList[0])
-        if ship.getHealth() < ship.getMaxHealth()/4 and ship.getType() != 'Warp Gate':
+        if ship.getHealth() < ship.getMaxHealth()/4 and ship.getType() != 'Warp Gate' or self.turnNumber()%100 >85:
           ship.selfDestruct()
 #OLD CODE    
     #myships = []
