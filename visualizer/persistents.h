@@ -1,6 +1,24 @@
 #ifndef PERSISTENTS_H
 #define PERSISTENTS_H
 
+#define M11  0.0    
+#define M12  1.0   
+#define M13  0.0   
+#define M14  0.0   
+#define M21 -0.5   
+#define M22  0.0   
+#define M23  0.5   
+#define M24  0.0   
+#define M31  1.0   
+#define M32 -2.5   
+#define M33  2.0   
+#define M34 -0.5   
+#define M41 -0.5   
+#define M42  1.5   
+#define M43 -1.5   
+#define M44  0.5 
+
+
 #include "parser/structures.h"
 #include <vector>
 #include <math.h>
@@ -73,22 +91,79 @@ namespace visualizer
             {
                 turn -= createdAtTurn;
                 
-                // Equation of a line: r(t) = a+t(b-a)
-                //   where a is the start postion and b is the end
-                SpacePoint location;
+                int i = turn;
                 
-                location.x = points[PreviousTurn(turn)].x + t * (points[turn].x - points[PreviousTurn(turn)].x);
-                location.y = points[PreviousTurn(turn)].y + t * (points[turn].y - points[PreviousTurn(turn)].y);
-                
-                return location;
+	            SpacePoint p;
+	            int step = 1;
+	            	
+	            int v1 = i-step;		
+	            int v2 = i;
+	            int v3 = i+step;
+	            int v4 = i+step*2;
+
+	            if( i-step < 0 )
+		            v1=0;
+	            if( points.size() <= i+step )
+		            v3=points.size()-1;
+	            if( points.size() <= i+step*2 )
+		            v4=points.size()-1;		
+	            
+	            double c1,c2,c3,c4;   
+
+                c1 = M12*points[v2].x;   
+                c2 = M21*points[v1].x + M23*points[v3].x;   
+                c3 = M31*points[v1].x + M32*points[v2].x + M33*points[v3].x + M34*points[v4].x;   
+                c4 = M41*points[v1].x + M42*points[v2].x + M43*points[v3].x + M44*points[v4].x;   
+
+                float x = (((c4*t + c3)*t +c2)*t + c1);
+
+                c1 = M12*points[v2].y;   
+                c2 = M21*points[v1].y + M23*points[v3].y;   
+                c3 = M31*points[v1].y + M32*points[v2].y + M33*points[v3].y + M34*points[v4].y;   
+                c4 = M41*points[v1].y + M42*points[v2].y + M43*points[v3].y + M44*points[v4].y;   
+
+                float y = (((c4*t + c3)*t +c2)*t + c1);
+
+                return SpacePoint( x, y );
             }
             
             float HeadingOn(int turn, float t)
             {
-                t = 0;
-                // ATan2(dy , dx) where dy = y2 - y1 and dx = x2 - x1
                 turn -= createdAtTurn;
-                return atan2( points[turn].y - points[PreviousTurn(turn)].y, points[turn].x - points[PreviousTurn(turn)].x );
+                
+                int i = turn;
+
+	            int step = 1;
+	            	
+	            int v1 = i-step;		
+	            int v2 = i;
+	            int v3 = i+step;
+	            int v4 = i+step*2;
+
+	            if( i-step < 0 )
+		            v1=0;
+	            if( points.size() <= i+step )
+		            v3=points.size()-1;
+	            if( points.size() <= i+step*2 )
+		            v4=points.size()-1;		
+	            
+	            double c1,c2,c3,c4;   
+
+                c1 = M12*points[v2].x;   
+                c2 = M21*points[v1].x + M23*points[v3].x;   
+                c3 = M31*points[v1].x + M32*points[v2].x + M33*points[v3].x + M34*points[v4].x;   
+                c4 = M41*points[v1].x + M42*points[v2].x + M43*points[v3].x + M44*points[v4].x;   
+
+                float x = (3*c4*t + 2*c3)*t +c2;
+
+                c1 = M12*points[v2].y;   
+                c2 = M21*points[v1].y + M23*points[v3].y;   
+                c3 = M31*points[v1].y + M32*points[v2].y + M33*points[v3].y + M34*points[v4].y;   
+                c4 = M41*points[v1].y + M42*points[v2].y + M43*points[v3].y + M44*points[v4].y;   
+
+                float y = (3*c4*t + 2*c3)*t +c2;
+
+                return atan2( y, x );
             }
             
             float HealthOn(int turn, float t)
