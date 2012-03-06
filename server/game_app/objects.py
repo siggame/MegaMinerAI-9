@@ -143,10 +143,10 @@ class Ship:
     for unit in self.game.objects.ships:
       if unit.owner != self.owner and unit.type == "Mine": 
         if inRange(x,y,self.radius,unit.x,unit.y,unit.range):
-          for attacked in ship.allInRange(self.owner):
+          for attacked in self.allInRange(self.owner):
             attacked.health -= unit.damage
             self.game.animations.append(['attack', unit, attacked])
-            if attacked.health <= 0 and attacked.id in selg.game.objects:
+            if attacked.health <= 0 and attacked.id in self.game.objects:
               self.game.removeObject(attacked)
           if self.id in self.game.objects:
             self.game.removeObject(unit)
@@ -157,7 +157,7 @@ class Ship:
       return "You cannot explode your Warp Gate"
     if self.owner != self.game.playerID:
       return "The enemy ship refuses to blow itself up, sorry"
-    for target in ship.allInRange(self.owner^1):     
+    for target in self.allInRange(self.owner^1):     
       if self.id in self.game.objects:
         self.attack(target) 
         self.game.removeObject(self)
