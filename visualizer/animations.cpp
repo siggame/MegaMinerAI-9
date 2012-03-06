@@ -141,7 +141,7 @@ namespace visualizer
     void DrawPlayerHUD::animate( const float& t, AnimData * d, IGame* game )
     {
         
-        game->renderer->setColor( m_PlayerHUD->id ? Color(1, 0, 0, 1) : Color(0, 0.4f, 1, 1) );
+        game->renderer->setColor( m_PlayerHUD->id ? Color(0, 0.4f, 1, 1) : Color(1, 0, 0, 1) );
         // Draw the player's name
         game->renderer->drawText( m_PlayerHUD->NameX(), 20, "Roboto", m_PlayerHUD->name, 200 );
         
