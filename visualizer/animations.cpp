@@ -44,13 +44,16 @@ namespace visualizer
         SpacePoint shipCenter = m_PersistentShip->LocationOn(m_Turn, t);
         shipCenter.x += *m_MapRadius;
         shipCenter.y += *m_MapRadius;
-        float shipHeading = (m_PersistentShip->HeadingOn(m_Turn, t) == 0 ? (shipOwner ? 90 : 270) : m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270);
+        float shipHeading = m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270;//(m_PersistentShip->HeadingOn(m_Turn, t) == 0 ? (shipOwner ? 90 : 270) : m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270);
         float shipStealth = m_PersistentShip->StealthOn(m_Turn, t);
         
         float shipRadius = m_PersistentShip->radius;
         bool shipIsExploding = m_PersistentShip->ExplodingOn(m_Turn);
+        bool renderShield = m_PersistentShip->RenderShield();
+        bool renderRange = m_PersistentShip->RenderRange();
+        int shipRange = m_PersistentShip->range;
         
-        vector< SpacePoint > shipAttacks = m_PersistentShip->AttacksOn( m_Turn );
+        vector< SpacePoint > shipAttacks = m_PersistentShip->AttacksOn( m_Turn, t );
         for(unsigned int i = 0; i < shipAttacks.size(); i++)
         {
             shipAttacks[i].x += *m_MapRadius;
@@ -95,8 +98,14 @@ namespace visualizer
         
         // Colors:
         Color teamColor[] = { Color(1, 0, 0, (shipIsExploding? 1 - t : shipStealth) ), Color(0, 0.4f, 1, (shipIsExploding? 1 - t : shipStealth) ) };
-        Color attackColor[] = { Color(1, 0, 0, t), Color(0, 0, 1, t) };
+        float attackTrans = t * 2;
+        if(t >= 0.5f)
+        {
+            attackTrans = 1 - (t - 0.5) * 2;
+        }
+        Color attackColor[] = { Color(1, 0, 0, attackTrans), Color(0, 0.4f, 1, attackTrans) };
         Color healthColor = Color(0, 1, 0, (shipIsExploding? 1 - t : shipStealth) );
+        Color rangeColor = shipOwner ? Color(0, 0.4f, 1, attackTrans/4.0f + 0.25f) : Color(1, 0, 0, attackTrans/4.0f + 0.25f);
         // END: Variables we will need
         
         
@@ -113,20 +122,34 @@ namespace visualizer
             game->renderer->setColor( Color(1, 1, 1, shipStealth) );
             //game->renderer->drawTexturedQuad(shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipRadius * 1.6f, shipTexture.str());
             drawRotatedTexturedQuad( game, shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipHeading, shipTexture.str());
-            game->renderer->drawTexturedQuad(shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2, shipRadius * 2, shipShieldTexture);
+            if(renderShield)
+            {
+                drawRotatedTexturedQuad( game, shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2, shipHeading, shipShieldTexture );
+            }
         }
     
         // Draw their health
-        game->renderer->setColor( teamColor[shipOwner] );
-        game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRadius, 100, healthEnd, healthStart+360 );
-        game->renderer->setColor( healthColor );
-        game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRadius, 100, healthStart, healthEnd );
+        if(renderShield)
+        {
+            game->renderer->setColor( teamColor[shipOwner] );
+            game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRadius, 100, healthEnd, healthStart+360 );
+            game->renderer->setColor( healthColor );
+            game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRadius, 100, healthStart, healthEnd );
+        }
         
         // Draw Attacks
         game->renderer->setColor( attackColor[shipOwner] );
         for(unsigned int i = 0; i < shipAttacks.size(); i++)
         {
             game->renderer->drawLine(shipCenter.x, shipCenter.y, shipAttacks[i].x, shipAttacks[i].y, 2); 
+        }
+        
+        
+        // Draw Range
+        if(renderRange)
+        {
+            game->renderer->setColor( rangeColor );
+            game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRange, 100 );
         }
         
     } // DrawPersistentShip::animation()
@@ -136,7 +159,7 @@ namespace visualizer
     void DrawPlayerHUD::animate( const float& t, AnimData * d, IGame* game )
     {
         
-        game->renderer->setColor( m_PlayerHUD->id ? Color(1, 0, 0, 1) : Color(0, 0.4f, 1, 1) );
+        game->renderer->setColor( m_PlayerHUD->id ? Color(0, 0.4f, 1, 1) : Color(1, 0, 0, 1) );
         // Draw the player's name
         game->renderer->drawText( m_PlayerHUD->NameX(), 20, "Roboto", m_PlayerHUD->name, 200 );
         

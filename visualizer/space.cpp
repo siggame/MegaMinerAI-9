@@ -118,7 +118,7 @@ namespace visualizer
                     case parser::ATTACK:
                     {
                         parser::attack &attack = (parser::attack&)*(*j);
-                        m_PersistentShips[shipID]->AddAttack( m_game->states[ state - 1 ].ships[ attack.target ], state );
+                        m_PersistentShips[shipID]->AddAttack( m_PersistentShips[m_game->states[ state - 1 ].ships[ attack.target ].id], state );
                         
                     } break;
                     case parser::STEALTH:
