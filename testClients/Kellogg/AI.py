@@ -97,37 +97,40 @@ class AI(BaseAI):
         bomber.append(ship)
     return bomber
          
-  def warpControl(self,warps,enemy):
-    print "Warp Control"
+  def warpControl(self,warps,enemy,myListDict):
+    for w in myListDict['Warp Gate']:
+      w.move(w.getX()+10,w.getY()-10)
+      self.smartWarp(w)
+      print "Warp Control"
   
-  def batShipControl(self,batShips,enemy):
+  def batShipControl(self,batShips,enemy,myListDict):
     print "BatShip Control"
   
-  def juggControl(self,jugg,enemys):
+  def juggControl(self,jugg,enemys,myListDict):
     print "JuggControl"
 
-  def mineLayerControl(self,mineLayers,enemy):
+  def mineLayerControl(self,mineLayers,enemy,myListDict):
     print "MineLayerControl"
     
-  def supportControl(self,supports,enemy):
+  def supportControl(self,supports,enemy,myListDict):
     print "Support Control"
     
-  def empControl(self,emps,enemy):
+  def empControl(self,emps,enemy,myListDict):
     print "emp control"
     
-  def stealthControl(self,stealths,enemy):
+  def stealthControl(self,stealths,enemy,myListDict):
     print "Stealth Control"
   
-  def cruiserControl(self,cruisers,enemy):
+  def cruiserControl(self,cruisers,enemy,myListDict):
     print "Cruiser Control"
   
-  def weapPlatControl(self,weapPlats,enemy):
+  def weapPlatControl(self,weapPlats,enemy,myListDict):
     print "weapPlate Control"
   
-  def intercepControl(self,interceps,enemy):
+  def intercepControl(self,interceps,enemy,myListDict):
     print "intercepControl"
     
-  def bomberControl(self,bombers,enemy):
+  def bomberControl(self,bombers,enemy,myListDict):
     print "bomber Control"
       
   def end(self):
@@ -153,8 +156,8 @@ class AI(BaseAI):
     dy = target.getY()-ship.getY()
     dist = abs(dx)+abs(dy)
     if dist > maxMove:
-      dx = int(math.copysign(maxMove/2,dx))
-      dy = int(math.copysign(maxMove/2,dy))
+      dx = int(math.copysign(maxMove/5,dx))
+      dy = int(math.copysign(maxMove/5,dy))
     ship.move(ship.getX()+dx,ship.getY()+dy)
     maxMove-=dist
        
@@ -172,11 +175,67 @@ class AI(BaseAI):
   def moveOutRange(self,ship,target):
     pass
   
-  def smartWarp(self,warpShip,type):
+  def smartWarp(self,warpShip):
      #TODO: make smart
-#     print "WARPING IN A ",type.getType()
-     type.warpIn(warpShip.getX(),warpShip.getY())
- 
+     shipTypes = self.shipTypes
+     types = []
+     for type in shipTypes:
+       types.append(type.getType())
+#     energy = self.getEnergy()
+     energy = 50
+     while energy >1:
+       if 'Battleship' in types:
+         for type in shipTypes:
+           if type.getType() == 'BattleShip' and energy >= type.getCost():
+             type.warpIn(warpShip.getX()+10,warpShip.getY())
+             energy-=type.getCost()
+       elif 'Juggernaut' in types:
+         for type in shipTypes:
+           if type.getType() == 'Juggernaut' and energy >= type.getCost():
+             type.warpIn(warpShip.getX()-10,warpShip.getY())
+             energy-=type.getCost()
+       if 'Mine Layer' in types:
+         for type in shipTypes:
+           if type.getType() == 'Mine Layer' and energy >= type.getCost():
+             type.warpIn(warpShip.getX(),warpShip.getY()+10)
+             energy-=type.getCost()
+       if 'Support' in types:
+         for type in shipTypes:
+           if type.getType() == 'Support' and energy >= type.getCost():
+             type.warpIn(warpShip.getX(),warpShip.getY()+10)
+             energy-=type.getCost()
+       if 'EMP' in types:
+          for type in shipTypes:
+            if type.getType() == 'EMP' and energy >= type.getCost():
+              type.warpIn(warpShip.getX(),warpShip.getY()+10)                                                          
+              energy-=type.getCost()
+       if 'Stealth' in types:
+         for type in shipTypes:
+           if type.getType() == 'Stealth' and energy >= type.getCost():
+             type.warpIn(warpShip.getX(),warpShip.getY()+10)
+             energy-=type.getCost()
+       if 'Cruiser' in types:
+          for type in shipTypes:
+            if type.getType() == 'Cruiser' and energy >= type.getCost():
+              type.warpIn(warpShip.getX(),warpShip.getY()+10)
+              energy-=type.getCost()
+       if 'Weapons Platforms' in types:
+          for type in shipTypes:
+            if type.getType() == 'Weapons Platform' and energy >= type.getCost():
+              type.warpIn(warpShip.getX(),warpShip.getY()+10)
+              energy-=type.getCost()
+       if 'Interceptor' in types:
+         for type in shipTypes:
+           if type.getType() == 'Interceptor' and energy >= type.getCost():
+             type.warpIn(warpShip.getX(),warpShip.getY()+10)
+             energy-=type.getCost()
+       if 'Bomber' in types:
+         for type in shipTypes:
+           if type.getType() == 'Bomber' and energy >= type.getCost():
+            type.warpIn(warpShip.getX(),warpShip.getY()+10)
+            energy-=type.getCost()
+     return
+                                                                                                                                                                                                                                                                                     
   #goes through all enemies in range, and returns the enemy whose current health is closest to, but less than, that ships damage. 
   #If no such enemy fits this (i.e., no enemey has less health than damage), returns enemy with lowest health
   def bestUseAttack(self,ship):
@@ -242,16 +301,16 @@ class AI(BaseAI):
         pass
    
     for ty in myListDict:
-       controlDict[ty](myListDict[ty],enemy)
+       controlDict[ty](myListDict[ty],enemy,myListDict)
        
     myShipsDict = myListDict
-    energy = myPlayer.getEnergy()
-    for w in myListDict['Warp Gate']:
-      w.move(w.getX()+10,w.getY()-10)
-      for type in shipTypes:
-        if type.getCost() <= energy:
-          self.smartWarp(w,type)
-          energy -= type.getCost()
+    #energy = myPlayer.getEnergy()
+    #for w in myListDict['Warp Gate']:
+    #  w.move(w.getX()+10,w.getY()-10)
+     # for type in shipTypes:
+     #   if type.getCost() <= energy:
+     #     self.smartWarp(w,type)
+     #     energy -= type.getCost()
     for ty in types:
       for ship in myListDict[ty]:
         self.moveToTarget(ship,foeWarp)
