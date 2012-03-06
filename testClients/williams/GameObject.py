@@ -78,8 +78,7 @@ class Ship(GameObject):
   def __init__(self, ptr):
     from BaseAI import BaseAI
     self.ptr = ptr
-    self.iteration = BaseAI.iteration
-    
+    self.iteration = BaseAI.iteration    
     self.id = library.shipGetId(ptr)
 
   def validify(self):

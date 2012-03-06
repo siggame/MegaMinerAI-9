@@ -6,6 +6,10 @@ import random
 
 myShips = []
 theirShips = []
+shipHealth = {}
+priorityList = {"Battleship" : 8,"Juggernaut" : 4,"Mine Layer" : 6,"Support" : 5, "Warp Gate" : 0, \
+    "EMP" : 7,"Stealth" : 10,"Cruiser" : 3,"Weapons Platform" : 9,"Interceptor" : 1,"Bomber" : 2}
+
 
 class AI(BaseAI):
   """The class implementing gameplay logic."""
@@ -21,7 +25,12 @@ class AI(BaseAI):
     return int(math.ceil(math.sqrt((fromX-toX)**2 + (fromY-toY)**2)))  
        
   def getRange(self, x1, y1, rad1, x2, y2, rad2):
-    return self.distance(x1, x2, y1, y2) <= rad1 + rad2   
+    return self.distance(x1, x2, y1, y2) <= rad1 + rad2 
+
+  def pointsAtEdge(self,X,Y,r,n): 
+    pi = 3.14159265  
+    points = [(int(math.floor((X + math.cos(2*pi/n*x)*r))),int(math.floor((Y + math.sin(2*pi/n*x)*r)))) for x in xrange(0,n+1)] 
+    return points     
         
   #Returns the x and y position of the nearest enemy
   def findNearest(self,ship):
@@ -35,15 +44,21 @@ class AI(BaseAI):
       
   #Returns the the furthest point along a path to target      
   def moveTo(self,ship,x,y):
-    distance = (((ship.getX() - x)**2) + ((ship.getY()- y)**2))**.5
+    distance = (((ship.getX() - x)**2) + ((ship.getY() - y)**2))**.5
+    if distance == 0:
+      return [x,y]
     if ship.getType == "Warp Gate":
-      distRatio = ship.getRange() / (1+distance)
+      distRatio = ship.getRange() / distance
     else:
-      distRatio = ship.getMovementLeft() / (1+distance)
+      distRatio = ship.getMovementLeft() / (distance*1.10)
+    if distRatio >= 1:
+      return [x,y]
     startX = int(ship.getX()*(1-distRatio))
     startY = int(ship.getY()*(1-distRatio))
     endX = int(x*distRatio)
     endY = int(y*distRatio)
+    if ship.getMovementLeft() < self.distance(ship.getX(), startX + endX, ship.getY(), startY + endY):
+      print ship.getType(), ship.getMovementLeft(), distance, self.distance(ship.getX(), startX + endX, ship.getY(), startY + endY), distRatio, startX + endX, startY + endY, ship.getX(), ship.getY(), x, y
     return [startX + endX, startY + endY]
    
   #Moves ship away from the nearest enemy
@@ -52,10 +67,10 @@ class AI(BaseAI):
     points = self.moveTo(ship, nearest[0],nearest[1])
     newPoints = [ship.getX() + (ship.getX() - points[0]), ship.getY() + (ship.getY() - points[1])]
     # If unit would move outside of the map, reduce move until it is legal
-    while newPoints[0]**2 + newPoints[1]**2 > self.mapRadius()**2:
-      newPoints[0] -= 2
-      newPoints[1] -= 2
-    ship.move(newPoints[0],newPoints[1])
+    if newPoints[0]**2 + newPoints[1]**2 > self.mapRadius()**2:
+        newPoints = self.moveTo(ship,0,0)
+    if self.distance(ship.getX(),newPoints[0], ship.getY(),newPoints[1]) > 1 and self.distance(ship.getX(),newPoints[0], ship.getY(),newPoints[1]) <= ship.getMovementLeft():
+      ship.move(newPoints[0],newPoints[1])
 
   def attackFurthestUnit(self,ship,target):
     for enemy in self.ships:
@@ -72,21 +87,18 @@ class AI(BaseAI):
     #Spawning all ships on first turn
     energyLeft = self.players[player].getEnergy()
     #Spawn one high tier ship if available
-    if availShips["Weapons Platform"] != 0:
-      availShips["Weapons Platform"].warpIn(safeWarp[0],safeWarp[1])
-      energyLeft -= availShips["Weapons Platform"].getCost()
-    #Only spawn a Battleship if there are no Weapons Platforms
-    elif availShips["Battleship"] != 0:
+    if availShips["Battleship"] != 0:
       availShips["Battleship"].warpIn(agressiveWarp[0],agressiveWarp[1])
       energyLeft -= availShips["Battleship"].getCost() 
-    #Only spawn a Juggernaut if there are no Weapons Platforms or Battleships available 
-    elif availShips["Juggernaut"] != 0:
-      availShips["Juggernaut"].warpIn(agressiveWarp[0],agressiveWarp[1])
-      energyLeft -= availShips["Juggernaut"].getCost()  
-    #Only spawn a Cruiser as last resort 
+    elif availShips["Weapons Platform"] != 0:
+      availShips["Weapons Platform"].warpIn(safeWarp[0],safeWarp[1])
+      energyLeft -= availShips["Weapons Platform"].getCost()
     elif availShips["Cruiser"] != 0:
       availShips["Cruiser"].warpIn(agressiveWarp[0],agressiveWarp[1])
       energyLeft -= availShips["Cruiser"].getCost() 
+    elif availShips["Juggernaut"] != 0:
+      availShips["Juggernaut"].warpIn(agressiveWarp[0],agressiveWarp[1])
+      energyLeft -= availShips["Juggernaut"].getCost()  
       
     #Spawn 10 low tier ships if a high tier was purchased, 15 if not   
     if energyLeft < 50: 
@@ -110,7 +122,7 @@ class AI(BaseAI):
           
     #Spawning specialty ships (Initial design)        
     if availShips["Mine Layer"] != 0:
-      while energyLeft > 5:
+      while energyLeft >= 5:
         availShips["Mine Layer"].warpIn(defensiveWarp[0],defensiveWarp[1])
         energyLeft -= availShips["Mine Layer"].getCost()                    
     if availShips["Support"] != 0 and energyLeft >= 5:
@@ -125,27 +137,53 @@ class AI(BaseAI):
         availShips["Stealth"].warpIn(agressiveWarp[0],agressiveWarp[1])
         energyLeft -= availShips["Stealth"].getCost()   
         
+  def highestPriorityEnemy(self,attackList):
+    if len(attackList) > 0:
+      target = attackList[0]      
+      for enemy in attackList:    
+        if priorityList[target.getType()] < priorityList[enemy.getType()]:
+          target = enemy  
+      return target
+    else:
+      return myShips[0]
+    
+  def moveToType(self,ship,type,FriendlyWarpGate):
+    if len(myShips) > 0:
+      target = myShips[0]
+      found = False 
+      for myShip in myShips:
+        if myShip.getType() == type:
+          target = myShip
+          found = True
+      if found == True:
+        move = self.moveTo(ship, target.getX(), target.getY())  
+      else:
+        move = self.moveTo(ship, FriendlyWarpGate[0].getX(), FriendlyWarpGate[0].getY()) 
+    
   #Attack all enemies in range with all attacks
   def attackAllInRange(self,ship):
     attackList = []
-    attacksLeft = ship.getAttacksLeft()
+    attacksLeft = 1
+    if ship.getType() != "EMP":
+      attacksLeft = ship.getAttacksLeft()
     #Construct a list of all enemies in range
     for enemy in theirShips:
       #If in range and not a mine
       if self.getRange(ship.getX(),ship.getY(),ship.getRange(),enemy.getX(),enemy.getY(),enemy.getRadius()) and enemy.getType() != "Mine":
         attackList.append(enemy)
     #While I still have targets and attacks, attack!
-    #TODO: Make ships prioritize special ships
-    print "New attacker: " + ship.getType() + " " + str(ship.getAttacksLeft())
-    for target in attackList:
-      print target.getId()
-      if attacksLeft > 0:
+    #TODO: Handle support damage and health modifiers
+    while attacksLeft > 0 and len(attackList) > 0:
+      target = self.highestPriorityEnemy(attackList)
+      if attacksLeft > 0 and shipHealth[target.getId()] > 0:
+        shipHealth[target.getId()] -= ship.getDamage()
+        if shipHealth[target.getId()] <= ship.getDamage() and target.getId() in theirShips:
+          theirShips.remove(target)
         ship.attack(target)
-        #Remove them from possible targets if they died
-        if target.getHealth() <= ship.getDamage():
-          theirShips.remove(target)  
-        #Remove from list to prevent multi-hitting
         attacksLeft-=1
+        attackList.remove(target)
+      else:
+        attackList.remove(target)
     del attackList[0:len(attackList)]
     return attacksLeft
               
@@ -156,23 +194,15 @@ class AI(BaseAI):
     pass    
 
   def run(self): 
-    print self.turnNumber()
-    #if self.turnNumber() == 4 or self.turnNumber() == 5:
-      #for ship in self.ships:
-        #print str(ship.getType()) + "-" + str(ship.getOwner())
-    #Variable declarations
     del myShips[0:len(myShips)]
     del theirShips[0:len(theirShips)]
     FriendlyWarpGate = []
     EnemyWarpGate = []     
+    #Establish library of all shipTypes available by name
     availShips = {"Battleship" : 0,"Juggernaut" : 0,"Mine Layer" : 0,"Support" : 0, \
     "EMP" : 0,"Stealth" : 0,"Cruiser" : 0,"Weapons Platform" : 0,"Interceptor" : 0,"Bomber" : 0}
-    #Establish library of all shipTypes available by name
-    if self.turnNumber() == 0 or self.turnNumber() == 1:
-      availShips = {"Battleship" : 0,"Juggernaut" : 0,"Mine Layer" : 0,"Support" : 0, \
-      "EMP" : 0,"Stealth" : 0,"Cruiser" : 0,"Weapons Platform" : 0,"Interceptor" : 0,"Bomber" : 0}
-      for shipType in self.shipTypes:
-        availShips[shipType.getType()] = shipType            
+    for shipType in self.shipTypes:
+      availShips[shipType.getType()] = shipType            
 
     #Find out who I am
     player = 0    
@@ -187,6 +217,7 @@ class AI(BaseAI):
         myShips.append(ship)
       else:
         theirShips.append(ship)
+        shipHealth[ship.getId()] = ship.getHealth()
      
    # print "Mine"
     #for ship in myShips:
@@ -251,7 +282,12 @@ class AI(BaseAI):
         #Find a way to make multiple layers deep       
       
     for ship in myShips:
-      if ship.getType() == "Interceptor" or ship.getType() == "Bomber" or ship.getType() == "Cruiser" or ship.getType() == "Juggernaut":
+      if ship.getType() == "Mine":
+        continue
+      elif ship.getHealth() <= int(ship.getMaxHealth()*.15) and ship.getType() != "Warp Gate":
+        ship.selfDestruct()
+      elif ship.getType() == "Interceptor" or ship.getType() == "Bomber" or ship.getType() == "Cruiser" or \
+      ship.getType() == "Juggernaut" or ship.getType() == "EMP":
         #Try to attack everything in range    
         attacksLeft = self.attackAllInRange(ship)
         #If all attacks expended, move away from enemies
@@ -259,26 +295,96 @@ class AI(BaseAI):
           self.moveAway(ship)        
         #Move towards enemies and try to attack again          
         else:
+          target = self.highestPriorityEnemy(theirShips)
+          points = [target.getX(), target.getY()]
+          move = self.moveTo(ship,points[0],points[1])
+          if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) <= ship.getMovementLeft():
+            ship.move(move[0],move[1])
+          attacksLeft = self.attackAllInRange(ship)       
+      elif ship.getType() == "Weapons Platform": 
+        if availShips["Mine Layer"] != 0:       
+          if player == 0:
+            move = self.moveTo(ship,((self.mapRadius()-1)*-1), 0) 
+            if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
+              ship.move(move[0], move[1])
+          else:
+            move = self.moveTo(ship,self.mapRadius()-1, 0) 
+            if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
+              ship.move([0],move[1])
+        else:
+          self.moveAway(ship)    
+        self.attackAllInRange(ship)              
+      elif ship.getType() == "Battleship":
+        move = self.moveTo(ship,EnemyWarpGate[0].getX(),EnemyWarpGate[0].getY())
+        ship.move(move[0], move[1])
+        self.attackAllInRange(ship) 
+      elif ship.getType() == "Support":
+        if availShips["Weapons Platform"] != 0:
+          self.moveToType(ship,"Weapons Platform",FriendlyWarpGate)
+        elif availShips["Battleship"] != 0:
+          self.moveToType(ship,"Battleship",FriendlyWarpGate)
+        else:
           points = self.findNearest(ship)
           move = self.moveTo(ship,points[0],points[1])
-          if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0:
-            ship.move(move[0],move[1])
-          attacksLeft = self.attackAllInRange(ship)         
-      elif ship.getType() == "Weapons Platform": 
-        pass
-      elif ship.getType() == "Battleship":
-        pass
-      elif ship.getType() == "Support":
-        pass
+          if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
+            ship.move(move[0],move[1])      
       elif ship.getType() == "Stealth":
-        pass
-      elif ship.getType() == "EMP":
-        pass
+        target = highestPriorityTarget(theirShips)
+        hasAttacked = False
+        if self.getRange(ship.getX(), ship.getY(), ship.getRange(), target.getX(), target.getY(), target.getRadius()):
+          attack(target)
+          moveAway(ship)
+        else:
+          move = self.moveTo(target.getX(), target.getY())
+          move(ship,move[0],move[1])
+          if self.getRange(ship.getX(), ship.getY(), ship.getRange(), target.getX(), target.getY(), target.getRadius()):
+            attack(target)
       elif ship.getType() == "Mine Layer":
-        pass
-      elif ship.getType() == "Warp Gate":
-        pass
-    
+        if ship.getAttacksLeft() > 0:
+          points = self.pointsAtEdge(FriendlyWarpGate[0].getX(), FriendlyWarpGate[0].getY(), FriendlyWarpGate[0].getRadius()+60, 24)
+          movementLeft = ship.getMovementLeft()
+          PlacedOne = False
+          for point in points:
+            if point[0]**2 + point[1]**2 < self.mapRadius()**2 and movementLeft > 0:
+              NoMine = True
+              move = self.moveTo(ship,point[0],point[1])
+              for myship in myShips:
+                if myship.getType() == "Mine":
+                  if self.getRange(move[0], move[1], myship.getRange()/2, myship.getX(), myship.getY(), myship.getRange()/2):
+                    NoMine = False
+              if NoMine == True and movementLeft > 0:
+                if self.distance(ship.getX(), move[0], ship.getY(), move[1]) <= movementLeft:
+                  if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
+                    ship.move(move[0],move[1])   
+                    movementLeft = 0         
+                    ship.attack(ship)
+                    PlacedOne = True
+          if PlacedOne == False:
+            move = self.moveTo(ship,EnemyWarpGate[0].getX(),EnemyWarpGate[0].getY())
+            if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
+              ship.move(move[0],move[1])
+              for enemy in theirShips:
+                if self.getRange(move[0], move[1], ship.getRange(), enemy.getX(), enemy.getY(), enemy.getRadius()):
+                  ship.attack(ship)
+        else:
+          points = self.findNearest(ship)
+          move = self.moveTo(ship,points[0], points[1])
+          if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
+            ship.move(move[0],move[1])
+            if self.getRange(move[0],move[1], ship.getRadius(), points[0], points[1], 25):
+              ship.selfDestruct()
+      elif ship.getType() == "Warp Gate":  
+        if availShips["Mine Layer"] != 0:      
+          if player == 0:
+            move = self.moveTo(ship,(self.mapRadius()-1)*-1, 0) 
+            if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
+              ship.move(move[0], move[1])
+          else:
+            move = self.moveTo(ship,self.mapRadius()-1, 0) 
+            if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
+              ship.move([0],move[1])
+        else:
+          self.moveAway(ship)
     return 1
     
 
