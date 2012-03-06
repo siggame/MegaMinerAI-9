@@ -4,7 +4,10 @@ from GameObject import *
 import random
 import math
 
-myShipsDict = {}
+enemyShips = []
+myPlayer = None
+foePlayer = None
+foeWarp = None
 
 class AI(BaseAI):
   """The class implementing gameplay logic."""
@@ -24,7 +27,6 @@ class AI(BaseAI):
     for ship in ships:
       if ship.getOwner() == player and ship.getType() == "Warp Gate":
         warp.append(ship)
-#    print "lenght of warp is ",len(warp)
     return warp
     
   def battleship(self,player,ships):
@@ -98,41 +100,52 @@ class AI(BaseAI):
     return bomber
          
   def warpControl(self,warps,enemy,myListDict):
+    print "warp control"
     for w in myListDict['Warp Gate']:
       w.move(w.getX()+10,w.getY()-10)
       self.smartWarp(w)
-      print "Warp Control"
   
   def batShipControl(self,batShips,enemy,myListDict):
-    print "BatShip Control"
+    for ship in batShips:
+      ship.move(ship.getX()+ship.getMaxMovement()/2,ship.getY()+ship.getMaxMovement()/2)
   
-  def juggControl(self,jugg,enemys,myListDict):
-    print "JuggControl"
+  def juggControl(self,juggs,enemys,myListDict):
+    for ship in juggs:
+      ship.move(ship.getX()-ship.getMaxMovement()/2,ship.getY()-ship.getMaxMovement()/2)
 
   def mineLayerControl(self,mineLayers,enemy,myListDict):
-    print "MineLayerControl"
-    
+    for ship in mineLayers:
+      ship.move(ship.getX()-ship.getMaxMovement()/5,ship.getY()+ship.getMaxMovement()/2)
+      ship.attack(ship)
+              
   def supportControl(self,supports,enemy,myListDict):
-    print "Support Control"
-    
+    for ship in supports:
+      ship.move(ship.getX()+ship.getMaxMovement()/2,ship.getY()-ship.getMaxMovement()/2)
+           
   def empControl(self,emps,enemy,myListDict):
-    print "emp control"
-    
+    for ship in emps:
+      ship.move(ship.getX(),ship.getY()+ship.getMaxMovement())
+           
   def stealthControl(self,stealths,enemy,myListDict):
-    print "Stealth Control"
-  
+    for ship in stealths:
+      ship.move(ship.getX()+ship.getMaxMovement(),ship.getY())
+         
   def cruiserControl(self,cruisers,enemy,myListDict):
-    print "Cruiser Control"
+    for ship in cruisers:
+      ship.move(ship.getX()+ship.getMaxMovement()/3,ship.getY()+2*ship.getMaxMovement()/3)
   
   def weapPlatControl(self,weapPlats,enemy,myListDict):
-    print "weapPlate Control"
+    for ship in weapPlats:
+      ship.move(ship.getX()+2*ship.getMaxMovement()/3,ship.getY()+ship.getMaxMovement()/3)
   
   def intercepControl(self,interceps,enemy,myListDict):
-    print "intercepControl"
-    
+    for ship in interceps:
+      ship.move(ship.getX()-2*ship.getMaxMovement()/3,ship.getY()+ship.getMaxMovement()/3)
+           
   def bomberControl(self,bombers,enemy,myListDict):
-    print "bomber Control"
-      
+    for ship in bombers:
+      ship.move(ship.getX()+ship.getMaxMovement()/3,ship.getY()-2*ship.getMaxMovement()/3)
+             
   def end(self):
     pass
 
@@ -158,11 +171,16 @@ class AI(BaseAI):
     if dist > maxMove:
       dx = int(math.copysign(maxMove/5,dx))
       dy = int(math.copysign(maxMove/5,dy))
-    ship.move(ship.getX()+dx,ship.getY()+dy)
+    if abs(dx)+abs(dy)>0:
+      ship.move(ship.getX()+dx,ship.getY()+dy)
     maxMove-=dist
        
   def findCluster(self,ship):
     pass
+#    cluster = 0
+#    clusterList = []
+#    for enemy in enemyShips:       
+#    pass
   
   def findNearest(self,ship,ships):
     pass
@@ -176,14 +194,20 @@ class AI(BaseAI):
     pass
   
   def smartWarp(self,warpShip):
-     #TODO: make smart
+     #TODO: make smarter
+     print "calling warp"
+     for player in self.players:
+       if self.playerID() == player.getId():
+         myPlayer = player
      shipTypes = self.shipTypes
      types = []
+     sortedCost = sorted(shipTypes, key=lambda x: x.getCost())
+     minCost = sortedCost[0].getCost()
      for type in shipTypes:
        types.append(type.getType())
-#     energy = self.getEnergy()
-     energy = 50
-     while energy >1:
+     energy = myPlayer.getEnergy()
+     print "types,mincost,energy",types,minCost,energy
+     while energy >= minCost:
        if 'Battleship' in types:
          for type in shipTypes:
            if type.getType() == 'BattleShip' and energy >= type.getCost():
@@ -271,15 +295,16 @@ class AI(BaseAI):
     #get string of each ship type
     for type in shipTypes:
       types.append(type.getType())
-      
+    types+=['Warp Gate']  
+
     ships = self.ships
-    #find out who I am
+
+    #find out who I am, and my foe
     for pl in self.players:
       if self.playerID() == pl.getId():
         myPlayer = pl
       else:
         foePlayer = pl
-    types+=['Warp Gate']
     
     #find enemy warp gate and make list of enemy ships
     for ship in self.ships:
@@ -288,6 +313,8 @@ class AI(BaseAI):
         foeWarp = ship
       elif ship.getOwner == foePlayer.getId():
         enemy.apend(ship)
+        
+    enemyShips = enemy
     
     #dictionary magic
     funDict = {'Warp Gate':self.warp,'Battleship':self.battleship,'Juggernaut':self.juggernaut,'Mine Layer':self.mines,'Support':self.support,'EMP':self.emp,'Stealth':self.stealth,'Cruiser':self.cruiser,'Weapons Platform':self.weapons,'Interceptor':self.interceptor,'Bomber':self.bomber}
@@ -303,22 +330,15 @@ class AI(BaseAI):
     for ty in myListDict:
        controlDict[ty](myListDict[ty],enemy,myListDict)
        
-    myShipsDict = myListDict
-    #energy = myPlayer.getEnergy()
-    #for w in myListDict['Warp Gate']:
-    #  w.move(w.getX()+10,w.getY()-10)
-     # for type in shipTypes:
-     #   if type.getCost() <= energy:
-     #     self.smartWarp(w,type)
-     #     energy -= type.getCost()
     for ty in types:
       for ship in myListDict[ty]:
         self.moveToTarget(ship,foeWarp)
         attackList = self.bestUseAttack(ship)
         if len(attackList) > 0 and ship.getAttacksLeft() > 0:
           ship.attack(attackList[0])
-        if ship.getHealth() < ship.getMaxHealth()/4 and ship.getType() != 'Warp Gate' or self.turnNumber()%100 >85:
-          ship.selfDestruct()
+        if ship.getType()!= 'Warp Gate':
+          if self.turnNumber()%100>90 or ship.getHealth()<ship.getMaxHealth()/4:
+            ship.selfDestruct()
 #OLD CODE    
     #myships = []
     #enemy = []

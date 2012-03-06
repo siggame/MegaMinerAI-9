@@ -178,6 +178,7 @@ class Ship:
       #Adding a new mine to the game
       shipStats = [cfgUnits["Mine"][value] for value in self.game.ordering]   
       self.game.addObject(Ship, [self.game.playerID, self.x, self.y] + shipStats)
+      self.maxAttacks-=1
       return True
     elif target.owner == self.owner:
       return 'No friendly fire please'
@@ -192,12 +193,12 @@ class Ship:
             #Increment the damage modifier for each radar in range
               modifier+=.5
               
-      #Special attack for the EMP class
-      if self.type == "EMP":
-        self.maxAttacks -= 1
-        for victim in self.allInRange(target.owner):
-          unit.attacksLeft = -1
-          unit.movementLeft = -1  
+        #Special attack for the EMP class
+        if self.type == "EMP":
+          self.maxAttacks -= 1
+          for victim in self.allInRange(target.owner):
+            unit.attacksLeft = -1
+            unit.movementLeft = -1  
           
       self.game.animations.append(['attack', self.id, target.id])
       target.health-=self.damage*modifier
