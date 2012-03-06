@@ -174,15 +174,15 @@ namespace visualizer
                 return healths[PreviousTurn(turn)] + t * ( healths[turn] - healths[PreviousTurn(turn)] );
             }
             
-            vector< SpacePoint > AttacksOn(int turn)
+            /*vector< SpacePoint > AttacksOn(int turn)
             {
                 if( m_AttackLocations.find( turn ) == m_AttackLocations.end() )
                     return vector< SpacePoint>();
                 else
                     return m_AttackLocations[turn];
-            }
+            }*/
             
-            void AddAttack( parser::Ship victim, int turn)
+            /*void AddAttack( parser::Ship victim, int turn)
             {
                 if(AttacksOn(turn).size() > 0)
                 {
@@ -190,6 +190,32 @@ namespace visualizer
                 }
                 
                 m_AttackLocations[turn].push_back( SpacePoint( victim.x, victim.y ) );
+            }*/
+            
+            vector< SpacePoint > AttacksOn( int turn, float t )
+            {
+                if( m_AttackVictims.find( turn ) == m_AttackVictims.end() )
+                    return vector< SpacePoint >();
+                
+                // else, find every victim's location
+                vector< SpacePoint > victimLocations;
+                
+                for(unsigned int i = 0; i < m_AttackVictims[turn].size(); i++)
+                {
+                    victimLocations.push_back( m_AttackVictims[turn][i]->LocationOn( turn, t ) );
+                }
+                
+                return victimLocations;
+            }
+            
+            void AddAttack( PersistentShip* victim, int turn )
+            {
+                if(m_AttackVictims.find( turn ) == m_AttackVictims.end())
+                {
+                    m_AttackVictims[turn] = vector< PersistentShip* >(); 
+                }
+                
+                m_AttackVictims[turn].push_back( victim );
             }
             
             void AddStealth( int turn )
@@ -250,7 +276,8 @@ namespace visualizer
             
         private:
             int createdAtTurn;
-            map< int, vector< SpacePoint > > m_AttackLocations;
+            //map< int, vector< SpacePoint > > m_AttackLocations;
+            map< int, vector < PersistentShip* > > m_AttackVictims;
             vector< pair< int, char > > m_Stealths;  // int represents the turn, char 's' represents that it went into stealth, 'd' is destealth
             
             int PreviousTurn(int turn)

@@ -50,7 +50,7 @@ namespace visualizer
         float shipRadius = m_PersistentShip->radius;
         bool shipIsExploding = m_PersistentShip->ExplodingOn(m_Turn);
         
-        vector< SpacePoint > shipAttacks = m_PersistentShip->AttacksOn( m_Turn );
+        vector< SpacePoint > shipAttacks = m_PersistentShip->AttacksOn( m_Turn, t );
         for(unsigned int i = 0; i < shipAttacks.size(); i++)
         {
             shipAttacks[i].x += *m_MapRadius;
@@ -95,7 +95,12 @@ namespace visualizer
         
         // Colors:
         Color teamColor[] = { Color(1, 0, 0, (shipIsExploding? 1 - t : shipStealth) ), Color(0, 0.4f, 1, (shipIsExploding? 1 - t : shipStealth) ) };
-        Color attackColor[] = { Color(1, 0, 0, t), Color(0, 0, 1, t) };
+        float attackTrans = t * 2;
+        if(t >= 0.5f)
+        {
+            attackTrans = 1 - (t - 0.5) * 2;
+        }
+        Color attackColor[] = { Color(1, 0, 0, attackTrans), Color(0, 0, 1, attackTrans) };
         Color healthColor = Color(0, 1, 0, (shipIsExploding? 1 - t : shipStealth) );
         // END: Variables we will need
         
