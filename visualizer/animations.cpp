@@ -9,103 +9,44 @@ namespace visualizer
     {
     }
 
+
     void DrawBackground::animate( const float& /* t */, AnimData * /* d */, IGame* game )
     {
-        game->renderer->setColor( Color( 1, 1, 1 ) );
+        game->renderer->setColor( Color( 1, 1, 1, 1 ) );
         game->renderer->drawTexturedQuad(0, 0, 2000, 2000, "background");
+        game->renderer->setColor( Color( 1, 1, 1, 0.4f ) );
         game->renderer->drawLine(490, 500, 510, 500, 1);
         game->renderer->drawLine(500, 490, 500, 510, 1);
         game->renderer->drawArc(500, 500, 500, 50 );
     }
   
-    void DrawSpaceShip::animate( const float& /* t */, AnimData * /* d */, IGame* game )
+    
+    void DrawPersistentShip::drawRotatedTexturedQuad( IGame* game, float x, float y, float length, float degrees, string texture)
     {
-        // HOW TO USE OPTIONS: if( game->options->getNumber( "RotateBoard" ) )
-        
-        Color teamColor[] = { Color(0.666, 0, 0), Color(0, 0, 0.666) };
-        Color health = Color(0, 0.666, 0);
-        
-        SpaceShip &ship = *m_spaceShip;
-        
-        // Build the ship type string and replace spaces with '-'
-        string shipType = ship.type;
-        for(int i = 0; i < shipType.length(); i++)
-        {
-            if(shipType[i] == ' ')
-            {
-                shipType[i] = '-';
-            }
-        }
-        
-        // Build the Ship's Texture string in textures.r
-        stringstream shipTexture;
-        if(strcmp("ship",shipType.c_str()) == 0)
-        {
-            shipTexture << "Ship-Default";
-        }
-        else
-        {
-            shipTexture << "Ship-" << (ship.owner ? "Blue-" : "Red-") << shipType;
-        }
-        
-        
-        // Health Calculations
-        const float upAngle = -90;
-        const float healthSection = 100;
-        ship.maxHealth = ship.maxHealth ? ship.maxHealth : 1;
-        float healthLeft = float(ship.health)/ship.maxHealth;
-        float healthStart = upAngle-healthSection*healthLeft;
-        float healthEnd   = upAngle+healthSection*healthLeft;
-        cout << healthLeft << endl;
-
-        // Set the color to white for drawing the ship
-        game->renderer->setColor( Color(1, 1, 1, 1) );
-        game->renderer->drawTexturedQuad((float)ship.x - (float)ship.radius/1.25f, (float)ship.y - (float)ship.radius/1.25f, ship.radius * 1.6f, ship.radius * 1.6f, shipTexture.str());
-        game->renderer->drawTexturedQuad((float)ship.x - (float)ship.radius, (float)ship.y - (float)ship.radius, ship.radius * 2.38f, ship.radius * 2.38f, (ship.owner ? "Blue-Shield" : "Red-Shield"));
-        
-        // Set the color to the team color to draw the outline of the shield
-        //game->renderer->setColor( teamColor[ship.owner] );
-        //game->renderer->drawCircle(ship.x, ship.y, ship.radius, 1);
-        
-        game->renderer->drawLine(ship.x - 5, ship.y, ship.x + 5, ship.y, 1);
-        game->renderer->drawLine(ship.x, ship.y - 5, ship.x, ship.y + 5, 1);
-        
-        // Draw their health
-        game->renderer->setColor( teamColor[ship.owner] );
-        game->renderer->drawArc(ship.x, ship.y, ship.radius, 100, healthEnd, healthStart+360 );
-        game->renderer->setColor( health );
-        game->renderer->useShader( ((Space*)game)->programs["test"] );
-        game->renderer->drawArc(ship.x, ship.y, ship.radius, 100, healthStart, healthEnd );
-        game->renderer->useShader( 0 );
+        /*game->renderer->push();
+       game->renderer->translate( 500, 500 );
+       game->renderer->rotate( 45, 0, 0, 1 );
+       game->renderer->drawQuad( -50, -50, 100, 100 );
+       game->renderer->pop();*/
+       
+       game->renderer->push();
+       game->renderer->translate( x + length/2, y + length/2 );
+       game->renderer->rotate( degrees, 0, 0, 1 );
+       game->renderer->drawTexturedQuad( -1 * length/2, -1 * length/2, length, length, texture );
+       game->renderer->pop();
     }
     
-
-    void DrawShipAttack::animate( const float& t, AnimData *d, IGame* game )
-    {
-        Color teamColor[] = { Color(1, 0, 0, t), Color(0, 0, 1, t) };
-        
-        //cout << "time t: " << t << endl;
-        
-        //AttackData *attack = (AttackData*)d;
-        AttackData &attack = *m_attackData;
-        
-        //cout << "attack: a(" << attack.attackerX << "," << attack.attackerY << ") to v(" << attack.victimX << "," << attack.victimY << ")" << endl;
-        
-        game->renderer->setColor( teamColor[attack.attackerTeam] );
-        game->renderer->drawLine(attack.attackerX, attack.attackerY, attack.victimX, attack.victimY, 2); 
-        
-        //if( t > startTime && t < endTime )
-        //else if ( t >= endTime )
-    } // DrawShipAttack::animate()
     
     void DrawPersistentShip::animate( const float& t, AnimData * d, IGame* game )
     {
         // BEGIN: Variables we will need
+        int shipOwner = m_PersistentShip->owner;
         SpacePoint shipCenter = m_PersistentShip->LocationOn(m_Turn, t);
         shipCenter.x += *m_MapRadius;
         shipCenter.y += *m_MapRadius;
+        float shipHeading = (m_PersistentShip->HeadingOn(m_Turn, t) == 0 ? (shipOwner ? 90 : 270) : m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270);
         float shipStealth = m_PersistentShip->StealthOn(m_Turn, t);
-        int shipOwner = m_PersistentShip->owner;
+        
         float shipRadius = m_PersistentShip->radius;
         bool shipIsExploding = m_PersistentShip->ExplodingOn(m_Turn);
         
@@ -153,7 +94,7 @@ namespace visualizer
         float healthEnd   = upAngle+healthSection*healthLeft;
         
         // Colors:
-        Color teamColor[] = { Color(1, 0, 0, (shipIsExploding? 1 - t : shipStealth) ), Color(0, 0, 1, (shipIsExploding? 1 - t : shipStealth) ) };
+        Color teamColor[] = { Color(1, 0, 0, (shipIsExploding? 1 - t : shipStealth) ), Color(0, 0.4f, 1, (shipIsExploding? 1 - t : shipStealth) ) };
         Color attackColor[] = { Color(1, 0, 0, t), Color(0, 0, 1, t) };
         Color healthColor = Color(0, 1, 0, (shipIsExploding? 1 - t : shipStealth) );
         // END: Variables we will need
@@ -170,8 +111,9 @@ namespace visualizer
         {
             // Set the color to white for drawing the ship
             game->renderer->setColor( Color(1, 1, 1, shipStealth) );
-            game->renderer->drawTexturedQuad(shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipRadius * 1.6f, shipTexture.str());
-            game->renderer->drawTexturedQuad(shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2.38f, shipRadius * 2.38f, shipShieldTexture);
+            //game->renderer->drawTexturedQuad(shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipRadius * 1.6f, shipTexture.str());
+            drawRotatedTexturedQuad( game, shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipHeading, shipTexture.str());
+            game->renderer->drawTexturedQuad(shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2, shipRadius * 2, shipShieldTexture);
         }
     
         // Draw their health
@@ -188,5 +130,31 @@ namespace visualizer
         }
         
     } // DrawPersistentShip::animation()
+    
+    
+    
+    void DrawPlayerHUD::animate( const float& t, AnimData * d, IGame* game )
+    {
+        
+        game->renderer->setColor( m_PlayerHUD->id ? Color(1, 0, 0, 1) : Color(0, 0.4f, 1, 1) );
+        // Draw the player's name
+        game->renderer->drawText( m_PlayerHUD->NameX(), 20, "Roboto", m_PlayerHUD->name, 200 );
+        
+        // Draw the player's energy
+        stringstream energy;
+        energy << "Energy: " << m_PlayerHUD->energy;
+        game->renderer->drawText( m_PlayerHUD->EnergyX(), 70, "Roboto", energy.str(), 100 );
+        
+        // Draw the player's victories
+        stringstream victories;
+        victories << "Victories: " << m_PlayerHUD->victories;
+        game->renderer->drawText( m_PlayerHUD->VictoriesX(), 100, "Roboto", victories.str(), 100 );
+        
+        // Draw the player's time left
+        game->renderer->drawText( m_PlayerHUD->TimeX(), 870, "Roboto", "Time Left:", 100 );
+        stringstream time;
+        time << m_PlayerHUD->time;
+        game->renderer->drawText( m_PlayerHUD->TimeX(), 900, "Roboto", time.str(), 100 );
+    }
 
 }

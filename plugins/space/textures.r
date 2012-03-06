@@ -1,4 +1,5 @@
 font DroidSansMono textures/fonts/DroidSansMono.png DroidSansMono.dat
+font Roboto textures/fonts/Roboto.png Roboto.dat
 texture background textures/effects/background.png
 texture Red-Shield textures/effects/red-shield.png
 texture Ship-Default textures/ships/default.png
@@ -117,3 +118,4 @@ texture explosion-85 textures/effects/explosion/explosion-86.png
 texture explosion-86 textures/effects/explosion/explosion-87.png
 texture explosion-87 textures/effects/explosion/explosion-88.png
 texture explosion-88 textures/effects/explosion/explosion-89.png
+texture warp textures/effects/warp.png
