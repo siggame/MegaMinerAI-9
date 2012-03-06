@@ -87,21 +87,18 @@ class AI(BaseAI):
     #Spawning all ships on first turn
     energyLeft = self.players[player].getEnergy()
     #Spawn one high tier ship if available
-    #Only spawn a Battleship if there are no Weapons Platforms
     if availShips["Battleship"] != 0:
       availShips["Battleship"].warpIn(agressiveWarp[0],agressiveWarp[1])
       energyLeft -= availShips["Battleship"].getCost() 
     elif availShips["Weapons Platform"] != 0:
       availShips["Weapons Platform"].warpIn(safeWarp[0],safeWarp[1])
       energyLeft -= availShips["Weapons Platform"].getCost()
-    #Only spawn a Juggernaut if there are no Weapons Platforms or Battleships available 
-    elif availShips["Juggernaut"] != 0:
-      availShips["Juggernaut"].warpIn(agressiveWarp[0],agressiveWarp[1])
-      energyLeft -= availShips["Juggernaut"].getCost()  
-    #Only spawn a Cruiser as last resort 
     elif availShips["Cruiser"] != 0:
       availShips["Cruiser"].warpIn(agressiveWarp[0],agressiveWarp[1])
       energyLeft -= availShips["Cruiser"].getCost() 
+    elif availShips["Juggernaut"] != 0:
+      availShips["Juggernaut"].warpIn(agressiveWarp[0],agressiveWarp[1])
+      energyLeft -= availShips["Juggernaut"].getCost()  
       
     #Spawn 10 low tier ships if a high tier was purchased, 15 if not   
     if energyLeft < 50: 
@@ -161,7 +158,7 @@ class AI(BaseAI):
       if found == True:
         move = self.moveTo(ship, target.getX(), target.getY())  
       else:
-        move = self.moveTo(ship, FriendlyWarpGate.getX(), FriendlyWarpGate.getY()) 
+        move = self.moveTo(ship, FriendlyWarpGate[0].getX(), FriendlyWarpGate[0].getY()) 
     
   #Attack all enemies in range with all attacks
   def attackAllInRange(self,ship):
@@ -180,10 +177,13 @@ class AI(BaseAI):
       target = self.highestPriorityEnemy(attackList)
       if attacksLeft > 0 and shipHealth[target.getId()] > 0:
         shipHealth[target.getId()] -= ship.getDamage()
-        if shipHealth[target.getId()] <= ship.getDamage():
+        if shipHealth[target.getId()] <= ship.getDamage() and target.getId() in theirShips:
           theirShips.remove(target)
         ship.attack(target)
         attacksLeft-=1
+        attackList.remove(target)
+      else:
+        attackList.remove(target)
     del attackList[0:len(attackList)]
     return attacksLeft
               
