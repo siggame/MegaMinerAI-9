@@ -8,7 +8,7 @@ myShips = []
 theirShips = []
 shipHealth = {}
 priorityList = {"Battleship" : 8,"Juggernaut" : 4,"Mine Layer" : 6,"Support" : 5, "Warp Gate" : 0, \
-    "EMP" : 7,"Stealth" : 10,"Cruiser" : 3,"Weapons Platform" : 9,"Interceptor" : 1,"Bomber" : 2, "Mine" : -1}
+    "EMP" : 7,"Stealth" : 10,"Cruiser" : 3,"Weapons Platform" : 9,"Interceptor" : 1,"Bomber" : 2, "Mine" : -2}
 
 
 class AI(BaseAI):
@@ -44,6 +44,21 @@ class AI(BaseAI):
       
   #Returns the the furthest point along a path to target      
   def moveTo(self,ship,x,y):
+    if ship.getType() != "Warp Gate" and ship.getType() != "Weapons Platform" and ship.getType() != "Mine Layer":
+      points = self.pointsAtEdge(x,y,ship.getRange()+20,16)
+      distance = 10000
+      for point in points:
+        if point[0]**2 + point[1]**2 < self.mapRadius()**2:
+          if self.distance(ship.getX(), point[0], ship.getY(), point[1]) < distance:
+            mineThere = False
+            for enemy in theirShips:
+              if enemy.getType() == "Mine":
+                if self.getRange(point[0], point[1], ship.getRadius(), enemy.getX(), enemy.getY(), enemy.getRange()):  
+                  mineThere = True
+            if mineThere == False:
+              distance = self.distance(ship.getX(), point[0], ship.getY(), point[1])
+              x = point[0]
+              y = point[1]
     distance = (((ship.getX() - x)**2) + ((ship.getY() - y)**2))**.5
     if distance == 0:
       return [x,y]
@@ -57,9 +72,31 @@ class AI(BaseAI):
     startY = int(ship.getY()*(1-distRatio))
     endX = int(x*distRatio)
     endY = int(y*distRatio)
+    finalX = startX + endX
+    finalY = startY + endY
+    mineThere = False
+    for enemy in theirShips:
+      if enemy.getType() == "Mine":
+        if self.getRange(finalX, finalY, ship.getRadius(), enemy.getX(), enemy.getY(), enemy.getRange()):  
+          mineThere = True
+    if mineThere == True:
+      points = self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()-5,24)
+      distance = 10000
+      for point in points:
+        if point[0]**2 + point[1]**2 < self.mapRadius()**2:
+          if self.distance(point[0], x,point[1], y) < distance:
+            mineThere = False
+            for enemy in theirShips:
+              if enemy.getType() == "Mine":
+                if self.getRange(point[0], point[1], ship.getRadius(), enemy.getX(), enemy.getY(), enemy.getRange()):  
+                  mineThere = True
+            if mineThere == False:
+              distance = self.distance(point[0], x,point[1], y)
+              finalX = point[0]
+              finalY = point[1]
     if ship.getMovementLeft() < self.distance(ship.getX(), startX + endX, ship.getY(), startY + endY):
       print ship.getType(), ship.getMovementLeft(), distance, self.distance(ship.getX(), startX + endX, ship.getY(), startY + endY), distRatio, startX + endX, startY + endY, ship.getX(), ship.getY(), x, y
-    return [startX + endX, startY + endY]
+    return [finalX, finalY]
    
   #Moves ship away from the nearest enemy
   def moveAway(self,ship): 
@@ -333,7 +370,7 @@ class AI(BaseAI):
         if attackData[0] == 0: 
           if ship.getType() != "EMP":
             self.moveAway(ship) 
-          else:       
+          else:
             self.blowUp(ship)          
         #Move towards enemies and try to attack again          
         else:
@@ -385,7 +422,7 @@ class AI(BaseAI):
           ship.move(move[0],move[1])
       elif ship.getType() == "Mine Layer":
         if ship.getAttacksLeft() > 0:
-          points = self.pointsAtEdge(FriendlyWarpGate[0].getX(), FriendlyWarpGate[0].getY(), FriendlyWarpGate[0].getRadius()+60, 24)
+          points = self.pointsAtEdge(FriendlyWarpGate[0].getX(), FriendlyWarpGate[0].getY(), FriendlyWarpGate[0].getRadius()+60, 32)
           movementLeft = ship.getMovementLeft()
           PlacedOne = False
           for point in points:
@@ -394,7 +431,7 @@ class AI(BaseAI):
               move = self.moveTo(ship,point[0],point[1])
               for myship in myShips:
                 if myship.getType() == "Mine":
-                  if self.getRange(move[0], move[1], myship.getRange()/2, myship.getX(), myship.getY(), myship.getRange()/2):
+                  if self.getRange(move[0], move[1], myship.getRange()*.75, myship.getX(), myship.getY(), myship.getRange()*.75):
                     NoMine = False
               if NoMine == True and movementLeft > 0:
                 if self.distance(ship.getX(), move[0], ship.getY(), move[1]) <= movementLeft:

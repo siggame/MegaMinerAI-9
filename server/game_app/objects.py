@@ -159,7 +159,9 @@ class Ship:
       return "The enemy ship refuses to blow itself up, sorry"
     for target in self.allInRange(self.owner^1):     
       if self.id in self.game.objects:
-        self.attack(target) 
+        target.health -= self.selfDestructDamage
+        if target.health <= 0 and target.id in self.game.objects:
+          self.game.removeObject(target)
         self.game.removeObject(self)
         self.game.animations.append(['selfDestruct', self.id])
     return True
