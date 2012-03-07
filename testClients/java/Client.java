@@ -65,6 +65,7 @@ public interface Client extends Library {
   int shipGetRange(Pointer ptr);
   int shipGetHealth(Pointer ptr);
   int shipGetMaxHealth(Pointer ptr);
+  int shipGetSelfDestructDamage(Pointer ptr);
 
 
     //properties

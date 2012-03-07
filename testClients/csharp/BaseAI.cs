@@ -19,7 +19,7 @@ public abstract class BaseAI
   {
     connection = c;
   }
-    
+
   ///
   ///Make this your username, which should be provided.
   public abstract String username();
@@ -75,31 +75,37 @@ public abstract class BaseAI
   ///How many turns it has been since the beginning of the game
   public int turnNumber()
   {
-    return Client.getTurnNumber(connection);
+    int value = Client.getTurnNumber(connection);
+    return value;
   }
   ///Player Number; either 0 or 1
   public int playerID()
   {
-    return Client.getPlayerID(connection);
+    int value = Client.getPlayerID(connection);
+    return value;
   }
   ///What number game this is for the server
   public int gameNumber()
   {
-    return Client.getGameNumber(connection);
+    int value = Client.getGameNumber(connection);
+    return value;
   }
   ///What round you are in the match
   public int round()
   {
-    return Client.getRound(connection);
+    int value = Client.getRound(connection);
+    return value;
   }
   ///How many victories a player needs to win
   public int victoriesNeeded()
   {
-    return Client.getVictoriesNeeded(connection);
+    int value = Client.getVictoriesNeeded(connection);
+    return value;
   }
   ///The radius of the map.  Center of screen is (0,0), with +x right, +y up
   public int mapRadius()
   {
-    return Client.getMapRadius(connection);
+    int value = Client.getMapRadius(connection);
+    return value;
   }
 }

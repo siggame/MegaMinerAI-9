@@ -27,7 +27,7 @@ int ShipType::cost()
 
 int ShipType::warpIn(int x, int y)
 {
-  return shiptypeWarpIn( (_ShipType*)ptr, x, y);
+  return shipTypeWarpIn( (_ShipType*)ptr, x, y);
 }
 
 

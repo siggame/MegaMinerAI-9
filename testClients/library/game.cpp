@@ -207,7 +207,7 @@ DLLEXPORT void getStatus(Connection* c)
 }
 
 
-DLLEXPORT int shiptypeWarpIn(_ShipType* object, int x, int y)
+DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y)
 {
   stringstream expr;
   expr << "(game-warp-in " << object->id
