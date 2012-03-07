@@ -26,9 +26,9 @@ class Ship
     }
     throw new ExistentialError();
   }
-    
+
     //commands
-    
+
   ///Command a ship to move to a specified position
   int move(int x, int y)
   {
@@ -48,9 +48,9 @@ class Ship
     target.validify();
     return Client.INSTANCE.shipAttack(ptr, target.ptr);
   }
-    
+
     //getters
-    
+
   ///Unique Identifier
   public int getId()
   {
@@ -134,6 +134,12 @@ class Ship
   {
     validify();
     return Client.INSTANCE.shipGetMaxHealth(ptr);
+  }
+  ///the amount of damage done when this ship blows up
+  public int getSelfDestructDamage()
+  {
+    validify();
+    return Client.INSTANCE.shipGetSelfDestructDamage(ptr);
   }
 
 }

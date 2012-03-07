@@ -65,7 +65,7 @@ extern "C"
 //commands
 
   ///Sends in a new ship of this type
-  DLLEXPORT int shiptypeWarpIn(_ShipType* object, int x, int y);
+  DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y);
   ///Allows a player to display messages on the screen
   DLLEXPORT int playerTalk(_Player* object, char* message);
   ///Command a ship to move to a specified position

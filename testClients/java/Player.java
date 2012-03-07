@@ -26,18 +26,18 @@ class Player
     }
     throw new ExistentialError();
   }
-    
+
     //commands
-    
+
   ///Allows a player to display messages on the screen
   int talk(String message)
   {
     validify();
     return Client.INSTANCE.playerTalk(ptr, message);
   }
-    
+
     //getters
-    
+
   ///Unique Identifier
   public int getId()
   {

@@ -67,14 +67,14 @@ public class Client {
   [DllImport("client")]
   public static extern int shipTypeGetId(IntPtr ptr);
   [DllImport("client")]
-  public static extern string shipTypeGetType(IntPtr ptr);
+  public static extern IntPtr shipTypeGetType(IntPtr ptr);
   [DllImport("client")]
   public static extern int shipTypeGetCost(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int playerGetId(IntPtr ptr);
   [DllImport("client")]
-  public static extern string playerGetPlayerName(IntPtr ptr);
+  public static extern IntPtr playerGetPlayerName(IntPtr ptr);
   [DllImport("client")]
   public static extern float playerGetTime(IntPtr ptr);
   [DllImport("client")]
@@ -93,7 +93,7 @@ public class Client {
   [DllImport("client")]
   public static extern int shipGetRadius(IntPtr ptr);
   [DllImport("client")]
-  public static extern string shipGetType(IntPtr ptr);
+  public static extern IntPtr shipGetType(IntPtr ptr);
   [DllImport("client")]
   public static extern int shipGetAttacksLeft(IntPtr ptr);
   [DllImport("client")]
@@ -110,6 +110,8 @@ public class Client {
   public static extern int shipGetHealth(IntPtr ptr);
   [DllImport("client")]
   public static extern int shipGetMaxHealth(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipGetSelfDestructDamage(IntPtr ptr);
 
 
     //properties

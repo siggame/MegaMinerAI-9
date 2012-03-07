@@ -38,8 +38,8 @@ library.networkLoop.restype = c_int
 library.networkLoop.argtypes = [c_void_p]
 
 #Functions
-library.shiptypeWarpIn.restype = c_int
-library.shiptypeWarpIn.argtypes = [c_void_p, c_int, c_int]
+library.shipTypeWarpIn.restype = c_int
+library.shipTypeWarpIn.argtypes = [c_void_p, c_int, c_int]
 
 library.playerTalk.restype = c_int
 library.playerTalk.argtypes = [c_void_p, c_char_p]

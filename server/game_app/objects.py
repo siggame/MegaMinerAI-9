@@ -204,7 +204,7 @@ class Ship:
           if unit.type == "Support":
             if unit.inRange(target):
             #Increment the damage modifier for each radar in range
-              modifier+=.5
+              modifier+= (unit.damage / 100)
               
         #Special attack for the EMP class
 #        if self.type == "EMP":

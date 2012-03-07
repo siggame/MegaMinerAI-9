@@ -43,6 +43,35 @@ namespace visualizer
         int TimeX() { return (id ? 850 : 40); }
         int VictoriesX() { return (id ? 840 : 10); }
     };
+    
+    class Warp: public Animatable
+    {
+        public:
+            int x;
+            int y;
+            int owner;
+            int radius;
+            bool fadeOut;
+            
+            Warp(int inX, int inY, int inRad, int inOwner, bool fade)
+            {
+                x = inX;
+                y = inY;
+                owner = inOwner;
+                radius = inRad;
+                fadeOut = fade;
+            }
+            
+            Warp( Warp &warp )
+            {
+                x = warp.x;
+                y = warp.y;
+                owner = warp.owner;
+                radius = warp.radius;
+                fadeOut = warp.fadeOut;
+            }
+            
+    };
 
 } // visualizer
 

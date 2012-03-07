@@ -43,6 +43,8 @@ class Ship {
   int health();
   ///the max health possible for the ship
   int maxHealth();
+  ///the amount of damage done when this ship blows up
+  int selfDestructDamage();
 
   // Actions
   ///Command a ship to move to a specified position

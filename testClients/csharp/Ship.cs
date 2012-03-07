@@ -8,11 +8,11 @@ public class Ship
   public IntPtr ptr;
   protected int ID;
   protected int iteration;
-  
+
   public Ship()
   {
   }
-  
+
   public Ship(IntPtr p)
   {
     ptr = p;
@@ -34,9 +34,9 @@ public class Ship
     }
     throw new ExistentialError();
   }
-    
+
     //commands
-    
+
   ///Command a ship to move to a specified position
   public int move(int x, int y)
   {
@@ -56,92 +56,113 @@ public class Ship
     target.validify();
     return Client.shipAttack(ptr, target.ptr);
   }
-    
+
     //getters
-    
+
   ///Unique Identifier
   public int getId()
   {
     validify();
-    return Client.shipGetId(ptr);
+    int value = Client.shipGetId(ptr);
+    return value;
   }
   ///The owner of the piece
   public int getOwner()
   {
     validify();
-    return Client.shipGetOwner(ptr);
+    int value = Client.shipGetOwner(ptr);
+    return value;
   }
   ///Position x
   public int getX()
   {
     validify();
-    return Client.shipGetX(ptr);
+    int value = Client.shipGetX(ptr);
+    return value;
   }
   ///Position y
   public int getY()
   {
     validify();
-    return Client.shipGetY(ptr);
+    int value = Client.shipGetY(ptr);
+    return value;
   }
   ///ship size radius
   public int getRadius()
   {
     validify();
-    return Client.shipGetRadius(ptr);
+    int value = Client.shipGetRadius(ptr);
+    return value;
   }
   ///The ship type
   public string getType()
   {
     validify();
-    return Client.shipGetType(ptr);
+    IntPtr value = Client.shipGetType(ptr);
+    return Marshal.PtrToStringAuto(value);
   }
   ///how many more attacks it has
   public int getAttacksLeft()
   {
     validify();
-    return Client.shipGetAttacksLeft(ptr);
+    int value = Client.shipGetAttacksLeft(ptr);
+    return value;
   }
   ///how much more movement it has
   public int getMovementLeft()
   {
     validify();
-    return Client.shipGetMovementLeft(ptr);
+    int value = Client.shipGetMovementLeft(ptr);
+    return value;
   }
   ///the largest possible movement
   public int getMaxMovement()
   {
     validify();
-    return Client.shipGetMaxMovement(ptr);
+    int value = Client.shipGetMaxMovement(ptr);
+    return value;
   }
   ///the max number of attacks it has
   public int getMaxAttacks()
   {
     validify();
-    return Client.shipGetMaxAttacks(ptr);
+    int value = Client.shipGetMaxAttacks(ptr);
+    return value;
   }
   ///the strength of its attacks
   public int getDamage()
   {
     validify();
-    return Client.shipGetDamage(ptr);
+    int value = Client.shipGetDamage(ptr);
+    return value;
   }
   ///the range of its attacks
   public int getRange()
   {
     validify();
-    return Client.shipGetRange(ptr);
+    int value = Client.shipGetRange(ptr);
+    return value;
   }
   ///the total health of the ship
   public int getHealth()
   {
     validify();
-    return Client.shipGetHealth(ptr);
+    int value = Client.shipGetHealth(ptr);
+    return value;
   }
   ///the max health possible for the ship
   public int getMaxHealth()
   {
     validify();
-    return Client.shipGetMaxHealth(ptr);
+    int value = Client.shipGetMaxHealth(ptr);
+    return value;
+  }
+  ///the amount of damage done when this ship blows up
+  public int getSelfDestructDamage()
+  {
+    validify();
+    int value = Client.shipGetSelfDestructDamage(ptr);
+    return value;
   }
 
 }
