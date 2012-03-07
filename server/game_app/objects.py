@@ -159,7 +159,9 @@ class Ship:
       return "The enemy ship refuses to blow itself up, sorry"
     for target in self.allInRange(self.owner^1):     
       if self.id in self.game.objects:
-        self.attack(target) 
+        target.health -= self.selfDestructDamage
+        if target.health <= 0 and target.id in self.game.objects:
+          self.game.removeObject(target)
         self.game.removeObject(self)
         self.game.animations.append(['selfDestruct', self.id])
     return True
@@ -178,7 +180,19 @@ class Ship:
       #Adding a new mine to the game
       shipStats = [cfgUnits["Mine"][value] for value in self.game.ordering]   
       self.game.addObject(Ship, [self.game.playerID, self.x, self.y] + shipStats)
+      self.maxAttacks-=1
       return True
+#CHANING STUFF HERE
+    if self.type == 'EMP' and self.id == target.id:
+      foe = self.owner^1
+      for ship in self.allInRange(foe):
+        ship.attacksLeft = -1
+        ship.movementLeft = -1
+        self.movementLeft = -1
+        self.maxAttacks -= 1      
+#Yo, Vis guys, how you want us do this?
+        self.game.animations.append(['attack',self.id,ship.id])
+    
     elif target.owner == self.owner:
       return 'No friendly fire please'
     elif not self.inRange(target):
@@ -192,12 +206,12 @@ class Ship:
             #Increment the damage modifier for each radar in range
               modifier+=.5
               
-      #Special attack for the EMP class
-      if self.type == "EMP":
-        self.maxAttacks -= 1
-        for victim in self.allInRange(target.owner):
-          unit.attacksLeft = -1
-          unit.movementLeft = -1  
+        #Special attack for the EMP class
+#        if self.type == "EMP":
+#          self.maxAttacks -= 1
+#          for victim in self.allInRange(target.owner):
+#            unit.attacksLeft = -1
+#            unit.movementLeft = -1  
           
       self.game.animations.append(['attack', self.id, target.id])
       target.health-=self.damage*modifier

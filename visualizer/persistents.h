@@ -274,6 +274,16 @@ namespace visualizer
                 points.push_back( SpacePoint( points.back().x, points.back().y ) );
             }
             
+            bool RenderShield()
+            {
+                return !(strcmp( "Mine", type.c_str() ) == 0);
+            }
+            
+            bool RenderRange()
+            {
+                return (strcmp( "Mine", type.c_str() ) == 0) || (strcmp( "Support", type.c_str() ) == 0);
+            }
+            
         private:
             int createdAtTurn;
             //map< int, vector< SpacePoint > > m_AttackLocations;
