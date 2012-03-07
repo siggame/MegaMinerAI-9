@@ -140,7 +140,7 @@ class AI(BaseAI):
       self.moveToTarget(ship,foeWarp[0])
       foe = self.bestUseAttack(ship)
       if len(foe) > 0:
-        ship.attack(foe[0])
+        ship.attack(ship)
                        
   def stealthControl(self,stealths,enemy,myListDict):
   #stick with other stealth ships, move towards most isolated enemy, or target emps or other priority targets, swarm them, then flee

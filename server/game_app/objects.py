@@ -182,6 +182,17 @@ class Ship:
       self.game.addObject(Ship, [self.game.playerID, self.x, self.y] + shipStats)
       self.maxAttacks-=1
       return True
+#CHANING STUFF HERE
+    if self.type == 'EMP' and self.id == target.id:
+      foe = self.owner^1
+      for ship in self.allInRange(foe):
+        ship.attacksLeft = -1
+        ship.movementLeft = -1
+        self.movementLeft = -1
+        self.maxAttacks -= 1      
+#Yo, Vis guys, how you want us do this?
+        self.game.animations.append(['attack',self.id,ship.id])
+    
     elif target.owner == self.owner:
       return 'No friendly fire please'
     elif not self.inRange(target):
@@ -196,11 +207,11 @@ class Ship:
               modifier+=.5
               
         #Special attack for the EMP class
-        if self.type == "EMP":
-          self.maxAttacks -= 1
-          for victim in self.allInRange(target.owner):
-            unit.attacksLeft = -1
-            unit.movementLeft = -1  
+#        if self.type == "EMP":
+#          self.maxAttacks -= 1
+#          for victim in self.allInRange(target.owner):
+#            unit.attacksLeft = -1
+#            unit.movementLeft = -1  
           
       self.game.animations.append(['attack', self.id, target.id])
       target.health-=self.damage*modifier
