@@ -26,18 +26,18 @@ class ShipType
     }
     throw new ExistentialError();
   }
-    
+
     //commands
-    
+
   ///Sends in a new ship of this type
   int warpIn(int x, int y)
   {
     validify();
     return Client.INSTANCE.shipTypeWarpIn(ptr, x, y);
   }
-    
+
     //getters
-    
+
   ///Unique Identifier
   public int getId()
   {

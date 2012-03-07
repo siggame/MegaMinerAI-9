@@ -87,12 +87,12 @@ stealth = Animation('stealth',
     ],
   )
   
-playerTalk = Animation('playerTalk',
-  data=[
-    Variable('acting', Player),
-    Variable('message', str),
-    ],
-  )
+#playerTalk = Animation('playerTalk',
+#  data=[
+#    Variable('acting', Player),
+#    Variable('message', str),
+#    ],
+#  )
 
 deStealth = Animation('deStealth',
   data=[

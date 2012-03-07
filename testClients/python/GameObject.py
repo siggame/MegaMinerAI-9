@@ -232,6 +232,11 @@ class Ship(GameObject):
     self.validify()
     return library.shipGetMaxHealth(self.ptr)
 
+  ##the amount of damage done when this ship blows up
+  def getSelfDestructDamage(self):
+    self.validify()
+    return library.shipGetSelfDestructDamage(self.ptr)
+
 
   def __str__(self):
     self.validify()
@@ -250,4 +255,5 @@ class Ship(GameObject):
     ret += "range: %s\n" % self.getRange()
     ret += "health: %s\n" % self.getHealth()
     ret += "maxHealth: %s\n" % self.getMaxHealth()
+    ret += "selfDestructDamage: %s\n" % self.getSelfDestructDamage()
     return ret

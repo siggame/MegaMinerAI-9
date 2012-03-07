@@ -8,11 +8,11 @@ public class Player
   public IntPtr ptr;
   protected int ID;
   protected int iteration;
-  
+
   public Player()
   {
   }
-  
+
   public Player(IntPtr p)
   {
     ptr = p;
@@ -34,47 +34,52 @@ public class Player
     }
     throw new ExistentialError();
   }
-    
+
     //commands
-    
+
   ///Allows a player to display messages on the screen
   public int talk(string message)
   {
     validify();
     return Client.playerTalk(ptr, message);
   }
-    
+
     //getters
-    
+
   ///Unique Identifier
   public int getId()
   {
     validify();
-    return Client.playerGetId(ptr);
+    int value = Client.playerGetId(ptr);
+    return value;
   }
   ///Player's Name
   public string getPlayerName()
   {
     validify();
-    return Client.playerGetPlayerName(ptr);
+    IntPtr value = Client.playerGetPlayerName(ptr);
+    return Marshal.PtrToStringAuto(value);
   }
   ///Time remaining, updated at start of turn
   public float getTime()
   {
     validify();
-    return Client.playerGetTime(ptr);
+    float value = Client.playerGetTime(ptr);
+    return value;
   }
   ///How many rounds you have won this match
   public int getVictories()
   {
     validify();
-    return Client.playerGetVictories(ptr);
+    int value = Client.playerGetVictories(ptr);
+    return value;
   }
   ///How much energy the player has left to warp in ships
   public int getEnergy()
   {
     validify();
-    return Client.playerGetEnergy(ptr);
+    int value = Client.playerGetEnergy(ptr);
+    return value;
   }
 
 }

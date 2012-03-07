@@ -8,11 +8,11 @@ public class ShipType
   public IntPtr ptr;
   protected int ID;
   protected int iteration;
-  
+
   public ShipType()
   {
   }
-  
+
   public ShipType(IntPtr p)
   {
     ptr = p;
@@ -34,35 +34,38 @@ public class ShipType
     }
     throw new ExistentialError();
   }
-    
+
     //commands
-    
+
   ///Sends in a new ship of this type
   public int warpIn(int x, int y)
   {
     validify();
     return Client.shipTypeWarpIn(ptr, x, y);
   }
-    
+
     //getters
-    
+
   ///Unique Identifier
   public int getId()
   {
     validify();
-    return Client.shipTypeGetId(ptr);
+    int value = Client.shipTypeGetId(ptr);
+    return value;
   }
   ///The ship type
   public string getType()
   {
     validify();
-    return Client.shipTypeGetType(ptr);
+    IntPtr value = Client.shipTypeGetType(ptr);
+    return Marshal.PtrToStringAuto(value);
   }
   ///The amount of money required to purchase this type of ship
   public int getCost()
   {
     validify();
-    return Client.shipTypeGetCost(ptr);
+    int value = Client.shipTypeGetCost(ptr);
+    return value;
   }
 
 }
