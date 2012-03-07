@@ -1,6 +1,7 @@
 #ifndef PERSISTENTS_H
 #define PERSISTENTS_H
 
+#if 0
 #define M11  0.0    
 #define M12  1.0   
 #define M13  0.0   
@@ -17,7 +18,29 @@
 #define M42  1.5   
 #define M43 -1.5   
 #define M44  0.5 
+#else
+// Official Cubic Hermite Spline Equation
+// See wiki
+#define M11  0.0   
+#define M21  1.0   
+#define M31 -2.0   
+#define M41  1.0   
 
+#define M12  1.0    
+#define M22  0.0   
+#define M32 -3.0   
+#define M42  2.0   
+
+#define M13  0.0   
+#define M23  0.0   
+#define M33  3.0   
+#define M43 -2.0   
+
+#define M14  0.0   
+#define M24  0.0   
+#define M34 -1.0   
+#define M44  1.0 
+#endif
 
 #include "parser/structures.h"
 #include <vector>
