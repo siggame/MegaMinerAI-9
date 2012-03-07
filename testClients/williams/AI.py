@@ -7,7 +7,7 @@ import random
 myShips = []
 theirShips = []
 shipHealth = {}
-priorityList = {"Battleship" : 8,"Juggernaut" : 4,"Mine Layer" : 6,"Support" : 5, "Warp Gate" : 0, \
+priorityList = {"Battleship" : 8,"Juggernaut" : 4,"Mine Layer" : -1,"Support" : 5, "Warp Gate" : 0, \
     "EMP" : 7,"Stealth" : 10,"Cruiser" : 3,"Weapons Platform" : 9,"Interceptor" : 1,"Bomber" : 2, "Mine" : -2}
 
 
@@ -94,8 +94,6 @@ class AI(BaseAI):
               distance = self.distance(point[0], x,point[1], y)
               finalX = point[0]
               finalY = point[1]
-    if ship.getMovementLeft() < self.distance(ship.getX(), startX + endX, ship.getY(), startY + endY):
-      print ship.getType(), ship.getMovementLeft(), distance, self.distance(ship.getX(), startX + endX, ship.getY(), startY + endY), distRatio, startX + endX, startY + endY, ship.getX(), ship.getY(), x, y
     return [finalX, finalY]
    
   #Moves ship away from the nearest enemy
@@ -261,22 +259,26 @@ class AI(BaseAI):
       if self.getRange(ship.getX(),ship.getY(),ship.getRange(),enemy.getX(),enemy.getY(),enemy.getRadius()) and enemy.getType() != "Mine" \
       and enemy not in attackedList:
         attackList.append(enemy)
-    #While I still have targets and attacks, attack!
-    #TODO: Handle support damage and health modifiers
-    while attacksLeft > 0 and len(attackList) > 0:
-      target = self.highestPriorityEnemy(attackList)
-      if attacksLeft > 0 and shipHealth[target.getId()] > 0:
-        shipHealth[target.getId()] -= ship.getDamage()
-        if shipHealth[target.getId()] <= ship.getDamage() and target.getId() in theirShips:
-          theirShips.remove(target)
+        
+    if ship.getType() == "EMP" and len(attackList) > 2:
+      ship.attack(ship)
+    else:
+      #While I still have targets and attacks, attack!
+      #TODO: Handle support damage and health modifiers
+      while attacksLeft > 0 and len(attackList) > 0:
+        target = self.highestPriorityEnemy(attackList)
+        if attacksLeft > 0 and shipHealth[target.getId()] > 0:
+          shipHealth[target.getId()] -= ship.getDamage()
+          if shipHealth[target.getId()] <= ship.getDamage() and target.getId() in theirShips:
+            theirShips.remove(target)
+          else:
+            attackedList.append(target)
+          ship.attack(target)
+          attacksLeft-=1
+          attackList.remove(target)
         else:
-          attackedList.append(target)
-        ship.attack(target)
-        attacksLeft-=1
-        attackList.remove(target)
-      else:
-        attackList.remove(target)
-    del attackList[0:len(attackList)]
+          attackList.remove(target)
+      del attackList[0:len(attackList)]
     return [attacksLeft, attackedList]
     
   def blowUp(self,ship):
@@ -331,6 +333,7 @@ class AI(BaseAI):
     if player == 1:
       modifier = 1
       
+      
     #Setting general warp locations   
     #Closest to enemy warpgate 
     agressiveWarp = self.moveTo(FriendlyWarpGate[0], EnemyWarpGate[0].getX(), EnemyWarpGate[0].getY())   
@@ -354,7 +357,6 @@ class AI(BaseAI):
       #EMP
         #Stay with group
         #Only fire at ships with > 50 health, enemy EMPs, or groups of 3 or more  
-      
     for ship in myShips:
       if ship.getType() == "Mine":
         break
@@ -437,9 +439,10 @@ class AI(BaseAI):
                 if self.distance(ship.getX(), move[0], ship.getY(), move[1]) <= movementLeft:
                   if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
                     ship.move(move[0],move[1])   
-                    movementLeft = 0         
-                    ship.attack(ship)                   
-                    PlacedOne = True
+                    movementLeft = 0  
+                    if self.turnNumber() >=10:                
+                      ship.attack(ship)                   
+                      PlacedOne = True
           if PlacedOne == False:
             move = self.moveTo(ship,EnemyWarpGate[0].getX(),EnemyWarpGate[0].getY())
             if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
