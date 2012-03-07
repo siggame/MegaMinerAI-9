@@ -53,9 +53,7 @@ namespace visualizer
         for (std::map< int, PersistentShip* >::iterator iter = m_PersistentShips.begin(); iter != m_PersistentShips.end(); ++iter)
         {
             selectedShipIDs.push_back( iter->second->id );
-            cout << "added an id\n";
         }
-        cout << "in selectedunits\n";
         return selectedShipIDs;
     }
 
