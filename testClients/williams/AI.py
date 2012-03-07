@@ -120,6 +120,7 @@ class AI(BaseAI):
               
   def spawnShips(self, player, availShips, safeWarp, defensiveWarp, agressiveWarp):
     #Spawning all ships on first turn
+    #Test double battleship logic
     energyLeft = self.players[player].getEnergy()
     if availShips["Mine Layer"] != 0 and availShips["Weapons Platform"] != 0:
       availShips["Weapons Platform"].warpIn(safeWarp[0],safeWarp[1])
@@ -192,9 +193,11 @@ class AI(BaseAI):
     if energyLeft >= 5:
       #Spawning specialty ships (Initial design)     
       if availShips["Mine Layer"] != 0:
-        while energyLeft >= 5:
+        i = 2
+        while energyLeft >= 5 and i > 0:
           availShips["Mine Layer"].warpIn(defensiveWarp[0],defensiveWarp[1])
-          energyLeft -= availShips["Mine Layer"].getCost()                    
+          energyLeft -= availShips["Mine Layer"].getCost() 
+          i-=1         
       if availShips["Support"] != 0 and energyLeft >= 5:
         availShips["Support"].warpIn(agressiveWarp[0],agressiveWarp[1])
         energyLeft -= availShips["Support"].getCost()
@@ -440,7 +443,7 @@ class AI(BaseAI):
                   if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
                     ship.move(move[0],move[1])   
                     movementLeft = 0  
-                    if self.turnNumber() >=10:                
+                    if self.turnNumber() >=7:                
                       ship.attack(ship)                   
                       PlacedOne = True
           if PlacedOne == False:
