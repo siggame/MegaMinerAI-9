@@ -255,54 +255,5 @@ class Ship(GameObject):
     ret += "range: %s\n" % self.getRange()
     ret += "health: %s\n" % self.getHealth()
     ret += "maxHealth: %s\n" % self.getMaxHealth()
-    return ret
-
-##An available ship type
-class ShipType(GameObject):
-  def __init__(self, ptr):
-    from BaseAI import BaseAI
-    self.ptr = ptr
-    self.iteration = BaseAI.iteration
-    
-    self.id = library.shipTypeGetId(ptr)
-
-  def validify(self):
-    from BaseAI import BaseAI
-    #if this class is pointing to an object from before the current turn it's probably
-    #somewhere else in memory now
-    if self.iteration == BaseAI.iteration:
-      return True
-    for i in BaseAI.shipTypes:
-      if i.id == self.id:
-        self.ptr = i.ptr
-        self.iteration = BaseAI.iteration
-        return True
-    raise ExistentialError()
-  ##Sends in a new ship of this type
-  def warpIn(self, x, y):
-    self.validify()
-    return library.shiptypeWarpIn(self.ptr, x, y)
-
-  ##Unique Identifier
-  def getId(self):
-    self.validify()
-    return library.shipTypeGetId(self.ptr)
-
-  ##The ship type
-  def getType(self):
-    self.validify()
-    return library.shipTypeGetType(self.ptr)
-
-  ##The amount of money required to purchase this type of ship
-  def getCost(self):
-    self.validify()
-    return library.shipTypeGetCost(self.ptr)
-
-
-  def __str__(self):
-    self.validify()
-    ret = ""
-    ret += "id: %s\n" % self.getId()
-    ret += "type: %s\n" % self.getType()
-    ret += "cost: %s\n" % self.getCost()
+    ret += "selfDestructDamage: %s\n" % self.getSelfDestructDamage()
     return ret
