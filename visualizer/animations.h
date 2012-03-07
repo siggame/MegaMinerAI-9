@@ -35,7 +35,7 @@ namespace visualizer
         public:
             DrawPersistentShip( PersistentShip* persistentShip, int turn, int* mapRadius ) { m_PersistentShip = persistentShip; m_Turn = turn; m_MapRadius = mapRadius; }
             void animate( const float& t, AnimData *d, IGame* game );
-            void drawRotatedTexturedQuad( IGame* game, float x, float y, float length, float degrees, string texture);
+            //void drawRotatedTexturedQuad( IGame* game, float x, float y, float length, float degrees, string texture);
             
             float controlDuration() const
             { return 1; }
@@ -61,6 +61,20 @@ namespace visualizer
         private:
             PlayerHUD* m_PlayerHUD;
     }; // DrawPersistentShip
+    
+    class DrawWarp: public Anim
+    {
+        public:
+            DrawWarp( Warp* warp ) { m_Warp = warp; }
+            void animate( const float& t, AnimData *d, IGame* game );
+
+            float controlDuration() const
+            { return 1; }
+            float totalDuration() const
+            { return 1; }
+        private:
+            Warp* m_Warp;
+    }; // DrawWarp
 
 }
 

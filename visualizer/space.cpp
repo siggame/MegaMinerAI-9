@@ -45,6 +45,17 @@ namespace visualizer
 
           animationEngine->registerGame( this, this ); */
     }
+    
+    list<int> Space::getSelectedUnits()
+    {
+        list< int > selectedShipIDs;
+        
+        for (std::map< int, PersistentShip* >::iterator iter = m_PersistentShips.begin(); iter != m_PersistentShips.end(); ++iter)
+        {
+            selectedShipIDs.push_back( iter->second->id );
+        }
+        return selectedShipIDs;
+    }
 
   void Space::loadGamelog( std::string gamelog )
   {
@@ -69,6 +80,9 @@ namespace visualizer
 
   void Space::load()
   {
+    map < int, vector< SmartPointer < Warp > > > Warps;
+    Warps[ -1 ] = vector< SmartPointer< Warp > >();
+    
     // Setup the renderer as mapRadius*2 x mapRadius*2
     renderer->setCamera( 0, 0, m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2);
     renderer->setGridDimensions( m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2 );
@@ -89,15 +103,23 @@ namespace visualizer
     // BEGIN: Look through the game logs and build the m_PersistentShips
     for(int state = 0; state < (int)m_game->states.size(); state++)
     {
+        Warps[ state ] = vector< SmartPointer< Warp > >();
         // Loop though each PersistentShip in the current state
         for(std::map<int, parser::Ship>::iterator i = m_game->states[ state ].ships.begin(); i != m_game->states[ state ].ships.end(); i++)
         {
             int shipID = i->second.id;
             
-            // If the current ship's ID does not map to a PersistentShip in the map, create it
+            // If the current ship's ID does not map to a PersistentShip in the map, create it and the warp for it
             if( m_PersistentShips.find(shipID) == m_PersistentShips.end() )
             {
                 m_PersistentShips[shipID] = new PersistentShip(state, i->second);
+                
+                // Add the warps for this ship (so long as it is not a mine)
+                if( strcmp( i->second.type, "Mine" ) != 0)
+                {
+                    Warps[ state - 1 ].push_back( new Warp( i->second.x + *m_MapRadius, i->second.y + *m_MapRadius, i->second.radius, i->second.owner, false ) );
+                    Warps[ state ].push_back( new Warp( i->second.x + *m_MapRadius, i->second.y + *m_MapRadius, i->second.radius, i->second.owner, true ) );
+                }
             }
             
             // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
@@ -152,6 +174,14 @@ namespace visualizer
         background->addKeyFrame( new DrawBackground() );
         turn.addAnimatable( background );
         
+        // Add each Warp to be drawn
+        for(unsigned int i = 0; i < Warps[ state ].size(); i++)
+        {
+            SmartPointer<Warp> warp = new Warp( *Warps[ state ][ i ] );
+            warp->addKeyFrame( new DrawWarp( warp ) );
+            turn.addAnimatable( warp );
+        }
+        
         // Add each players information to the HUD and draw it
         for(int playerid = 0; playerid < 2; playerid++)
         {
@@ -159,6 +189,7 @@ namespace visualizer
             hud->addKeyFrame( new DrawPlayerHUD(hud) );
             turn.addAnimatable( hud );
         }     
+        
         
         
         // For each of our PersistentShips
