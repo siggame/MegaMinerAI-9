@@ -21,7 +21,7 @@ namespace visualizer
     }
   
     
-    void DrawPersistentShip::drawRotatedTexturedQuad( IGame* game, float x, float y, float length, float degrees, string texture)
+    void drawRotatedTexturedQuad( IGame* game, float x, float y, float length, float degrees, string texture)
     {
         /*game->renderer->push();
        game->renderer->translate( 500, 500 );
@@ -178,6 +178,15 @@ namespace visualizer
         stringstream time;
         time << m_PlayerHUD->time;
         game->renderer->drawText( m_PlayerHUD->TimeX(), 900, "Roboto", time.str(), 100 );
+    }
+    
+    
+    
+    void DrawWarp::animate( const float& t, AnimData * d, IGame* game )
+    {
+        game->renderer->setColor( Color( 1, 1, 1 ) );
+        float size = m_Warp->fadeOut ? 1 - t : t;
+        drawRotatedTexturedQuad( game, m_Warp->x - size*m_Warp->radius, m_Warp->y - size*m_Warp->radius, size*m_Warp->radius * 2, t * 360.0f, "warp" );
     }
 
 }
