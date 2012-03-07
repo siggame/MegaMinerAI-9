@@ -1,22 +1,25 @@
 #ifndef PERSISTENTS_H
 #define PERSISTENTS_H
 
-#if 0
+#if 1
 #define M11  0.0    
-#define M12  1.0   
-#define M13  0.0   
-#define M14  0.0   
 #define M21 -0.5   
-#define M22  0.0   
-#define M23  0.5   
-#define M24  0.0   
 #define M31  1.0   
-#define M32 -2.5   
-#define M33  2.0   
-#define M34 -0.5   
 #define M41 -0.5   
+
+#define M12  1.0   
+#define M22  0.0   
+#define M32 -2.5   
 #define M42  1.5   
+
+#define M13  0.0   
+#define M23  0.5   
+#define M33  2.0   
 #define M43 -1.5   
+
+#define M14  0.0   
+#define M24  0.0   
+#define M34 -0.5   
 #define M44  0.5 
 #else
 // Official Cubic Hermite Spline Equation

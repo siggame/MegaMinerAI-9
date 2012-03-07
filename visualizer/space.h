@@ -30,6 +30,8 @@ namespace visualizer
             void load();
             void setup();
 
+            void preDraw();
+
             void addCurrentBoard();
     
             map<string, int> programs;

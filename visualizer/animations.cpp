@@ -12,6 +12,7 @@ namespace visualizer
 
     void DrawBackground::animate( const float& /* t */, AnimData * /* d */, IGame* game )
     {
+      cout << "background" << endl;
         game->renderer->setColor( Color( 1, 1, 1, 1 ) );
         game->renderer->drawTexturedQuad(0, 0, 2000, 2000, "background");
         game->renderer->setColor( Color( 1, 1, 1, 0.4f ) );
@@ -39,6 +40,7 @@ namespace visualizer
     
     void DrawPersistentShip::animate( const float& t, AnimData * d, IGame* game )
     {
+      cout << "SHIP" << endl;
         // BEGIN: Variables we will need
         int shipOwner = m_PersistentShip->owner;
         SpacePoint shipCenter = m_PersistentShip->LocationOn(m_Turn, t);
@@ -184,6 +186,7 @@ namespace visualizer
     
     void DrawWarp::animate( const float& t, AnimData * d, IGame* game )
     {
+      cout << "WARP" << endl;
         game->renderer->setColor( Color( 1, 1, 1 ) );
         float size = m_Warp->fadeOut ? 1 - t : t;
         drawRotatedTexturedQuad( game, m_Warp->x - size*m_Warp->radius, m_Warp->y - size*m_Warp->radius, size*m_Warp->radius * 2, t * 360.0f, "warp" );

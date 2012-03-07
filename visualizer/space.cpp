@@ -21,6 +21,11 @@ namespace visualizer
         
     } // Space::~Space()
 
+    void Space::preDraw()
+    {
+      cout << "PRE" << endl;
+    }
+
     PluginInfo Space::getPluginInfo()
     {
         PluginInfo i;
@@ -200,7 +205,7 @@ namespace visualizer
             {
                 // Then and and draw it
                 SmartPointer<PersistentShipAnim> ship = new PersistentShipAnim();
-                background->addKeyFrame( new DrawPersistentShip( iter->second, state, m_MapRadius ) );
+                ship->addKeyFrame( new DrawPersistentShip( iter->second, state, m_MapRadius ) );
                 turn.addAnimatable( ship );
             }
         }
