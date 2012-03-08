@@ -148,8 +148,7 @@ class Ship:
             self.game.animations.append(['attack', unit, attacked])
             if attacked.health <= 0 and attacked.id in self.game.objects:
               self.game.removeObject(attacked)
-          if self.id in self.game.objects:
-            self.game.removeObject(unit)
+          self.game.removeObject(unit)
     return True
 
   def selfDestruct(self):
