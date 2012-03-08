@@ -171,8 +171,11 @@ class Ship:
     modifier = 1
     if self.owner != self.game.playerID:
        return "You cannot make enemy ships attack"
-    if self.attacksLeft <= 0:
+    if self.attacksLeft <= 0 or self.maxAttacks <=0:
       return "Ship %i has no attacks left"%(self.id)
+    if target.id in self.targeted and self.type == "Mine Layer":# and target.id == self.id:
+       return "A mine layer can only lay one mine per turn"
+#       return "This Mine Layer %i has already laid a mine this turn"(self.id)
     if target.id in self.targeted:
       return "You have already commanded %i to attack %i"%(self.id, target.id)
     if self.type == "Mine Layer" and self.id == target.id:   
@@ -180,8 +183,9 @@ class Ship:
       shipStats = [cfgUnits["Mine"][value] for value in self.game.ordering]   
       self.game.addObject(Ship, [self.game.playerID, self.x, self.y] + shipStats)
       self.maxAttacks-=1
+      self.targeted.add(self.id)
       return True
-#CHANING STUFF HERE
+#CHANGING STUFF HERE
     if self.type == 'EMP' and self.id == target.id:
       foe = self.owner^1
       for ship in self.allInRange(foe):
@@ -191,7 +195,7 @@ class Ship:
         self.maxAttacks -= 1      
 #Yo, Vis guys, how you want us do this?
         self.game.animations.append(['attack',self.id,ship.id])
-    
+        return True
     elif target.owner == self.owner:
       return 'No friendly fire please'
     elif not self.inRange(target):
