@@ -186,10 +186,11 @@ namespace visualizer
     
     void DrawWarp::animate( const float& t, AnimData * d, IGame* game )
     {
-      cout << "WARP" << endl;
         game->renderer->setColor( Color( 1, 1, 1 ) );
+        stringstream warpTexture;
+        warpTexture << "warp-" << ( m_Warp->owner ? "blue" : "red" );
         float size = m_Warp->fadeOut ? 1 - t : t;
-        drawRotatedTexturedQuad( game, m_Warp->x - size*m_Warp->radius, m_Warp->y - size*m_Warp->radius, size*m_Warp->radius * 2, t * 360.0f, "warp" );
+        drawRotatedTexturedQuad( game, m_Warp->x - size*m_Warp->radius, m_Warp->y - size*m_Warp->radius, size*m_Warp->radius * 2, t * 360.0f, warpTexture.str() );
     }
 
 }

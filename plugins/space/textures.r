@@ -118,4 +118,5 @@ texture explosion-85 textures/effects/explosion/explosion-86.png
 texture explosion-86 textures/effects/explosion/explosion-87.png
 texture explosion-87 textures/effects/explosion/explosion-88.png
 texture explosion-88 textures/effects/explosion/explosion-89.png
-texture warp textures/effects/warp.png
+texture warp-red textures/effects/red-warp.png
+texture warp-blue textures/effects/blue-warp.png
