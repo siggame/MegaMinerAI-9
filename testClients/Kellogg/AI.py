@@ -142,7 +142,6 @@ class AI(BaseAI):
   #create mine field around warp gate, if x amount of mines already near warp gate and have mines left, move towards
   #largest cluster dropping mines 
     for ship in myListDict['Mine Layer']:
-      print "CONTROLLING MINELAYS"
       move = [0,0,0,0]
       for i in move:
         ship.move(ship.getX()-ship.getMaxMovement()/5,ship.getY()+ship.getMaxMovement()/2)
@@ -150,23 +149,30 @@ class AI(BaseAI):
           ship.attack(ship)
               
   def supportControl(self,enemyListDict,myListDict):
-    #if warpgate is below x health, move towards and heal warp Gate, else move with largest cluster of friendly units
+    #if warpgate is below x health, move towards and heal warp Gate, else if wp in game,  move a support to them,  else move with largest cluster of friendly units
     target = myListDict['Warp Gate'][0]
-    for ship in myListDict['Cruiser']:
-      print "controlling support"
+    for ship in myListDict['Support']:
       if myListDict['Warp Gate'][0].getHealth() <= myListDict['Warp Gate'][0].getMaxHealth()/2:
-        self.moveToTarget(ship,myListDict['Warp Gate'][0]) 
-      else:
+        self.moveToTarget(myListDict['Support'][0],myListDict['Warp Gate'][0])
+    
+    if len(myListDict['Support'])>=2:
+       if len(myListDict['Weapons Platform'])>0:
+         self.moveToTarget(myListDict['Support'][0],myListDict['Weapons Platform'][0])
+       for ship in myListDict['Support'][1:]:
+         target2 = self.findCluster(ship,ship.getOwner(),myShips)
+         if isinstance(target2,Ship) and target2.getType()!= 'Mine':
+            target = target2
+         self.moveToTarget(ship,target)
+    else:
+     for ship in myListDict['Support']:  
         target2 = self.findCluster(ship,ship.getOwner(),myShips)
-        if isinstance(target2,Ship):
+        if isinstance(target2,Ship) and target2.getType()!= 'Mine':
           target = target2
         self.moveToTarget(ship,target)
-      ship.move(ship.getX()+10,ship.getY()+10)      
            
   def empControl(self,enemyListDict,myListDict):
     #move towards largest cluster of enemy units, stun them. Works well with multi attackers
     target = enemyListDict['Warp Gate'][0]
-    print "controlling emps"
     for ship in myListDict['EMP']:
       target2 = self.findCluster(ship,foePlayer[0].getId(),enemyShips)
       if isinstance(target2,Ship):
@@ -198,11 +204,11 @@ class AI(BaseAI):
           attacks-=1
       for support in enemyListDict['Support']:
         if attacks > 0:
-          ship.attack(suppor)
+          ship.attack(support)
           attacks-=1
-      for emp in enemyListDict['EMP']:
+      for wp in enemyListDict['Weapons Platform']:
         if attacks > 0:
-          ship.attack(emp)
+          ship.attack(wp)
           attacks-=1
       for stealth in enemyListDict['Stealth']:
         if attacks > 0:
@@ -293,20 +299,8 @@ class AI(BaseAI):
        ship.move(ship.getX()+dx,ship.getY()+dy)
        maxMove-=dist
                                               
-  
-  def deliberateWarp(self,w):
-    pass
-    #types = ['Weapons Platform','Mine Layer','EMP','Support']
-    #avail = self.shipTypes
-    #for ship in avail:
-    #  if ship.getType() == 'Weapons Platform':
-    #    ship.warpIn(w.getX(),w.getY())
-    #  for type in types:
-    #    if ship.getType() == type:
-    #      ship.warpIn(w.getX(),w.getY())  
-  
   def smartWarp(self,warpShip):
-     #TODO: make smarter
+     #TODO: make smarterer
      #dictionaries are great
      typeDict = {}
      for type in self.shipTypes:
@@ -314,46 +308,46 @@ class AI(BaseAI):
      energy = myPlayer[0].getEnergy()
      sortedCost = sorted(self.shipTypes, key=lambda x: x.getCost())
      minCost = sortedCost[0].getCost()
-     while energy >= minCost:
-       if 'Weapons Platform' in typeDict and energy >= typeDict['Weapons Platform'].getCost():
+     if 'Weapons Platform' in typeDict and energy >= typeDict['Weapons Platform'].getCost():
+       typeDict['Weapons Platform'].warpIn(warpShip.getX(),warpShip.getY())
+       energy-=typeDict['Weapons Platform'].getCost()
+       if  energy >= typeDict['Weapons Platform'].getCost():
          typeDict['Weapons Platform'].warpIn(warpShip.getX(),warpShip.getY())
          energy-=typeDict['Weapons Platform'].getCost()
-         if  energy >= typeDict['Weapons Platform'].getCost():
-           typeDict['Weapons Platform'].warpIn(warpShip.getX(),warpShip.getY())
-           energy-=typeDict['Weapons Platform'].getCost()
-       if 'Support' in typeDict and energy >= typeDict['Support'].getCost():
+     if 'Support' in typeDict and energy >= typeDict['Support'].getCost():
+       typeDict['Support'].warpIn(warpShip.getX(),warpShip.getY())
+       energy-=typeDict['Support'].getCost()
+       if  energy >= typeDict['Support'].getCost():
          typeDict['Support'].warpIn(warpShip.getX(),warpShip.getY())
          energy-=typeDict['Support'].getCost()
-         if  energy >= typeDict['Support'].getCost():
-           typeDict['Support'].warpIn(warpShip.getX(),warpShip.getY())
-           energy-=typeDict['Support'].getCost()
-       if 'Mine Layer' in typeDict and energy >= typeDict['Mine Layer'].getCost():
+     if 'Mine Layer' in typeDict and energy >= typeDict['Mine Layer'].getCost():
+       typeDict['Mine Layer'].warpIn(warpShip.getX(),warpShip.getY())
+       energy-=typeDict['Mine Layer'].getCost()
+       if energy >= typeDict['Mine Layer'].getCost():
          typeDict['Mine Layer'].warpIn(warpShip.getX(),warpShip.getY())
          energy-=typeDict['Mine Layer'].getCost()
-         if energy >= typeDict['Mine Layer'].getCost():
-           typeDict['Mine Layer'].warpIn(warpShip.getX(),warpShip.getY())
-           energy-=typeDict['Mine Layer'].getCost()
-       if 'Battleship' in typeDict and energy >= typeDict['Battleship'].getCost():
-         typeDict['Support'].warpIn(warpShip.getX(),warpShip.getY())
-         energy-=typeDict['Battleship'].getCost()
-       if 'EMP' in typeDict and energy >= typeDict['EMP'].getCost():
-         typeDict['EMP'].warpIn(warpShip.getX(),warpShip.getY())
-         energy-=typeDict['EMP'].getCost()
-       if 'Juggernaut' in typeDict and energy >= typeDict['Juggernaut'].getCost():
-         typeDict['Juggernaut'].warpIn(warpShip.getX(),warpShip.getY())
-         energy-=typeDict['Juggernaut'].getCost()
+     if 'EMP' in typeDict and energy >= typeDict['EMP'].getCost():
+       typeDict['EMP'].warpIn(warpShip.getX(),warpShip.getY())
+       energy-=typeDict['EMP'].getCost()
+     if 'Battleship' in typeDict and energy >= typeDict['Battleship'].getCost():
+       typeDict['Battleship'].warpIn(warpShip.getX(),warpShip.getY())
+       energy-=typeDict['Battleship'].getCost()
+     elif 'Juggernaut' in typeDict and energy >= typeDict['Juggernaut'].getCost():
+       typeDict['Juggernaut'].warpIn(warpShip.getX(),warpShip.getY())
+       energy-=typeDict['Juggernaut'].getCost()
+     elif 'Cruiser' in typeDict and energy >= typeDict['Cruiser'].getCost():
+       typeDict['Cruiser'].warpIn(warpShip.getX(),warpShip.getY())
+       energy-=typeDict['Cruiser'].getCost()          
+     while energy >= minCost:
        if 'Stealth' in typeDict and energy >= typeDict['Stealth'].getCost():
-          typeDict['Stealth'].warpIn(warpShip.getX(),warpShip.getY())
-          energy-=typeDict['Stealth'].getCost()
-       if 'Bomber' in typeDict and energy >= typeDict['Bomber'].getCost():
+        typeDict['Stealth'].warpIn(warpShip.getX(),warpShip.getY())
+        energy-=typeDict['Stealth'].getCost()
+       elif 'Bomber' in typeDict and energy >= typeDict['Bomber'].getCost():
          typeDict['Bomber'].warpIn(warpShip.getX(),warpShip.getY())
          energy-=typeDict['Bomber'].getCost()
-       if 'Interceptor' in typeDict and energy >= typeDict['Interceptor'].getCost():
-        typeDict['Interceptor'].warpIn(warpShip.getX(),warpShip.getY())
-        energy-=typeDict['Interceptor'].getCost()
-       if 'Cruiser' in typeDict and energy >= typeDict['Cruiser'].getCost():
-        typeDict['Cruiser'].warpIn(warpShip.getX(),warpShip.getY())
-        energy-=typeDict['Cruiser'].getCost()
+       elif 'Interceptor' in typeDict and energy >= typeDict['Interceptor'].getCost():
+         typeDict['Interceptor'].warpIn(warpShip.getX(),warpShip.getY())
+         energy-=typeDict['Interceptor'].getCost()
      return                                                                   
               
 #OLD CODE #         
