@@ -311,7 +311,7 @@ class AI(BaseAI):
      typeDict = {}
      for type in self.shipTypes:
        typeDict[type.getType()] = type
-     energy = 50
+     energy = myPlayer[0].getEnergy()
      sortedCost = sorted(self.shipTypes, key=lambda x: x.getCost())
      minCost = sortedCost[0].getCost()
      while energy >= minCost:
