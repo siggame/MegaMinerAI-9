@@ -114,9 +114,8 @@ class AI(BaseAI):
   def warpControl(self,enemyListDict,myListDict):
     for w in myListDict['Warp Gate']:
 #      w.move(w.getX()+10,w.getY()-10)
-      if self.turnNumber()<3:
-        self.deliberateWarp(w)
-        self.smartWarp(w)
+        #self.deliberateWarp(w)
+      self.smartWarp(w)
       nearest = self.findNearest(w,enemyShips)
       self.moveAway(w,nearest)
   
@@ -296,83 +295,130 @@ class AI(BaseAI):
                                               
   
   def deliberateWarp(self,w):
-    types = ['Weapons Platform','Mine Layer','EMP','Support']
-    avail = self.shipTypes
-    for ship in avail:
-      if ship.getType() == 'Weapons Platform':
-        ship.warpIn(w.getX(),w.getY())
-      for type in types:
-        if ship.getType() == type:
-          ship.warpIn(w.getX(),w.getY())  
+    pass
+    #types = ['Weapons Platform','Mine Layer','EMP','Support']
+    #avail = self.shipTypes
+    #for ship in avail:
+    #  if ship.getType() == 'Weapons Platform':
+    #    ship.warpIn(w.getX(),w.getY())
+    #  for type in types:
+    #    if ship.getType() == type:
+    #      ship.warpIn(w.getX(),w.getY())  
   
   def smartWarp(self,warpShip):
      #TODO: make smarter
-     warping = []
-     for player in self.players:
-       if self.playerID() == player.getId():
-         myPlayer = player
-     shipTypes = self.shipTypes
-     types = []
-     sortedCost = sorted(shipTypes, key=lambda x: x.getCost())
+     #dictionaries are great
+     typeDict = {}
+     for type in self.shipTypes:
+       typeDict[type.getType()] = type
+     energy = 50
+     sortedCost = sorted(self.shipTypes, key=lambda x: x.getCost())
      minCost = sortedCost[0].getCost()
-     for type in shipTypes:
-       types.append(type.getType())
-     energy = myPlayer.getEnergy()
      while energy >= minCost:
-       if 'Battleship' in types and False:
-         for type in shipTypes:
-           if type.getType() == 'BattleShip' and energy >= type.getCost():
-             warping.append(type)
-             energy-=type.getCost()
-       if 'Juggernaut' in types and False:
-         for type in shipTypes:
-           if type.getType() == 'Juggernaut' and energy >= type.getCost():
-             warping.append(type)
-             energy-=type.getCost()
-       if 'Mine Layer' in types:
-         for type in shipTypes:
-           if type.getType() == 'Mine Layer' and energy >= type.getCost():
-             warping.append(type)
-             energy-=type.getCost()
-       if 'Support' in types:
-         for type in shipTypes:
-           if type.getType() == 'Support' and energy >= type.getCost():
-             warping.append(type)
-             energy-=type.getCost()
-       if 'EMP' in types:
-          for type in shipTypes:
-            if type.getType() == 'EMP' and energy >= type.getCost():
-              warping.append(type)
-              energy-=type.getCost()
-       if 'Stealth' in types:
-         for type in shipTypes:
-           if type.getType() == 'Stealth' and energy >= type.getCost():
-             warping.append(type)
-             energy-=type.getCost()
-       if 'Cruiser' in types and False:
-          for type in shipTypes:
-            if type.getType() == 'Cruiser' and energy >= type.getCost():
-              warping.append(type)
-              energy-=type.getCost()
-       if 'Weapons Platforms' in types:
-          for type in shipTypes:
-            if type.getType() == 'Weapons Platform' and energy >= type.getCost():
-              warping.append(type)
-              energy-=type.getCost()
-       if 'Interceptor' in types:
-         for type in shipTypes:
-           if type.getType() == 'Interceptor' and energy >= type.getCost():
-             warping.append(type)
-             energy-=type.getCost()
-       if 'Bomber' in types:
-         for type in shipTypes:
-           if type.getType() == 'Bomber' and energy >= type.getCost():
-            warping.append(type)
-            energy-=type.getCost()
-     
-     for type in warping:
-       type.warpIn(warpShip.getX(),warpShip.getY())
-     return
+       if 'Weapons Platform' in typeDict and energy >= typeDict['Weapons Platform'].getCost():
+         typeDict['Weapons Platform'].warpIn(warpShip.getX(),warpShip.getY())
+         energy-=typeDict['Weapons Platform'].getCost()
+         if  energy >= typeDict['Weapons Platform'].getCost():
+           typeDict['Weapons Platform'].warpIn(warpShip.getX(),warpShip.getY())
+           energy-=typeDict['Weapons Platform'].getCost()
+       if 'Support' in typeDict and energy >= typeDict['Support'].getCost():
+         typeDict['Support'].warpIn(warpShip.getX(),warpShip.getY())
+         energy-=typeDict['Support'].getCost()
+         if  energy >= typeDict['Support'].getCost():
+           typeDict['Support'].warpIn(warpShip.getX(),warpShip.getY())
+           energy-=typeDict['Support'].getCost()
+       if 'Mine Layer' in typeDict and energy >= typeDict['Mine Layer'].getCost():
+         typeDict['Mine Layer'].warpIn(warpShip.getX(),warpShip.getY())
+         energy-=typeDict['Mine Layer'].getCost()
+         if energy >= typeDict['Mine Layer'].getCost():
+           typeDict['Mine Layer'].warpIn(warpShip.getX(),warpShip.getY())
+           energy-=typeDict['Mine Layer'].getCost()
+       if 'Battleship' in typeDict and energy >= typeDict['Battleship'].getCost():
+         typeDict['Support'].warpIn(warpShip.getX(),warpShip.getY())
+         energy-=typeDict['Battleship'].getCost()
+       if 'EMP' in typeDict and energy >= typeDict['EMP'].getCost():
+         typeDict['EMP'].warpIn(warpShip.getX(),warpShip.getY())
+         energy-=typeDict['EMP'].getCost()
+       if 'Juggernaut' in typeDict and energy >= typeDict['Juggernaut'].getCost():
+         typeDict['Juggernaut'].warpIn(warpShip.getX(),warpShip.getY())
+         energy-=typeDict['Juggernaut'].getCost()
+       if 'Stealth' in typeDict and energy >= typeDict['Stealth'].getCost():
+          typeDict['Stealth'].warpIn(warpShip.getX(),warpShip.getY())
+          energy-=typeDict['Stealth'].getCost()
+       if 'Bomber' in typeDict and energy >= typeDict['Bomber'].getCost():
+         typeDict['Bomber'].warpIn(warpShip.getX(),warpShip.getY())
+         energy-=typeDict['Bomber'].getCost()
+       if 'Interceptor' in typeDict and energy >= typeDict['Interceptor'].getCost():
+        typeDict['Interceptor'].warpIn(warpShip.getX(),warpShip.getY())
+        energy-=typeDict['Interceptor'].getCost()
+       if 'Cruiser' in typeDict and energy >= typeDict['Cruiser'].getCost():
+        typeDict['Cruiser'].warpIn(warpShip.getX(),warpShip.getY())
+        energy-=typeDict['Cruiser'].getCost()
+     return                                                                   
+              
+#OLD CODE #         
+#     comment = """for type in self.shipTypes:
+#        if type.getType() == 'Weapons Platform':
+#           type.warpIn(warpShip.getX(),warpShip.getY())
+#           type.warpIn(warpShip.getY(),warpship.getY())
+#     for type in shipTypes:
+#       types.append(type.getType())
+#     energy = myPlayer.getEnergy()
+#     while energy >= minCost:
+#       if 'Battleship' in types and False:
+#         for type in shipTypes:
+#           if type.getType() == 'BattleShip' and energy >= type.getCost():
+#             warping.append(type)
+#             energy-=type.getCost()
+#       if 'Juggernaut' in types and False:
+#         for type in shipTypes:
+#           if type.getType() == 'Juggernaut' and energy >= type.getCost():
+#             warping.append(type)
+#             energy-=type.getCost()
+#       if 'Mine Layer' in types:
+#         for type in shipTypes:
+#           if type.getType() == 'Mine Layer' and energy >= type.getCost():
+#             warping.append(type)
+#             energy-=type.getCost()
+#       if 'Support' in types:
+#         for type in shipTypes:
+#           if type.getType() == 'Support' and energy >= type.getCost():
+#             warping.append(type)
+#             energy-=type.getCost()
+#       if 'EMP' in types:
+#          for type in shipTypes:
+#            if type.getType() == 'EMP' and energy >= type.getCost():
+#              warping.append(type)
+#              energy-=type.getCost()
+#       if 'Stealth' in types:
+#         for type in shipTypes:
+#           if type.getType() == 'Stealth' and energy >= type.getCost():
+#             warping.append(type)
+#             energy-=type.getCost()
+#       if 'Cruiser' in types and False:
+#          for type in shipTypes:
+#            if type.getType() == 'Cruiser' and energy >= type.getCost():
+#              warping.append(type)
+#              energy-=type.getCost()
+#       if 'Weapons Platforms' in types:
+#          for type in shipTypes:
+#            if type.getType() == 'Weapons Platform' and energy >= type.getCost():
+#              warping.append(type)
+#              energy-=type.getCost()
+#       if 'Interceptor' in types:
+#         for type in shipTypes:
+#           if type.getType() == 'Interceptor' and energy >= type.getCost():
+#             warping.append(type)
+#             energy-=type.getCost()
+#       if 'Bomber' in types:
+#         for type in shipTypes:
+#           if type.getType() == 'Bomber' and energy >= type.getCost():
+#            warping.append(type)
+#            energy-=type.getCost()
+#     
+#     for type in warping:
+#       type.warpIn(warpShip.getX(),warpShip.getY())"""
+#     return
                                                                                                                                                                                                                                                                                      
   #goes through all enemies in range, and returns the a list of the enemy whose current health is closest to, but less than, that ships damage. 
   #If no such enemy fits this (i.e., no enemey has less health than damage), returns a list of the enemy with lowest health
