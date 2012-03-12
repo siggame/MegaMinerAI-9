@@ -25,13 +25,13 @@ class Match(DefaultGameWorld):
     DefaultGameWorld.__init__(self)
     self.scribe = Scribe(self.logPath())
     self.addPlayer(self.scribe, "spectator")
-
     self.turnNumber = -1
     self.playerID = -1
     self.gameNumber = id
     self.round = -1
     self.victoriesNeeded = self.victories
-    self.mapRadius = self.radius
+    self.innerMapRadius = self.innerRadius
+    self.outerMapRadius = self.outerRadius
 
   def addPlayer(self, connection, type="player"):
     connection.type = type
@@ -95,7 +95,7 @@ class Match(DefaultGameWorld):
     for player in self.objects.players:
       #Give players energy initially each round
       player.energy = self.startEnergy
-      player.warpGate = self.addObject(Ship, [player.id, (player.id * 2 - 1) * self.mapRadius / 2, 0] + self.warpGate).id
+      player.warpGate = self.addObject(Ship, [player.id, (player.id * 2 - 1) * self.outerMapRadius / 2, 0] + self.warpGate + [False, False]).id
     
     # Ensure you have at least 5 ships in the chain
     if len(self.shipChain) < self.shipsPerRound:
@@ -259,12 +259,12 @@ class Match(DefaultGameWorld):
   def status(self, connection):
     msg = ["status"]
 
-    msg.append(["game", self.turnNumber, self.playerID, self.gameNumber, self.round, self.victoriesNeeded, self.mapRadius])
+    msg.append(["game", self.turnNumber, self.playerID, self.gameNumber, self.round, self.victoriesNeeded, self.innerMapRadius, self.outerMapRadius])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])
     typeLists.append(["Ship"] + [i.toList() for i in self.objects.values() if i.__class__ is Ship and 
-                     (not i.stealthed or i.owner == self.playerID or connection.type != "player")])
+                     (not i.isStealthed or i.owner == self.playerID or connection.type != "player")])
     typeLists.append(["ShipType"] + [i.toList() for i in self.objects.values() if i.__class__ is ShipType])
 
     msg.extend(typeLists)

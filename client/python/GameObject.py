@@ -182,7 +182,7 @@ class Ship(GameObject):
     self.validify()
     return library.shipGetY(self.ptr)
 
-  ##ship size radius
+  ##Ship size radius
   def getRadius(self):
     self.validify()
     return library.shipGetRadius(self.ptr)
@@ -192,50 +192,60 @@ class Ship(GameObject):
     self.validify()
     return library.shipGetType(self.ptr)
 
-  ##how many more attacks it has
+  ##How many more attacks it has
   def getAttacksLeft(self):
     self.validify()
     return library.shipGetAttacksLeft(self.ptr)
 
-  ##how much more movement it has
+  ##How much more movement it has
   def getMovementLeft(self):
     self.validify()
     return library.shipGetMovementLeft(self.ptr)
 
-  ##the largest possible movement
+  ##The largest possible movement
   def getMaxMovement(self):
     self.validify()
     return library.shipGetMaxMovement(self.ptr)
 
-  ##the max number of attacks it has
+  ##The max number of attacks it has
   def getMaxAttacks(self):
     self.validify()
     return library.shipGetMaxAttacks(self.ptr)
 
-  ##the strength of its attacks
+  ##The strength of its attacks
   def getDamage(self):
     self.validify()
     return library.shipGetDamage(self.ptr)
 
-  ##the range of its attacks
+  ##The range of its attacks
   def getRange(self):
     self.validify()
     return library.shipGetRange(self.ptr)
 
-  ##the total health of the ship
+  ##The total health of the ship
   def getHealth(self):
     self.validify()
     return library.shipGetHealth(self.ptr)
 
-  ##the max health possible for the ship
+  ##The max health possible for the ship
   def getMaxHealth(self):
     self.validify()
     return library.shipGetMaxHealth(self.ptr)
 
-  ##the amount of damage done when this ship blows up
+  ##The amount of damage done when this ship blows up
   def getSelfDestructDamage(self):
     self.validify()
     return library.shipGetSelfDestructDamage(self.ptr)
+
+  ##Tells whether or not the ship is stealthed
+  def getIsStealthed(self):
+    self.validify()
+    return library.shipGetIsStealthed(self.ptr)
+
+  ##Tells whether or not this ship is EMPd
+  def getIsEMPd(self):
+    self.validify()
+    return library.shipGetIsEMPd(self.ptr)
 
 
   def __str__(self):
@@ -256,4 +266,6 @@ class Ship(GameObject):
     ret += "health: %s\n" % self.getHealth()
     ret += "maxHealth: %s\n" % self.getMaxHealth()
     ret += "selfDestructDamage: %s\n" % self.getSelfDestructDamage()
+    ret += "isStealthed: %s\n" % self.getIsStealthed()
+    ret += "isEMPd: %s\n" % self.getIsEMPd()
     return ret

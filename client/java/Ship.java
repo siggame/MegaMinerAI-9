@@ -75,7 +75,7 @@ class Ship
     validify();
     return Client.INSTANCE.shipGetY(ptr);
   }
-  ///ship size radius
+  ///Ship size radius
   public int getRadius()
   {
     validify();
@@ -87,59 +87,71 @@ class Ship
     validify();
     return Client.INSTANCE.shipGetType(ptr);
   }
-  ///how many more attacks it has
+  ///How many more attacks it has
   public int getAttacksLeft()
   {
     validify();
     return Client.INSTANCE.shipGetAttacksLeft(ptr);
   }
-  ///how much more movement it has
+  ///How much more movement it has
   public int getMovementLeft()
   {
     validify();
     return Client.INSTANCE.shipGetMovementLeft(ptr);
   }
-  ///the largest possible movement
+  ///The largest possible movement
   public int getMaxMovement()
   {
     validify();
     return Client.INSTANCE.shipGetMaxMovement(ptr);
   }
-  ///the max number of attacks it has
+  ///The max number of attacks it has
   public int getMaxAttacks()
   {
     validify();
     return Client.INSTANCE.shipGetMaxAttacks(ptr);
   }
-  ///the strength of its attacks
+  ///The strength of its attacks
   public int getDamage()
   {
     validify();
     return Client.INSTANCE.shipGetDamage(ptr);
   }
-  ///the range of its attacks
+  ///The range of its attacks
   public int getRange()
   {
     validify();
     return Client.INSTANCE.shipGetRange(ptr);
   }
-  ///the total health of the ship
+  ///The total health of the ship
   public int getHealth()
   {
     validify();
     return Client.INSTANCE.shipGetHealth(ptr);
   }
-  ///the max health possible for the ship
+  ///The max health possible for the ship
   public int getMaxHealth()
   {
     validify();
     return Client.INSTANCE.shipGetMaxHealth(ptr);
   }
-  ///the amount of damage done when this ship blows up
+  ///The amount of damage done when this ship blows up
   public int getSelfDestructDamage()
   {
     validify();
     return Client.INSTANCE.shipGetSelfDestructDamage(ptr);
+  }
+  ///Tells whether or not the ship is stealthed
+  public int getIsStealthed()
+  {
+    validify();
+    return Client.INSTANCE.shipGetIsStealthed(ptr);
+  }
+  ///Tells whether or not this ship is EMPd
+  public int getIsEMPd()
+  {
+    validify();
+    return Client.INSTANCE.shipGetIsEMPd(ptr);
   }
 
 }

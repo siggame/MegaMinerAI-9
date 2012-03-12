@@ -47,7 +47,9 @@ public class Client {
   [DllImport("client")]
   public static extern int getVictoriesNeeded(IntPtr connection);
   [DllImport("client")]
-  public static extern int getMapRadius(IntPtr connection);
+  public static extern int getInnerMapRadius(IntPtr connection);
+  [DllImport("client")]
+  public static extern int getOuterMapRadius(IntPtr connection);
 
   [DllImport("client")]
   public static extern IntPtr getShipType(IntPtr connection, int num);
@@ -112,6 +114,10 @@ public class Client {
   public static extern int shipGetMaxHealth(IntPtr ptr);
   [DllImport("client")]
   public static extern int shipGetSelfDestructDamage(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipGetIsStealthed(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipGetIsEMPd(IntPtr ptr);
 
 
     //properties

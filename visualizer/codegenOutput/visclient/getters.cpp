@@ -3,6 +3,18 @@
 namespace client
 {
 
+DLLEXPORT int shipTypeGetId(_ShipType* ptr)
+{
+  return ptr->id;
+}
+DLLEXPORT char* shipTypeGetType(_ShipType* ptr)
+{
+  return ptr->type;
+}
+DLLEXPORT int shipTypeGetCost(_ShipType* ptr)
+{
+  return ptr->cost;
+}
 DLLEXPORT int playerGetId(_Player* ptr)
 {
   return ptr->id;
@@ -79,17 +91,17 @@ DLLEXPORT int shipGetMaxHealth(_Ship* ptr)
 {
   return ptr->maxHealth;
 }
-DLLEXPORT int shipTypeGetId(_ShipType* ptr)
+DLLEXPORT int shipGetSelfDestructDamage(_Ship* ptr)
 {
-  return ptr->id;
+  return ptr->selfDestructDamage;
 }
-DLLEXPORT char* shipTypeGetType(_ShipType* ptr)
+DLLEXPORT int shipGetIsStealthed(_Ship* ptr)
 {
-  return ptr->type;
+  return ptr->isStealthed;
 }
-DLLEXPORT int shipTypeGetCost(_ShipType* ptr)
+DLLEXPORT int shipGetIsEMPd(_Ship* ptr)
 {
-  return ptr->cost;
+  return ptr->isEMPd;
 }
 
 }

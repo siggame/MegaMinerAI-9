@@ -57,6 +57,8 @@ struct Ship
   int health;
   int maxHealth;
   int selfDestructDamage;
+  int isStealthed;
+  int isEMPd;
 
   friend std::ostream& operator<<(std::ostream& stream, Ship obj);
 };
@@ -124,7 +126,8 @@ struct GameState
   int gameNumber;
   int round;
   int victoriesNeeded;
-  int mapRadius;
+  int innerMapRadius;
+  int outerMapRadius;
 
   std::map< int, std::vector< SmartPointer< Animation > > > animations;
   friend std::ostream& operator<<(std::ostream& stream, GameState obj);

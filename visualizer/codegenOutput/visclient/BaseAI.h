@@ -8,9 +8,9 @@
 #include <ctime>
 #include "game.h"
 
+#include "ShipType.h"
 #include "Player.h"
 #include "Ship.h"
-#include "ShipType.h"
 
 namespace client
 {
@@ -24,9 +24,9 @@ class BaseAI
 {
 protected:
   Connection* c;
+  std::vector<ShipType> shipTypes;
   std::vector<Player> players;
   std::vector<Ship> ships;
-  std::vector<ShipType> shipTypes;
 public:
   ///How many turns it has been since the beginning of the game
   int turnNumber();
@@ -38,8 +38,10 @@ public:
   int round();
   ///How many victories a player needs to win
   int victoriesNeeded();
-  ///The radius of the map.  Center of screen is (0,0), with +x right, +y up
-  int mapRadius();
+  ///The inner radius of the map.  Center of screen is (0,0), with +x right, +y up
+  int innerMapRadius();
+  ///The outer radius of the map.  Center of screen is (0,0), with +x right, +y up
+  int outerMapRadius();
   
   BaseAI(Connection* c);
   virtual ~BaseAI();

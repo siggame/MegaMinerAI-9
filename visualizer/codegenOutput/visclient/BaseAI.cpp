@@ -28,15 +28,27 @@ int BaseAI::victoriesNeeded()
 {
   return getVictoriesNeeded(c);
 }
-int BaseAI::mapRadius()
+int BaseAI::innerMapRadius()
 {
-  return getMapRadius(c);
+  return getInnerMapRadius(c);
+}
+int BaseAI::outerMapRadius()
+{
+  return getOuterMapRadius(c);
 }
 
 bool BaseAI::startTurn()
 {
   static bool initialized = false;
   int count = 0;
+  count = getShipTypeCount(c);
+  shipTypes.clear();
+  shipTypes.resize(count);
+  for(int i = 0; i < count; i++)
+  {
+    shipTypes[i] = ShipType(getShipType(c, i));
+  }
+
   count = getPlayerCount(c);
   players.clear();
   players.resize(count);
@@ -51,14 +63,6 @@ bool BaseAI::startTurn()
   for(int i = 0; i < count; i++)
   {
     ships[i] = Ship(getShip(c, i));
-  }
-
-  count = getShipTypeCount(c);
-  shipTypes.clear();
-  shipTypes.resize(count);
-  for(int i = 0; i < count; i++)
-  {
-    shipTypes[i] = ShipType(getShipType(c, i));
   }
 
   if(!initialized)

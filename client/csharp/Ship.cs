@@ -87,7 +87,7 @@ public class Ship
     int value = Client.shipGetY(ptr);
     return value;
   }
-  ///ship size radius
+  ///Ship size radius
   public int getRadius()
   {
     validify();
@@ -101,67 +101,81 @@ public class Ship
     IntPtr value = Client.shipGetType(ptr);
     return Marshal.PtrToStringAuto(value);
   }
-  ///how many more attacks it has
+  ///How many more attacks it has
   public int getAttacksLeft()
   {
     validify();
     int value = Client.shipGetAttacksLeft(ptr);
     return value;
   }
-  ///how much more movement it has
+  ///How much more movement it has
   public int getMovementLeft()
   {
     validify();
     int value = Client.shipGetMovementLeft(ptr);
     return value;
   }
-  ///the largest possible movement
+  ///The largest possible movement
   public int getMaxMovement()
   {
     validify();
     int value = Client.shipGetMaxMovement(ptr);
     return value;
   }
-  ///the max number of attacks it has
+  ///The max number of attacks it has
   public int getMaxAttacks()
   {
     validify();
     int value = Client.shipGetMaxAttacks(ptr);
     return value;
   }
-  ///the strength of its attacks
+  ///The strength of its attacks
   public int getDamage()
   {
     validify();
     int value = Client.shipGetDamage(ptr);
     return value;
   }
-  ///the range of its attacks
+  ///The range of its attacks
   public int getRange()
   {
     validify();
     int value = Client.shipGetRange(ptr);
     return value;
   }
-  ///the total health of the ship
+  ///The total health of the ship
   public int getHealth()
   {
     validify();
     int value = Client.shipGetHealth(ptr);
     return value;
   }
-  ///the max health possible for the ship
+  ///The max health possible for the ship
   public int getMaxHealth()
   {
     validify();
     int value = Client.shipGetMaxHealth(ptr);
     return value;
   }
-  ///the amount of damage done when this ship blows up
+  ///The amount of damage done when this ship blows up
   public int getSelfDestructDamage()
   {
     validify();
     int value = Client.shipGetSelfDestructDamage(ptr);
+    return value;
+  }
+  ///Tells whether or not the ship is stealthed
+  public int getIsStealthed()
+  {
+    validify();
+    int value = Client.shipGetIsStealthed(ptr);
+    return value;
+  }
+  ///Tells whether or not this ship is EMPd
+  public int getIsEMPd()
+  {
+    validify();
+    int value = Client.shipGetIsEMPd(ptr);
     return value;
   }
 

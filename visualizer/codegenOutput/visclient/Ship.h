@@ -27,26 +27,32 @@ class Ship {
   int x();
   ///Position y
   int y();
-  ///ship size radius
+  ///Ship size radius
   int radius();
   ///The ship type
   char* type();
-  ///how many more attacks it has
+  ///How many more attacks it has
   int attacksLeft();
-  ///how much more movement it has
+  ///How much more movement it has
   int movementLeft();
-  ///the largest possible movement
+  ///The largest possible movement
   int maxMovement();
-  ///the max number of attacks it has
+  ///The max number of attacks it has
   int maxAttacks();
-  ///the strength of its attacks
+  ///The strength of its attacks
   int damage();
-  ///the range of its attacks
+  ///The range of its attacks
   int range();
-  ///the total health of the ship
+  ///The total health of the ship
   int health();
-  ///the max health possible for the ship
+  ///The max health possible for the ship
   int maxHealth();
+  ///The amount of damage done when this ship blows up
+  int selfDestructDamage();
+  ///Tells whether or not the ship is stealthed
+  int isStealthed();
+  ///Tells whether or not this ship is EMPd
+  int isEMPd();
 
   // Actions
   ///Command a ship to move to a specified position
