@@ -92,4 +92,12 @@ DLLEXPORT int shipGetSelfDestructDamage(_Ship* ptr)
 {
   return ptr->selfDestructDamage;
 }
+DLLEXPORT int shipGetIsStealthed(_Ship* ptr)
+{
+  return ptr->isStealthed;
+}
+DLLEXPORT int shipGetIsEMPd(_Ship* ptr)
+{
+  return ptr->isEMPd;
+}
 

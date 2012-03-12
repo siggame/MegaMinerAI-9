@@ -45,6 +45,8 @@ std::ostream& operator<<(std::ostream& stream, Ship ob)
   stream << "health: " << ob.health  <<'\n';
   stream << "maxHealth: " << ob.maxHealth  <<'\n';
   stream << "selfDestructDamage: " << ob.selfDestructDamage  <<'\n';
+  stream << "isStealthed: " << ob.isStealthed  <<'\n';
+  stream << "isEMPd: " << ob.isEMPd  <<'\n';
   return stream;
 }
 
@@ -102,7 +104,8 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
   stream << "gameNumber: " << ob.gameNumber  <<'\n';
   stream << "round: " << ob.round  <<'\n';
   stream << "victoriesNeeded: " << ob.victoriesNeeded  <<'\n';
-  stream << "mapRadius: " << ob.mapRadius  <<'\n';
+  stream << "innerMapRadius: " << ob.innerMapRadius  <<'\n';
+  stream << "outerMapRadius: " << ob.outerMapRadius  <<'\n';
 
   stream << "\n\nShipTypes:\n";
   for(std::map<int,ShipType>::iterator i = ob.shipTypes.begin(); i != ob.shipTypes.end(); i++)

@@ -45,28 +45,6 @@ class AI(BaseAI):
       
   #Returns the the furthest point along a path to target      
   def moveTo(self,ship,x,y, locs):
-    #if ship.getType() != "Warp Gate" and ship.getType() != "Weapons Platform" and ship.getType() != "Mine Layer":
-     # points = self.pointsAtEdge(x,y,ship.getRange()+20,32)
-     # distance = 10000
-      #for point in points:
-       # if point[0]**2 + point[1]**2 < self.mapRadius()**2:
-         # if self.distance(ship.getX(), point[0], ship.getY(), point[1]) < distance:
-           # mineThere = False
-           #for enemy in theirShips:
-            #  if enemy.getType() == "Mine":
-                #if self.getRange(point[0], point[1], ship.getRadius(), enemy.getX(), enemy.getY(), enemy.getRange()):  
-                 # mineThere = True
-           # if mineThere == False:
-              #Test code for spread out
-              #if availShips["Miner Layer"] != 0:
-             # spreadOut = True
-             # for myShip in myShips:
-               # if self.getRange(point[0], point[1], ship.getRadius(), myShip.getX(), myShip.getY(), enemy.getRadius()/2):                
-                #  spreadOut = False
-              #if spreadOut == True and self.distance(ship.getX(), point[0], ship.getY(), point[1]) < distance: :
-               # distance = self.distance(ship.getX(), point[0], ship.getY(), point[1])
-               # x = point[0]
-              #  y = point[1]
     #Gets point furthest along a path between ship and target location
     distance = (((ship.getX() - x)**2) + ((ship.getY() - y)**2))**.5
     if distance == 0:
@@ -75,8 +53,6 @@ class AI(BaseAI):
       distRatio = ship.getRange() / distance
     else:
       distRatio = ship.getMovementLeft() / (distance*1.10)
-    #if distRatio >= 1:
-      #return [x,y]
     startX = int(ship.getX()*(1-distRatio))
     startY = int(ship.getY()*(1-distRatio))
     endX = int(x*distRatio)
@@ -96,7 +72,7 @@ class AI(BaseAI):
       points = self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()-5,32)
       distance = 10000
       for point in points:
-        if point[0]**2 + point[1]**2 < self.mapRadius()**2:
+        if point[0]**2 + point[1]**2 < self.outerMapRadius()**2 and point[0]**2 + point[1]**2 > self.innerMapRadius()**2:
           goodMove = True
           for enemy in theirShips:
             if enemy.getType() == "Mine":
@@ -118,8 +94,8 @@ class AI(BaseAI):
     points = self.moveTo(ship, nearest[0],nearest[1],locs)
     newPoints = [ship.getX() + (ship.getX() - points[0]), ship.getY() + (ship.getY() - points[1])]
     # If unit would move outside of the map, reduce move until it is legal
-    if newPoints[0]**2 + newPoints[1]**2 > self.mapRadius()**2:
-        newPoints = self.moveTo(ship,0,0,locs)
+    if newPoints[0]**2 + newPoints[1]**2 < self.outerMapRadius()**2 and newPoints[0]**2 + newPoints[1]**2 > self.innerMapRadius()**2:
+      newPoints = self.moveTo(ship,0,0,locs)
     if self.distance(ship.getX(),newPoints[0], ship.getY(),newPoints[1]) > 1 and self.distance(ship.getX(),newPoints[0], ship.getY(),newPoints[1]) <= ship.getMovementLeft():
       ship.move(newPoints[0],newPoints[1])
 
@@ -482,7 +458,7 @@ class AI(BaseAI):
           movementLeft = ship.getMovementLeft()
           PlacedOne = False
           for point in points:
-            if point[0]**2 + point[1]**2 < self.mapRadius()**2 and movementLeft > 0:
+            if point[0]**2 + point[1]**2 < self.outerMapRadius()**2 and point[0]**2 + point[1]**2 > self.innerMapRadius()**2 and movementLeft > 0:
               NoMine = True
               move = self.moveTo(ship,point[0],point[1],locs)
               for myship in myShips:
@@ -510,12 +486,12 @@ class AI(BaseAI):
       elif ship.getType() == "Warp Gate":  
         if availShips["Mine Layer"] != 0:      
           if player == 0:
-            move = self.moveTo(ship,(self.mapRadius()-1)*-1, 0,locs) 
+            move = self.moveTo(ship,(self.outerMapRadius()-1)*-1, 0,locs) 
             if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
               ship.move(move[0], move[1])
               locs.append(move)
           else:
-            move = self.moveTo(ship,self.mapRadius()-1, 0,locs) 
+            move = self.moveTo(ship,self.outerMapRadius()-1, 0,locs) 
             if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
               ship.move(move[0],move[1])
               locs.append(move)

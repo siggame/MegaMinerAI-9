@@ -14,11 +14,20 @@
 namespace parser
 {
 
-const int ATTACK = 0;
-const int DESTEALTH = 1;
-const int MOVE = 2;
-const int SELFDESTRUCT = 3;
-const int STEALTH = 4;
+const int MOVE = 0;
+const int SELFDESTRUCT = 1;
+const int ATTACK = 2;
+const int STEALTH = 3;
+const int DESTEALTH = 4;
+
+struct ShipType
+{
+  int id;
+  char* type;
+  int cost;
+
+  friend std::ostream& operator<<(std::ostream& stream, ShipType obj);
+};
 
 struct Player
 {
@@ -47,38 +56,17 @@ struct Ship
   int range;
   int health;
   int maxHealth;
+  int selfDestructDamage;
+  int isStealthed;
+  int isEMPd;
 
   friend std::ostream& operator<<(std::ostream& stream, Ship obj);
-};
-
-struct ShipType
-{
-  int id;
-  char* type;
-  int cost;
-
-  friend std::ostream& operator<<(std::ostream& stream, ShipType obj);
 };
 
 
 struct Animation
 {
   int type;
-};
-
-struct attack : public Animation
-{
-  int acting;
-  int target;
-
-  friend std::ostream& operator<<(std::ostream& stream, attack obj);
-};
-
-struct deStealth : public Animation
-{
-  int acting;
-
-  friend std::ostream& operator<<(std::ostream& stream, deStealth obj);
 };
 
 struct move : public Animation
@@ -99,11 +87,26 @@ struct selfDestruct : public Animation
   friend std::ostream& operator<<(std::ostream& stream, selfDestruct obj);
 };
 
+struct attack : public Animation
+{
+  int acting;
+  int target;
+
+  friend std::ostream& operator<<(std::ostream& stream, attack obj);
+};
+
 struct stealth : public Animation
 {
   int acting;
 
   friend std::ostream& operator<<(std::ostream& stream, stealth obj);
+};
+
+struct deStealth : public Animation
+{
+  int acting;
+
+  friend std::ostream& operator<<(std::ostream& stream, deStealth obj);
 };
 
 
@@ -114,16 +117,17 @@ struct AnimOwner: public Animation
 
 struct GameState
 {
+  std::map<int,ShipType> shipTypes;
   std::map<int,Player> players;
   std::map<int,Ship> ships;
-  std::map<int,ShipType> shipTypes;
 
   int turnNumber;
   int playerID;
   int gameNumber;
   int round;
   int victoriesNeeded;
-  int mapRadius;
+  int innerMapRadius;
+  int outerMapRadius;
 
   std::map< int, std::vector< SmartPointer< Animation > > > animations;
   friend std::ostream& operator<<(std::ostream& stream, GameState obj);

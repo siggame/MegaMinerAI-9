@@ -261,6 +261,22 @@ static bool parseShip(Ship& object, sexp_t* expression)
   object.selfDestructDamage = atoi(sub->val);
   sub = sub->next;
 
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  sub = sub->next;
+
   return true;
 
 }
@@ -414,7 +430,10 @@ static bool parseSexp(Game& game, sexp_t* expression)
           gs.victoriesNeeded = atoi(sub->val);
           sub = sub->next;
           if ( !sub ) return false;
-          gs.mapRadius = atoi(sub->val);
+          gs.innerMapRadius = atoi(sub->val);
+          sub = sub->next;
+          if ( !sub ) return false;
+          gs.outerMapRadius = atoi(sub->val);
           sub = sub->next;
       }
       else if(string(sub->val) == "ShipType")

@@ -10,7 +10,6 @@
 #include <sstream>
 #include <fstream>
 #include <memory>
-#include <cmath>
 
 #include "game.h"
 #include "network.h"
@@ -60,7 +59,8 @@ DLLEXPORT Connection* createConnection()
   c->gameNumber = 0;
   c->round = 0;
   c->victoriesNeeded = 0;
-  c->mapRadius = 0;
+  c->innerMapRadius = 0;
+  c->outerMapRadius = 0;
   c->ShipTypes = NULL;
   c->ShipTypeCount = 0;
   c->Players = NULL;
@@ -217,8 +217,6 @@ DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
-  // Game logic goes here
-  object->_c->Players[object->_c->playerID].energy -= object->cost;
   return 1;
 }
 
@@ -235,17 +233,6 @@ DLLEXPORT int playerTalk(_Player* object, char* message)
   return 1;
 }
 
-int distance(int fromx, int fromy, int tox, int toy)
-{
-  int dx = fromx-tox;
-  int dy = fromy-toy;
-  return ceil(sqrt(dx*dx + dy*dy));
-}
-
-bool inRange(int fromx, int fromy, int fromr, int tox, int toy, int tor)
-{
-  return distance(fromx, fromy, tox, toy) <= fromr + tor;
-}
 
 DLLEXPORT int shipMove(_Ship* object, int x, int y)
 {
@@ -257,10 +244,6 @@ DLLEXPORT int shipMove(_Ship* object, int x, int y)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
-  // Game logic goes here
-  object->movementLeft -= distance(object->x, object->y, x, y);
-  object->x = x;
-  object->y = y;
   return 1;
 }
 
@@ -272,7 +255,6 @@ DLLEXPORT int shipSelfDestruct(_Ship* object)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
-  // TODO Game logic goes here
   return 1;
 }
 
@@ -285,9 +267,6 @@ DLLEXPORT int shipAttack(_Ship* object, _Ship* target)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
-  // Game logic goes here
-  object->attacksLeft -= 1;
-  target->health -= object->damage;
   return 1;
 }
 
@@ -369,6 +348,8 @@ void parseShip(Connection* c, _Ship* object, sexp_t* expression)
   object->maxHealth = atoi(sub->val);
   sub = sub->next;
   object->selfDestructDamage = atoi(sub->val);
+  sub = sub->next;
+  sub = sub->next;
   sub = sub->next;
 
 }
@@ -456,7 +437,10 @@ DLLEXPORT int networkLoop(Connection* c)
           c->victoriesNeeded = atoi(sub->val);
           sub = sub->next;
 
-          c->mapRadius = atoi(sub->val);
+          c->innerMapRadius = atoi(sub->val);
+          sub = sub->next;
+
+          c->outerMapRadius = atoi(sub->val);
           sub = sub->next;
 
         }
@@ -576,7 +560,11 @@ DLLEXPORT int getVictoriesNeeded(Connection* c)
 {
   return c->victoriesNeeded;
 }
-DLLEXPORT int getMapRadius(Connection* c)
+DLLEXPORT int getInnerMapRadius(Connection* c)
 {
-  return c->mapRadius;
+  return c->innerMapRadius;
+}
+DLLEXPORT int getOuterMapRadius(Connection* c)
+{
+  return c->outerMapRadius;
 }

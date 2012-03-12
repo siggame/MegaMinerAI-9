@@ -85,6 +85,16 @@ int Ship::selfDestructDamage()
   return ((_Ship*)ptr)->selfDestructDamage;
 }
 
+int Ship::isStealthed()
+{
+  return ((_Ship*)ptr)->isStealthed;
+}
+
+int Ship::isEMPd()
+{
+  return ((_Ship*)ptr)->isEMPd;
+}
+
 
 int Ship::move(int x, int y)
 {
@@ -120,5 +130,7 @@ std::ostream& operator<<(std::ostream& stream,Ship ob)
   stream << "health: " << ((_Ship*)ob.ptr)->health  <<'\n';
   stream << "maxHealth: " << ((_Ship*)ob.ptr)->maxHealth  <<'\n';
   stream << "selfDestructDamage: " << ((_Ship*)ob.ptr)->selfDestructDamage  <<'\n';
+  stream << "isStealthed: " << ((_Ship*)ob.ptr)->isStealthed  <<'\n';
+  stream << "isEMPd: " << ((_Ship*)ob.ptr)->isEMPd  <<'\n';
   return stream;
 }

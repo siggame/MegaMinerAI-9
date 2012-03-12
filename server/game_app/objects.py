@@ -42,7 +42,7 @@ class Player:
 
 
 class Ship:
-  def __init__(self, game, id, owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, range, health, maxHealth, selfDestructDamage):
+  def __init__(self, game, id, owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, range, health, maxHealth, selfDestructDamage, isStealthed, isEMPd):
     self.game = game
     self.id = id
     self.owner = owner
@@ -59,7 +59,8 @@ class Ship:
     self.health = health
     self.maxHealth = maxHealth
     self.selfDestructDamage = selfDestructDamage
-    self.stealthed = False
+    self.isStealthed = isStealthed
+    self.isEMPd = isEMPd
     self.targeted = set()
 
   def toList(self):
@@ -79,6 +80,8 @@ class Ship:
       self.health,
       self.maxHealth,
       self.selfDestructDamage,
+      self.isStealthed,
+      self.isEMPd,
       ]
     return value
     
@@ -95,7 +98,7 @@ class Ship:
     #Ships warp in at the beginning of that player's turn
     for warp in self.game.objects.players[self.game.playerID].warping:
       #Uses a list of ship values in the config to get all of the ships stats
-      shipStats = [cfgUnits[warp[0]][value] for value in self.game.ordering]   
+      shipStats = [cfgUnits[warp[0]][value] for value in self.game.ordering] + [False, False]  
       #Adds the ship with the retreived stats to the game
       self.game.addObject(Ship, [self.game.playerID, warp[1], warp[2]] + shipStats)
       #Remove the created ship from the queue
@@ -115,8 +118,11 @@ class Ship:
         self.movementLeft = 0
         self.attacksLeft = 0
       else:
+        self.isEMPd == False
         self.movementLeft = self.maxMovement         
         self.attacksLeft = self.maxAttacks
+      if self.isStealthed == False:
+        self.isStealthed == True
                     
   def move(self, x, y):
     if self.owner != self.game.playerID:
@@ -124,8 +130,10 @@ class Ship:
     #moved is the distance they've moved, where they were to where they're going
     moved = distance(self.x, x, self.y, y)       
     #if they're trying to move outside the map
-    if x**2 + y**2 > self.game.mapRadius**2:
+    if x**2 + y**2 > self.game.outerMapRadius**2:
       return "You don't want to move out of the map, you'd be lost in Space"
+    elif x**2 + y**2 < self.game.innerMapRadius**2:
+      return "You don't want to fly into the planet!"
     #check if they can't move that far
     elif self.movementLeft - moved < 0:
       return "You cannot move that far, your engines lack the power"#think of something clever here
@@ -185,15 +193,13 @@ class Ship:
       self.maxAttacks-=1
       self.targeted.add(self.id)
       return True
-#CHANGING STUFF HERE
     if self.type == 'EMP' and self.id == target.id:
       foe = self.owner^1
       for ship in self.allInRange(foe):
         ship.attacksLeft = -1
-        ship.movementLeft = -1
-        self.movementLeft = -1
-        self.maxAttacks -= 1      
-#Yo, Vis guys, how you want us do this?
+        ship.movementLeft = -1 
+        ship.isEMPd == True        
+        #Yo, Vis guys, how you want us do this?
         self.game.animations.append(['attack',self.id,ship.id])
         return True
     elif target.owner == self.owner:
@@ -208,13 +214,6 @@ class Ship:
             if unit.inRange(target):
             #Increment the damage modifier for each radar in range
               modifier+= (unit.damage / 100)
-              
-        #Special attack for the EMP class
-#        if self.type == "EMP":
-#          self.maxAttacks -= 1
-#          for victim in self.allInRange(target.owner):
-#            unit.attacksLeft = -1
-#            unit.movementLeft = -1  
           
       self.game.animations.append(['attack', self.id, target.id])
       target.health-=self.damage*modifier
@@ -222,6 +221,8 @@ class Ship:
       if target.health <= 0 and target.id in self.game.objects:
         self.game.removeObject(target)
       self.targeted.add(target.id)
+      if self.type == "Stealth" and self.isStealthed == True:
+        isStealthed == False
     return True 
     
   def inRange(self, target):
@@ -263,8 +264,10 @@ class ShipType:
     if self.game.playerID != player.id:
       #print self.game.playerID, player.id
       return "You cannot warp in ships on your opponent's turn",
-    if x**2 + y**2 > self.game.mapRadius**2:
+    if x**2 + y**2 > self.game.outerMapRadius**2:
       return "That ship would be lost in space...forever"
+    elif x**2 + y**2 < self.game.innerMapRadius**2:
+      return "Warping ships on the planet does not help in the fight!"
     elif player.energy < self.cost:
       return "You need to not be poor to buy that kind of ship"
     elif not inRange(warpX,warpY,cfgUnits["Warp Gate"]["range"],x,y,0):

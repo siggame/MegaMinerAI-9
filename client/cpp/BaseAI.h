@@ -35,8 +35,10 @@ public:
   int round();
   ///How many victories a player needs to win
   int victoriesNeeded();
-  ///The radius of the map.  Center of screen is (0,0), with +x right, +y up
-  int mapRadius();
+  ///The inner radius of the map.  Center of screen is (0,0), with +x right, +y up
+  int innerMapRadius();
+  ///The outer radius of the map.  Center of screen is (0,0), with +x right, +y up
+  int outerMapRadius();
   
   BaseAI(Connection* c);
   virtual ~BaseAI();

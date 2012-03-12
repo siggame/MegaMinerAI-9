@@ -8,11 +8,18 @@ namespace client
 {
 
 struct Connection;
+struct _ShipType;
 struct _Player;
 struct _Ship;
-struct _ShipType;
 
 
+struct _ShipType
+{
+  Connection* _c;
+  int id;
+  char* type;
+  int cost;
+};
 struct _Player
 {
   Connection* _c;
@@ -39,13 +46,9 @@ struct _Ship
   int range;
   int health;
   int maxHealth;
-};
-struct _ShipType
-{
-  Connection* _c;
-  int id;
-  char* type;
-  int cost;
+  int selfDestructDamage;
+  int isStealthed;
+  int isEMPd;
 };
 
 }

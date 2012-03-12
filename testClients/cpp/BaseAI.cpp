@@ -25,9 +25,13 @@ int BaseAI::victoriesNeeded()
 {
   return getVictoriesNeeded(c);
 }
-int BaseAI::mapRadius()
+int BaseAI::innerMapRadius()
 {
-  return getMapRadius(c);
+  return getInnerMapRadius(c);
+}
+int BaseAI::outerMapRadius()
+{
+  return getOuterMapRadius(c);
 }
 
 bool BaseAI::startTurn()

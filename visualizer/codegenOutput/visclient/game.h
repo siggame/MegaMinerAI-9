@@ -39,14 +39,15 @@ struct Connection
   int gameNumber;
   int round;
   int victoriesNeeded;
-  int mapRadius;
+  int innerMapRadius;
+  int outerMapRadius;
 
+  _ShipType* ShipTypes;
+  int ShipTypeCount;
   _Player* Players;
   int PlayerCount;
   _Ship* Ships;
   int ShipCount;
-  _ShipType* ShipTypes;
-  int ShipTypeCount;
 };
 
 #ifdef __cplusplus
@@ -67,6 +68,8 @@ extern "C"
 
 //commands
 
+  ///Sends in a new ship of this type
+  DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y);
   ///Allows a player to display messages on the screen
   DLLEXPORT int playerTalk(_Player* object, char* message);
   ///Command a ship to move to a specified position
@@ -75,8 +78,6 @@ extern "C"
   DLLEXPORT int shipSelfDestruct(_Ship* object);
   ///Commands your ship to attack a target
   DLLEXPORT int shipAttack(_Ship* object, _Ship* target);
-  ///Sends in a new ship of this type
-  DLLEXPORT int shiptypeWarpIn(_ShipType* object, int x, int y);
 
 //derived properties
 
@@ -89,16 +90,17 @@ DLLEXPORT int getPlayerID(Connection* c);
 DLLEXPORT int getGameNumber(Connection* c);
 DLLEXPORT int getRound(Connection* c);
 DLLEXPORT int getVictoriesNeeded(Connection* c);
-DLLEXPORT int getMapRadius(Connection* c);
+DLLEXPORT int getInnerMapRadius(Connection* c);
+DLLEXPORT int getOuterMapRadius(Connection* c);
+
+DLLEXPORT _ShipType* getShipType(Connection* c, int num);
+DLLEXPORT int getShipTypeCount(Connection* c);
 
 DLLEXPORT _Player* getPlayer(Connection* c, int num);
 DLLEXPORT int getPlayerCount(Connection* c);
 
 DLLEXPORT _Ship* getShip(Connection* c, int num);
 DLLEXPORT int getShipCount(Connection* c);
-
-DLLEXPORT _ShipType* getShipType(Connection* c, int num);
-DLLEXPORT int getShipTypeCount(Connection* c);
 
 
 
