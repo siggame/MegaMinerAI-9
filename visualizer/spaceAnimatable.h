@@ -12,6 +12,9 @@ namespace visualizer
 {
     struct Background: public Animatable
     {
+        int innerRadius;
+        int outerRadius;
+        int turn;
     };
     
     struct PersistentShipAnim: public Animatable

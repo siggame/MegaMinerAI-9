@@ -18,14 +18,18 @@ namespace visualizer
   
     class DrawBackground: public Anim
     {
-      public:
-        void animate( const float& t, AnimData* d, IGame* game );
+        public:
+            DrawBackground( Background* background ) { m_Background = background; }
+            void animate( const float& t, AnimData* d, IGame* game );
 
-        float controlDuration() const
-        { return 0; }
+            float controlDuration() const
+            { return 0; }
 
-        float totalDuration() const
-        { return 0; }
+            float totalDuration() const
+            { return 0; }
+        
+        private:
+            Background *m_Background;
 
     }; // DrawBackground
   

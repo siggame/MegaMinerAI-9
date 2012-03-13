@@ -267,6 +267,7 @@ static bool parseShip(Ship& object, sexp_t* expression)
     return false;
   }
 
+  object.isStealthed = atoi(sub->val);
   sub = sub->next;
 
   if ( !sub ) 
@@ -275,6 +276,7 @@ static bool parseShip(Ship& object, sexp_t* expression)
     return false;
   }
 
+  object.isEMPd = atoi(sub->val);
   sub = sub->next;
 
   return true;
