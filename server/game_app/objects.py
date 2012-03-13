@@ -98,7 +98,8 @@ class Ship:
     #Ships warp in at the beginning of that player's turn
     for warp in self.game.objects.players[self.game.playerID].warping:
       #Uses a list of ship values in the config to get all of the ships stats
-      shipStats = [cfgUnits[warp[0]][value] for value in self.game.ordering] + [False, False]  
+      shipStats = [cfgUnits[warp[0]][value] for value in self.game.ordering] 
+      shipStats.extend([False, False])
       #Adds the ship with the retreived stats to the game
       self.game.addObject(Ship, [self.game.playerID, warp[1], warp[2]] + shipStats)
       #Remove the created ship from the queue
@@ -189,7 +190,7 @@ class Ship:
     if self.type == "Mine Layer" and self.id == target.id:   
       #Adding a new mine to the game
       shipStats = [cfgUnits["Mine"][value] for value in self.game.ordering]   
-      self.game.addObject(Ship, [self.game.playerID, self.x, self.y] + shipStats)
+      self.game.addObject(Ship, [self.game.playerID, self.x, self.y] + shipStats + [False, False])
       self.maxAttacks-=1
       self.targeted.add(self.id)
       return True

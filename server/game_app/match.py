@@ -122,7 +122,6 @@ class Match(DefaultGameWorld):
       
     for obj in self.objects.values():
       obj.nextTurn()
-
     self.checkWinner()
 
     if self.winner is None:
