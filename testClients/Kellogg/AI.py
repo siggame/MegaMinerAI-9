@@ -113,8 +113,6 @@ class AI(BaseAI):
   
   def warpControl(self,enemyListDict,myListDict):
     for w in myListDict['Warp Gate']:
-#      w.move(w.getX()+10,w.getY()-10)
-        #self.deliberateWarp(w)
       self.smartWarp(w)
       nearest = self.findNearest(w,enemyShips)
       self.moveAway(w,nearest)
@@ -151,22 +149,22 @@ class AI(BaseAI):
   def supportControl(self,enemyListDict,myListDict):
     #if warpgate is below x health, move towards and heal warp Gate, else if wp in game,  move a support to them,  else move with largest cluster of friendly units
     target = myListDict['Warp Gate'][0]
-    for ship in myListDict['Support']:
-      if myListDict['Warp Gate'][0].getHealth() <= myListDict['Warp Gate'][0].getMaxHealth()/2:
-        self.moveToTarget(myListDict['Support'][0],myListDict['Warp Gate'][0])
+    if myListDict['Warp Gate'][0].getHealth() <= myListDict['Warp Gate'][0].getMaxHealth()/2:
+      for ship in myListDict['Support']:
+          self.moveToTarget(myListDict['Support'][0],myListDict['Warp Gate'][0])
     
-    if len(myListDict['Support'])>=2:
-       if len(myListDict['Weapons Platform'])>0:
-         self.moveToTarget(myListDict['Support'][0],myListDict['Weapons Platform'][0])
-       for ship in myListDict['Support'][1:]:
-         target2 = self.findCluster(ship,ship.getOwner(),myShips)
-         if isinstance(target2,Ship) and target2.getType()!= 'Mine':
-            target = target2
-         self.moveToTarget(ship,target)
+   # elif len(myListDict['Support'])>=2:
+   #    if len(myListDict['Weapons Platform'])>0:
+   #      self.moveToTarget(myListDict['Support'][0],myListDict['Weapons Platform'][0])
+   #    for ship in myListDict['Support'][1:]:
+   #      target2 = self.findCluster(ship,ship.getOwner(),myShips)
+   #      if isinstance(target2,Ship) and target2.getType()!= 'Mine' and target2.getType()!='Support':
+   #         target = target2
+   #      self.moveToTarget(ship,target)
     else:
      for ship in myListDict['Support']:  
         target2 = self.findCluster(ship,ship.getOwner(),myShips)
-        if isinstance(target2,Ship) and target2.getType()!= 'Mine':
+        if isinstance(target2,Ship) and target2.getType() != 'Mine':# and target2.getType()!='Support':
           target = target2
         self.moveToTarget(ship,target)
            
@@ -196,30 +194,27 @@ class AI(BaseAI):
     #stay far from enemy units, snipe priority targets (emp,stealth, etc)
     #TODO make attacking more efficient
     for ship in myListDict['Weapons Platform']:
-      print "CONTROLLING WEAP PLATS"
       attacks = ship.getMaxAttacks()
-      for miner in enemyListDict['Mine Layer']:    
-        if attacks > 0:
-          ship.attack(miner)
-          attacks-=1
-      for support in enemyListDict['Support']:
-        if attacks > 0:
+      if attacks > 0:
+        for support in enemyListDict['Support']:
           ship.attack(support)
           attacks-=1
-      for wp in enemyListDict['Weapons Platform']:
-        if attacks > 0:
+      if attacks > 0:
+        for wp in enemyListDict['Weapons Platform']:
           ship.attack(wp)
           attacks-=1
-      for stealth in enemyListDict['Stealth']:
-        if attacks > 0:
+      if attacks > 0:
+        for miner in enemyListDict['Mine Layer']:
+         if miner.getAttacksLeft()>0:
+           ship.attack(miner)
+           attacks-=1
+      if attacks > 0:
+        for stealth in enemyListDict['Stealth']:
           ship.attack(stealth)
           attacks -= 1
       if attacks > 0:
-        attackList = self.bestUseAttack(ship)
-        if len(attackList) > 0:
-          ship.attack(attackList[0])
-        else:
           ship.attack(enemyListDict['Warp Gate'][0])
+      #TODO make it so they attack anything that is shooting them
       nearest = self.findNearest(ship,enemyShips)
       self.moveAway(ship,nearest)
 
@@ -256,9 +251,9 @@ class AI(BaseAI):
     dy = target.getY()-ship.getY()
     dist = abs(dx)+abs(dy)
     if dist > maxMove:
-      dx = int(math.copysign(maxMove/3,dx))
-      dy = int(math.copysign(maxMove/3,dy))
-    if abs(dx)+abs(dy)>0:
+      dx = int(math.copysign(maxMove/2,dx))
+      dy = int(math.copysign(maxMove/2,dy))
+    if abs(dx)+abs(dy)>0 and ((ship.getX()+abs(dx))**2 + (ship.getX()+abs(dy))**2) <= self.mapRadius()**2:
       ship.move(ship.getX()+dx,ship.getY()+dy)
     maxMove-=dist
     
@@ -283,7 +278,7 @@ class AI(BaseAI):
     return target
                 
   def moveInRange(self,ship,target):
-    maxMove = ship.getMaxMovement()
+#    maxMove = ship.getMaxMovement()
 #    while maxMove > 0 and not inRange(ship.getX(),ship.getY(),ship.getRange(),target.getX(),target.getY(),target.getRadius):
     pass
   
@@ -295,10 +290,22 @@ class AI(BaseAI):
      if dist > maxMove:
        dx = int(math.copysign(maxMove/2,dx))
        dy = int(math.copysign(maxMove/2,dy))
-     if abs(dx)+abs(dy)>0:
+     totX = (ship.getX()+dx)**2
+     totY = (ship.getY()+dy)**2
+     if abs(dx)+abs(dy)> 0 and totX + totY <= self.mapRadius()**2:
        ship.move(ship.getX()+dx,ship.getY()+dy)
        maxMove-=dist
                                               
+  def testWarp(self,warpShip):
+     typeDict = {}
+     for type in self.shipTypes:
+       typeDict[type.getType()] = type
+     energy = myPlayer[0].getEnergy()
+     if 'Support' in typeDict:
+       while energy >= typeDict['Support'].getCost():
+         typeDict['Support'].warpIn(warpShip.getX(),warpShip.getY())                      
+         energy-=typeDict['Support'].getCost()
+            
   def smartWarp(self,warpShip):
      #TODO: make smarterer
      #dictionaries are great
@@ -326,9 +333,6 @@ class AI(BaseAI):
        if energy >= typeDict['Mine Layer'].getCost():
          typeDict['Mine Layer'].warpIn(warpShip.getX(),warpShip.getY())
          energy-=typeDict['Mine Layer'].getCost()
-     if 'EMP' in typeDict and energy >= typeDict['EMP'].getCost():
-       typeDict['EMP'].warpIn(warpShip.getX(),warpShip.getY())
-       energy-=typeDict['EMP'].getCost()
      if 'Battleship' in typeDict and energy >= typeDict['Battleship'].getCost():
        typeDict['Battleship'].warpIn(warpShip.getX(),warpShip.getY())
        energy-=typeDict['Battleship'].getCost()
@@ -338,7 +342,11 @@ class AI(BaseAI):
      elif 'Cruiser' in typeDict and energy >= typeDict['Cruiser'].getCost():
        typeDict['Cruiser'].warpIn(warpShip.getX(),warpShip.getY())
        energy-=typeDict['Cruiser'].getCost()          
+     if 'EMP' in typeDict and energy >= typeDict['EMP'].getCost():
+       typeDict['EMP'].warpIn(warpShip.getX(),warpShip.getY())
+       energy-=typeDict['EMP'].getCost()
      while energy >= minCost:
+       print energy
        if 'Stealth' in typeDict and energy >= typeDict['Stealth'].getCost():
         typeDict['Stealth'].warpIn(warpShip.getX(),warpShip.getY())
         energy-=typeDict['Stealth'].getCost()
@@ -348,71 +356,10 @@ class AI(BaseAI):
        elif 'Interceptor' in typeDict and energy >= typeDict['Interceptor'].getCost():
          typeDict['Interceptor'].warpIn(warpShip.getX(),warpShip.getY())
          energy-=typeDict['Interceptor'].getCost()
+       else:
+         break
      return                                                                   
               
-#OLD CODE #         
-#     comment = """for type in self.shipTypes:
-#        if type.getType() == 'Weapons Platform':
-#           type.warpIn(warpShip.getX(),warpShip.getY())
-#           type.warpIn(warpShip.getY(),warpship.getY())
-#     for type in shipTypes:
-#       types.append(type.getType())
-#     energy = myPlayer.getEnergy()
-#     while energy >= minCost:
-#       if 'Battleship' in types and False:
-#         for type in shipTypes:
-#           if type.getType() == 'BattleShip' and energy >= type.getCost():
-#             warping.append(type)
-#             energy-=type.getCost()
-#       if 'Juggernaut' in types and False:
-#         for type in shipTypes:
-#           if type.getType() == 'Juggernaut' and energy >= type.getCost():
-#             warping.append(type)
-#             energy-=type.getCost()
-#       if 'Mine Layer' in types:
-#         for type in shipTypes:
-#           if type.getType() == 'Mine Layer' and energy >= type.getCost():
-#             warping.append(type)
-#             energy-=type.getCost()
-#       if 'Support' in types:
-#         for type in shipTypes:
-#           if type.getType() == 'Support' and energy >= type.getCost():
-#             warping.append(type)
-#             energy-=type.getCost()
-#       if 'EMP' in types:
-#          for type in shipTypes:
-#            if type.getType() == 'EMP' and energy >= type.getCost():
-#              warping.append(type)
-#              energy-=type.getCost()
-#       if 'Stealth' in types:
-#         for type in shipTypes:
-#           if type.getType() == 'Stealth' and energy >= type.getCost():
-#             warping.append(type)
-#             energy-=type.getCost()
-#       if 'Cruiser' in types and False:
-#          for type in shipTypes:
-#            if type.getType() == 'Cruiser' and energy >= type.getCost():
-#              warping.append(type)
-#              energy-=type.getCost()
-#       if 'Weapons Platforms' in types:
-#          for type in shipTypes:
-#            if type.getType() == 'Weapons Platform' and energy >= type.getCost():
-#              warping.append(type)
-#              energy-=type.getCost()
-#       if 'Interceptor' in types:
-#         for type in shipTypes:
-#           if type.getType() == 'Interceptor' and energy >= type.getCost():
-#             warping.append(type)
-#             energy-=type.getCost()
-#       if 'Bomber' in types:
-#         for type in shipTypes:
-#           if type.getType() == 'Bomber' and energy >= type.getCost():
-#            warping.append(type)
-#            energy-=type.getCost()
-#     
-#     for type in warping:
-#       type.warpIn(warpShip.getX(),warpShip.getY())"""
-#     return
                                                                                                                                                                                                                                                                                      
   #goes through all enemies in range, and returns the a list of the enemy whose current health is closest to, but less than, that ships damage. 
   #If no such enemy fits this (i.e., no enemey has less health than damage), returns a list of the enemy with lowest health
@@ -420,18 +367,37 @@ class AI(BaseAI):
     foe = ship.getOwner()^1
     targets = self.allInRange(ship,foe,ship.getRange())
     result = []
-    if len(targets)>0:
+    if len(targets) > 0:
       health = 0
       damage = ship.getDamage()
       aNewList = sorted(targets, key=lambda x: x.getHealth())
+      print aNewList
       guy = aNewList[0]    
+      result.append(aNewList[0])
       for target in targets:
         if target.getHealth() > health and target.getHealth() <= damage:# and target.getMaxHealth() > maxHealth:
+          result.append(target)
           guy = target
           health = target.getHealth()
-      result.append(guy) 
+    #result.append(guy) 
+#      print "OUTPUT FROM RESULT LOOKEY HERE-------------------------------------"
+      for r in result:
+        print r.getHealth()
+      result.sort()
+      result.reverse()
+      sortHealth = [s.getHealth() for s in result]
+#      print "RESULT = ",sortHealth
     return result
     
+    
+  def seppuku(self,ship):
+    if ship.getHealth() <= ship.getMaxHealth()/3 or ship.getMaxAttacks() == 0:
+      if ship.getType()!= 'Warp Gate':
+        target = self.findNearest(ship,enemyShips)
+        self.moveToTarget(ship,target)
+        ship.selfDestruct()
+    return 
+             
   def run(self):
     #Gah, so many ships
     types=[]; warps=[]; batShips=[]; juggs=[]; mineLayers=[]; supports=[]; mines = []
@@ -474,8 +440,12 @@ class AI(BaseAI):
          controlDict[ty](enemyListDict,myListDict)
        except KeyError:
          pass #print ty
-    #for ty in types:
-    #  for ship in myListDict[ty]:
+    
+    #end dictionary magic
+    
+    for ship in myShips:
+      self.seppuku(ship)
+
     return 1
 
   def __init__(self, conn):
