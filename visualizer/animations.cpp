@@ -5,23 +5,6 @@
 
 namespace visualizer
 {
-    void StartAnim::animate( const float& /* t */, AnimData * /* d */, IGame* game )
-    {
-    }
-
-
-    void DrawBackground::animate( const float& /* t */, AnimData * /* d */, IGame* game )
-    {
-      cout << "background" << endl;
-        game->renderer->setColor( Color( 1, 1, 1, 1 ) );
-        game->renderer->drawTexturedQuad(0, 0, 2000, 2000, "background");
-        game->renderer->setColor( Color( 1, 1, 1, 0.4f ) );
-        game->renderer->drawLine(490, 500, 510, 500, 1);
-        game->renderer->drawLine(500, 490, 500, 510, 1);
-        game->renderer->drawArc(500, 500, 500, 50 );
-    }
-  
-    
     void drawRotatedTexturedQuad( IGame* game, float x, float y, float length, float degrees, string texture)
     {
         /*game->renderer->push();
@@ -38,9 +21,24 @@ namespace visualizer
     }
     
     
+    
+    void StartAnim::animate( const float& /* t */, AnimData * /* d */, IGame* game )
+    {
+    }
+
+
+    void DrawBackground::animate( const float& t, AnimData * d, IGame* game )
+    {
+        game->renderer->setColor( Color( 1, 1, 1, 1 ) );
+        game->renderer->drawTexturedQuad(0, 0, m_Background->outerRadius * 2, m_Background->outerRadius * 2, "background");
+        //game->renderer->drawTexturedQuad(m_Background->outerRadius - m_Background->innerRadius, m_Background->outerRadius - m_Background->innerRadius, m_Background->innerRadius * 2, m_Background->innerRadius * 2, "planet");
+        drawRotatedTexturedQuad( game, m_Background->outerRadius - m_Background->innerRadius, m_Background->outerRadius - m_Background->innerRadius, m_Background->innerRadius * 2, ((float)m_Background->turn + t) * 3.6f, "planet" );
+        game->renderer->setColor( Color( 1, 1, 1, 0.4f ) );
+        game->renderer->drawArc(500, 500, 500, 50 );
+    }
+    
     void DrawPersistentShip::animate( const float& t, AnimData * d, IGame* game )
     {
-      cout << "SHIP" << endl;
         // BEGIN: Variables we will need
         int shipOwner = m_PersistentShip->owner;
         SpacePoint shipCenter = m_PersistentShip->LocationOn(m_Turn, t);
@@ -48,6 +46,8 @@ namespace visualizer
         shipCenter.y += *m_MapRadius;
         float shipHeading = m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270;//(m_PersistentShip->HeadingOn(m_Turn, t) == 0 ? (shipOwner ? 90 : 270) : m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270);
         float shipStealth = m_PersistentShip->StealthOn(m_Turn, t);
+        bool shipIsEMPed = m_PersistentShip->EMPedOn(m_Turn);
+        bool shipIsEMP = strcmp( "EMP", m_PersistentShip->type.c_str() ) == 0;
         
         float shipRadius = m_PersistentShip->radius;
         bool shipIsExploding = m_PersistentShip->ExplodingOn(m_Turn);
@@ -86,6 +86,12 @@ namespace visualizer
             shipTexture << "Ship-" << (m_PersistentShip->owner ? "Blue-" : "Red-") << shipType;
         }
         
+        stringstream empedTexture;
+        empedTexture << "emped-" << (m_PersistentShip->owner ? "red" : "blue"); // reversed because the enemy emps them, so it should be the ENEMY's color!
+        
+        stringstream empTexture;
+        empTexture << "emp-" << (m_PersistentShip->owner ? "blue" : "red");
+        
         // Build the Explosion Texture
         stringstream shipExplosionTexture;
         shipExplosionTexture << "explosion-" << (int)(t * 89.0f);
@@ -108,6 +114,7 @@ namespace visualizer
         Color attackColor[] = { Color(1, 0, 0, attackTrans), Color(0, 0.4f, 1, attackTrans) };
         Color healthColor = Color(0, 1, 0, (shipIsExploding? 1 - t : shipStealth) );
         Color rangeColor = shipOwner ? Color(0, 0.4f, 1, attackTrans/4.0f + 0.25f) : Color(1, 0, 0, attackTrans/4.0f + 0.25f);
+        Color normalColor = Color (1, 1, 1, 1);
         // END: Variables we will need
         
         
@@ -139,11 +146,28 @@ namespace visualizer
             game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRadius, 100, healthStart, healthEnd );
         }
         
-        // Draw Attacks
-        game->renderer->setColor( attackColor[shipOwner] );
-        for(unsigned int i = 0; i < shipAttacks.size(); i++)
+        
+        
+        if(shipIsEMPed)
         {
-            game->renderer->drawLine(shipCenter.x, shipCenter.y, shipAttacks[i].x, shipAttacks[i].y, 2); 
+            // Commented out until the isEMPd works
+            //game->renderer->setColor( normalColor );
+            //drawRotatedTexturedQuad( game, shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2, shipHeading, empedTexture.str() );
+        }
+        
+        // Draw Attacks
+        if(shipIsEMP && shipAttacks.size() > 0)
+        {
+            game->renderer->setColor( normalColor );
+            drawRotatedTexturedQuad( game, shipCenter.x - shipRange, shipCenter.y - shipRange, shipRange * 2, shipHeading, empTexture.str() );
+        }
+        else if (shipAttacks.size() > 0)
+        {
+            game->renderer->setColor( attackColor[shipOwner] );
+            for(unsigned int i = 0; i < shipAttacks.size(); i++)
+            {
+                game->renderer->drawLine(shipCenter.x, shipCenter.y, shipAttacks[i].x, shipAttacks[i].y, 2); 
+            }
         }
         
         

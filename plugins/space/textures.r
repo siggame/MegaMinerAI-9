@@ -120,3 +120,8 @@ texture explosion-87 textures/effects/explosion/explosion-88.png
 texture explosion-88 textures/effects/explosion/explosion-89.png
 texture warp-red textures/effects/red-warp.png
 texture warp-blue textures/effects/blue-warp.png
+texture emp-red textures/effects/red-emp.png
+texture emp-blue textures/effects/blue-emp.png
+texture emped-red textures/effects/red-emped.png
+texture emped-blue textures/effects/blue-emped.png
+texture planet textures/effects/planet.png

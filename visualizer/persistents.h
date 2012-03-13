@@ -107,6 +107,7 @@ namespace visualizer
             // Stats that change each turn
             vector< SpacePoint > points;
             vector< int > healths;
+            vector< bool > emps;
             
             bool ExistsAtTurn(int turn)
             {
@@ -198,6 +199,12 @@ namespace visualizer
                 
                 // h(t) = a + t(b - a)
                 return healths[PreviousTurn(turn)] + t * ( healths[turn] - healths[PreviousTurn(turn)] );
+            }
+            
+            bool EMPedOn(int turn)
+            {
+                turn -= createdAtTurn;
+                return emps[turn];
             }
             
             /*vector< SpacePoint > AttacksOn(int turn)

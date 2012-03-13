@@ -38,7 +38,7 @@ namespace visualizer
 
   void Space::preDraw()
   {
-    cout << "PRE" << endl;
+    //cout << "PRE" << endl;
   }
 
   PluginInfo Space::getPluginInfo()
@@ -101,8 +101,8 @@ namespace visualizer
     Warps[ -1 ] = vector< SmartPointer< Warp > >();
 
     // Setup the renderer as mapRadius*2 x mapRadius*2
-    renderer->setCamera( 0, 0, m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2);
-    renderer->setGridDimensions( m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2 );
+    renderer->setCamera( 0, 0, m_game->states[0].outerMapRadius * 2, m_game->states[0].outerMapRadius * 2);
+    renderer->setGridDimensions( m_game->states[0].outerMapRadius * 2, m_game->states[0].outerMapRadius * 2 );
     
     resourceManager->loadResourceFile( "./plugins/space/textures.r" );
 
@@ -112,7 +112,8 @@ namespace visualizer
 
     animationEngine->registerGame( this, this );
 
-    m_mapRadius =  m_game->states[ 0 ].mapRadius;
+    m_outerMapRadius = m_game->states[ 0 ].outerMapRadius;
+    m_innerMapRadius = m_game->states[ 0 ].innerMapRadius;
 
     timeManager->setNumTurns( m_game->states.size() );
 
@@ -133,14 +134,21 @@ namespace visualizer
           // Add the warps for this ship (so long as it is not a mine)
           if( strcmp( i->second.type, "Mine" ) != 0)
           {
-            Warps[ state - 1 ].push_back( new Warp( i->second.x + m_mapRadius, i->second.y + m_mapRadius, i->second.radius, i->second.owner, false ) );
-            Warps[ state ].push_back( new Warp( i->second.x + m_mapRadius, i->second.y + m_mapRadius, i->second.radius, i->second.owner, true ) );
+            Warps[ state - 1 ].push_back( new Warp( i->second.x + m_outerMapRadius, i->second.y + m_outerMapRadius, i->second.radius, i->second.owner, false ) );
+            Warps[ state ].push_back( new Warp( i->second.x + m_outerMapRadius, i->second.y + m_outerMapRadius, i->second.radius, i->second.owner, true ) );
           }
         }
 
         // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
         m_PersistentShips[shipID]->points.push_back( SpacePoint( i->second.x, i->second.y ) );
         m_PersistentShips[shipID]->healths.push_back( i->second.health );
+        if(!i->second.isEMPd)
+        {
+            cout << "Something wasn't EMPed!\n";
+        }
+        //cout << "EMPED: " << (i->second.isEMPd ? "true" : "false") << endl;
+        //cout << "STEALTH: " << (i->second.isStealthed ? "true" : "false") << endl;
+        m_PersistentShips[shipID]->emps.push_back( i->second.isEMPd );
 
         // Check for this ship's animations in the gamelog
         for
@@ -185,7 +193,10 @@ namespace visualizer
 
       // Add and draw the background
       SmartPointer<Background> background = new Background();
-      background->addKeyFrame( new DrawBackground() );
+      background->outerRadius = m_outerMapRadius;
+      background->innerRadius = m_innerMapRadius;
+      background->turn = state;
+      background->addKeyFrame( new DrawBackground( background ) );
       turn.addAnimatable( background );
 
       // Add each Warp to be drawn
@@ -214,7 +225,7 @@ namespace visualizer
         {
           // Then and and draw it
           SmartPointer<PersistentShipAnim> ship = new PersistentShipAnim();
-          ship->addKeyFrame( new DrawPersistentShip( iter->second, state, &m_mapRadius ) );
+          ship->addKeyFrame( new DrawPersistentShip( iter->second, state, &m_outerMapRadius ) );
           turn.addAnimatable( ship );
         }
       }
