@@ -63,6 +63,7 @@ ShipType = Model('ShipType',
   )
 
 move = Animation('move',
+<<<<<<< HEAD
   data=[Variable('actingID', int),
     Variable('fromX', int),
     Variable('fromY', int),

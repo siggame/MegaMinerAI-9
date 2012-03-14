@@ -55,11 +55,11 @@ std::ostream& operator<<(std::ostream& stream, Ship ob)
 std::ostream& operator<<(std::ostream& stream, move ob)
 {
   stream << "move" << "\n";
+  stream << "acting: " << ob.acting  <<'\n';
   stream << "fromX: " << ob.fromX  <<'\n';
   stream << "fromY: " << ob.fromY  <<'\n';
   stream << "toX: " << ob.toX  <<'\n';
   stream << "toY: " << ob.toY  <<'\n';
-  stream << "acting: " << ob.acting  <<'\n';
   return stream;
 }
 
