@@ -71,11 +71,11 @@ struct Animation
 
 struct move : public Animation
 {
+  int acting;
   int fromX;
   int fromY;
   int toX;
   int toY;
-  int acting;
 
   friend std::ostream& operator<<(std::ostream& stream, move obj);
 };

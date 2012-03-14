@@ -294,6 +294,13 @@ static bool parseMove(move& object, sexp_t* expression)
     cerr << "Error in parsemove.\n Parsing: " << *expression << endl;
     return false;
   }
+  object.acting = atoi(sub->val);
+  sub = sub->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parsemove.\n Parsing: " << *expression << endl;
+    return false;
+  }
   object.fromX = atoi(sub->val);
   sub = sub->next;
   if( !sub ) 
@@ -316,13 +323,6 @@ static bool parseMove(move& object, sexp_t* expression)
     return false;
   }
   object.toY = atoi(sub->val);
-  sub = sub->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parsemove.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.acting = atoi(sub->val);
   sub = sub->next;
   return true;
 

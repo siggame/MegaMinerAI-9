@@ -200,7 +200,6 @@ class Ship:
         ship.attacksLeft = -1
         ship.movementLeft = -1 
         ship.isEMPd == True        
-        #Yo, Vis guys, how you want us do this?
         self.game.animations.append(['attack',self.id,ship.id])
         return True
     elif target.owner == self.owner:
