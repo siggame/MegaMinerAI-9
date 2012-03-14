@@ -104,7 +104,7 @@ namespace visualizer
     renderer->setCamera( 0, 0, m_game->states[0].outerMapRadius * 2, m_game->states[0].outerMapRadius * 2);
     renderer->setGridDimensions( m_game->states[0].outerMapRadius * 2, m_game->states[0].outerMapRadius * 2 );
     
-    resourceManager->loadResourceFile( "./plugins/space/textures.r" );
+    resourceManager->loadResourceFile( "./plugins/space/resources.r" );
 
     int p = programs["test"] = renderer->createShaderProgram();
     renderer->attachShader( p, "testShader" );
