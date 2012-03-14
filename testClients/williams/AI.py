@@ -226,8 +226,8 @@ class AI(BaseAI):
       #If in range and not a mine
       if self.getRange(ship.getX(),ship.getY(),ship.getRange(),enemy.getX(),enemy.getY(),enemy.getRadius()) and enemy.getType() != "Mine" \
       and enemy not in attackedList:
-        attackList.append(enemy)
-               
+        attackList.append(enemy) 
+    stacked = len(attackedList)        
     if ship.getType() == "EMP" and len(attackList) > 2:
       ship.attack(ship)
     else:
@@ -248,7 +248,7 @@ class AI(BaseAI):
           attackList.remove(target)
       del attackList[0:len(attackList)]
       
-    if len(attackList) > 5:
+    if stacked > 5:
       self.blowUp(ship)
       
     return [attacksLeft, attackedList]
@@ -259,6 +259,9 @@ class AI(BaseAI):
     ship.move(move[0],move[1])
     if self.getRange(move[0],move[1],ship.getRadius(), points[0], points[1], 30):
       ship.selfDestruct()
+      for enemy in theirShips:
+        if getRange(move[0],move[1],ship.getRadius(), enemy.getX(), enemy.getY(), enemy.getRadius()):
+          shipHealth[enemy.getId()] -= ship.getSelfDestructDamage()
               
   def init(self):      
     pass

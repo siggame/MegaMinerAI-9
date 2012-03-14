@@ -63,7 +63,8 @@ ShipType = Model('ShipType',
   )
 
 move = Animation('move',
-  data=[ Variable('acting', Ship),
+<<<<<<< HEAD
+  data=[Variable('actingID', int),
     Variable('fromX', int),
     Variable('fromY', int),
     Variable('toX', int),
@@ -73,32 +74,32 @@ move = Animation('move',
 
 attack = Animation('attack',
   data=[
-    Variable('acting', Ship),
-    Variable('target', Ship),
+    Variable('actingID', int),
+    Variable('targetID', int),
     ],
   )
   
 selfDestruct = Animation ('selfDestruct' ,
   data=[
-    Variable('acting', Ship),
+    Variable('actingID', int),
     ],
   )
 
 stealth = Animation('stealth',
   data=[
-    Variable('acting', Ship),
+    Variable('actingID', int),
     ],
   )
   
-#playerTalk = Animation('playerTalk',
-#  data=[
-#    Variable('acting', Player),
-#    Variable('message', str),
-#    ],
-#  )
+playerTalk = Animation('playerTalk',
+  data=[
+    Variable('actingID', int),
+    Variable('message', str),
+    ],
+  )
 
 deStealth = Animation('deStealth',
   data=[
-    Variable('acting', Ship),
+    Variable('actingID', int),
     ],
   )
