@@ -32,6 +32,7 @@ namespace visualizer
             void destroy();
 
             void preDraw();
+            void postDraw();
 
             void addCurrentBoard();
     

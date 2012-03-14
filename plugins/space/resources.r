@@ -28,7 +28,6 @@ texture Ship-Blue-Support textures/ships/blue/support.png
 texture Ship-Blue-Stealth textures/ships/blue/stealth.png
 texture Ship-Blue-Warp-Gate textures/ships/blue/warp-gate.png
 texture Ship-Blue-Weapons-Platform textures/ships/blue/weapons-platform.png
-fshader testShader shaders/shockwave.frag
 texture explosion-0 textures/effects/explosion/explosion-1.png
 texture explosion-1 textures/effects/explosion/explosion-2.png
 texture explosion-2 textures/effects/explosion/explosion-3.png
@@ -125,3 +124,5 @@ texture emp-blue textures/effects/blue-emp.png
 texture emped-red textures/effects/red-emped.png
 texture emped-blue textures/effects/blue-emped.png
 texture planet textures/effects/planet.png
+fshader testShader shaders/shockwave.frag
+fshader post1 shaders/post.frag

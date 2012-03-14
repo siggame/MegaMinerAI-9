@@ -41,6 +41,20 @@ namespace visualizer
     //cout << "PRE" << endl;
   }
 
+  void Space::postDraw()
+  {
+    if( renderer->fboSupport() )
+    {
+      renderer->useShader( programs["post"] ); 
+#if 1
+      renderer->swapFBO();
+#endif
+      renderer->useShader( 0 );
+
+    }
+  }
+
+
   PluginInfo Space::getPluginInfo()
   {
     PluginInfo i;
@@ -108,6 +122,10 @@ namespace visualizer
 
     int p = programs["test"] = renderer->createShaderProgram();
     renderer->attachShader( p, "testShader" );
+    renderer->buildShaderProgram( p );
+
+    p = programs["post"] = renderer->createShaderProgram();
+    renderer->attachShader( p, "post1" );
     renderer->buildShaderProgram( p );
 
     animationEngine->registerGame( this, this );
