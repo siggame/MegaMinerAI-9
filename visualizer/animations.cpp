@@ -151,8 +151,8 @@ namespace visualizer
         if(shipIsEMPed)
         {
             // Commented out until the isEMPd works
-            //game->renderer->setColor( normalColor );
-            //drawRotatedTexturedQuad( game, shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2, shipHeading, empedTexture.str() );
+            game->renderer->setColor( normalColor );
+            drawRotatedTexturedQuad( game, shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2, shipHeading, empedTexture.str() );
         }
         
         // Draw Attacks

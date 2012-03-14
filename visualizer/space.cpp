@@ -142,10 +142,6 @@ namespace visualizer
         // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
         m_PersistentShips[shipID]->points.push_back( SpacePoint( i->second.x, i->second.y ) );
         m_PersistentShips[shipID]->healths.push_back( i->second.health );
-        if(!i->second.isEMPd)
-        {
-            cout << "Something wasn't EMPed!\n";
-        }
         //cout << "EMPED: " << (i->second.isEMPd ? "true" : "false") << endl;
         //cout << "STEALTH: " << (i->second.isStealthed ? "true" : "false") << endl;
         m_PersistentShips[shipID]->emps.push_back( i->second.isEMPd );
