@@ -63,11 +63,11 @@ ShipType = Model('ShipType',
   )
 
 move = Animation('move',
-  data=[ Variable('fromX', int),
+  data=[ Variable('acting', Ship),
+    Variable('fromX', int),
     Variable('fromY', int),
     Variable('toX', int),
     Variable('toY', int),
-    Variable('acting', Ship),
     ],
   )
 
