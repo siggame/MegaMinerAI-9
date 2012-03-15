@@ -26,10 +26,16 @@ namespace visualizer
     m_game = 0;
 
     // free up all the memory from the PersistentShips
-    for (std::map< int, PersistentShip* >::iterator iter = m_PersistentShips.begin(); iter != m_PersistentShips.end(); ++iter)
+    for ( auto& i : m_PersistentShips )
+    {
+      delete i.second;
+    }
+#if 0
+    for (auto iter = m_PersistentShips.begin(); iter != m_PersistentShips.end(); ++iter)
     {
       delete iter->second;
     }
+#endif
 
     m_PersistentShips.clear();
     programs.clear();

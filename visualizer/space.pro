@@ -24,4 +24,7 @@ QMAKE_LFLAGS_RELEASE += -shared -Wl
 DEFINES += YY_NO_UNISTD_H PERFT_FAST
 DESTDIR = ../plugins/
 
+QMAKE_CXXFLAGS += -std=c++0x
+QMAKE_CXXFLAGS_DEBUG += -std=c++0x
+
 QT += opengl
