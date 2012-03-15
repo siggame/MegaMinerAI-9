@@ -15,11 +15,9 @@ priorityList = {"Battleship" : 6.5,"Juggernaut" : 4,"Mine Layer" : 8.5,"Support"
 
 
 #FEATURE LIST:
-  #Handle minefields
   #Move to support ships
   #Figure out freezing issue
-  #Optimize code
-        
+  #Optimize code       
     
 class AI(BaseAI):
   """The class implementing gameplay logic."""
@@ -55,7 +53,8 @@ class AI(BaseAI):
   def moveToInjured(self, ship):
     weakestShip = myShips[0]
     for myShip in myShips:
-      if myShip.getHealth() < weakestShip.getHealth() and myShip.getId() != ship.getId() and myShip.getType() != "Mine":
+      if (myShip.getHealth()/myShip.getMaxHealth())  < (weakestShip.getHealth() / weakestShip.getMaxHealth()) and myShip.getId() != ship.getId() \
+      and myShip.getType() != "Mine":
         weakestShip = myShip
     move = self.moveTo(ship, weakestShip.getX(), weakestShip.getY(), locs, detonate)
     if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) <= ship.getMovementLeft():
@@ -358,14 +357,10 @@ class AI(BaseAI):
     defensiveLayer = False
       
     for ship in myShips:
-      #Mines do nothing
-      if ship.getType() == "Mine":
-        break
       #If a ship is below 25% health, find the nearest enemy and self destruct
       if ship.getHealth() <= (ship.getMaxHealth()*.25) and ship.getType() != "Warp Gate":
         self.attackAllInRange(ship, ship.getAttacksLeft(), []) 
         self.blowUp(ship)
-        break
       #General ship type. Move to highest priority target and attack
       elif ship.getType() == "Interceptor" or ship.getType() == "Bomber" or ship.getType() == "Cruiser" or \
       ship.getType() == "Juggernaut" or ship.getType() == "EMP" or ship.getType() == "Battleship" \
