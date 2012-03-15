@@ -9,6 +9,7 @@ myPlayer = []
 foePlayer = []
 allTypes = ['Warp Gate', 'Battleship','Juggernaut', 'Mine Layer', 'Support', 'EMP', 'Stealth', 'Cruiser','Weapons Platform', 'Interceptor', 'Bomber','Mine']
 myShips = []
+numPoints = 50
 
 class AI(BaseAI):
   """The class implementing gameplay logic."""
@@ -113,9 +114,9 @@ class AI(BaseAI):
   
   def warpControl(self,enemyListDict,myListDict):
     for w in myListDict['Warp Gate']:
-      self.smartWarp(w)
+ #     self.smartWarp(w)
       nearest = self.findNearest(w,enemyShips)
-      self.moveAway(w,nearest)
+      self.moveTo(w,w.getX(),w.getY(),nearest.getX(),nearest.getY(),w.getMaxMovement())
   
   def batShipControl(self,enemyListDict,myListDict):
     #Move towards enemy warp gate. if not in range of warp gate, attack enemy with most health that you can kill
@@ -253,7 +254,7 @@ class AI(BaseAI):
     if dist > maxMove:
       dx = int(math.copysign(maxMove/2,dx))
       dy = int(math.copysign(maxMove/2,dy))
-    if abs(dx)+abs(dy)>0 and ((ship.getX()+abs(dx))**2 + (ship.getX()+abs(dy))**2) <= self.mapRadius()**2:
+    if abs(dx)+abs(dy)>0 and ((ship.getX()+abs(dx))**2 + (ship.getX()+abs(dy))**2) <= self.outerMapRadius()**2:
       ship.move(ship.getX()+dx,ship.getY()+dy)
     maxMove-=dist
     
@@ -277,10 +278,48 @@ class AI(BaseAI):
         target = ship    
     return target
                 
-  def moveInRange(self,ship,target):
-#    maxMove = ship.getMaxMovement()
-#    while maxMove > 0 and not inRange(ship.getX(),ship.getY(),ship.getRange(),target.getX(),target.getY(),target.getRadius):
-    pass
+  def moveTo(self,ship,fromX,fromY,toX,toY,movement):
+      dx = toX-fromX; dy = toY-fromY
+      while movement > 0 and abs(toX-fromX)+abs(toY-fromY)>0:
+        if abs(dx+dy)>movement+1:
+          dx/=2
+          dy/=2
+          print "halving dx,dy, movement ",dx,dy,movement
+          if dx == -1 and dy == -1 and movement == 1:
+            break
+        else:
+            newX = fromX+dx; newY = fromY+dy
+#            print "NEWX, NEWY",newX,newY
+            if abs(newX)+abs(newY) < self.innerMapRadius():
+              print "moving out of inner"
+              newX,newY = self.farthestPoint(0,0,movement,self.innerMapRadius(),fromX,fromY)
+              movement-=abs(fromX-newX)+abs(fromY-newY);fromX=newX; fromY=newY; 
+              ship.move(newX,newY)
+            elif abs(newX)+abs(newY) > self.outerMapRadius():
+              print "moving out of outer"
+              newX,newY = self.farthestPoint(0,0,movement,self.outerMapRadius(),fromX,fromY)
+              fromX=newX; fromY=newY; movement-=abs(fromX-newX)+abs(fromY-newY)
+              ship.move(newX,newY)
+            else:
+              mines = self.mines(ship.getOwner()^1,enemyShips)
+              if len(mines)>0:
+                for mine in mines:
+                  if abs(fromX-mine.getX())+abs(fromY-mine.getY())<=(ship.getRadius()+mine.getRange()):
+                    print "avoiding mines"
+                    newX,newY = self.farthestPoint(mine.getX(),mine.getY(),movement,mine.getRange(),fromX,fromY)
+                    fromX=newX; fromY=newY; movement-=abs(fromX-newX)+abs(fromY-newY)
+                    ship.move(newX,newY)                           
+                  else:
+#                    print "easy move"
+                    ship.move(newX,newY)
+                    fromX+=dx; fromY+=dy
+                    movement -=abs(dx+dy)
+              else: 
+#                print "easier move"
+                ship.move(newX,newY)
+                fromX+=dx; fromY+=dy
+                movement -=abs(dx+dy)
+                                                                         
   
   def moveAway(self,ship,target):
      maxMove = ship.getMaxMovement()
@@ -292,7 +331,7 @@ class AI(BaseAI):
        dy = int(math.copysign(maxMove/2,dy))
      totX = (ship.getX()+dx)**2
      totY = (ship.getY()+dy)**2
-     if abs(dx)+abs(dy)> 0 and totX + totY <= self.mapRadius()**2:
+     if abs(dx)+abs(dy)> 0 and totX + totY <= self.outerMapRadius()**2:
        ship.move(ship.getX()+dx,ship.getY()+dy)
        maxMove-=dist
                                               
@@ -360,7 +399,7 @@ class AI(BaseAI):
          break
      return                                                                   
               
-                                                                                                                                                                                                                                                                                     
+#TODO have it return a list, or take a list of attackable targets                                                                                                                                                                                                                                                                                     
   #goes through all enemies in range, and returns the a list of the enemy whose current health is closest to, but less than, that ships damage. 
   #If no such enemy fits this (i.e., no enemey has less health than damage), returns a list of the enemy with lowest health
   def bestUseAttack(self,ship):
@@ -397,7 +436,61 @@ class AI(BaseAI):
         self.moveToTarget(ship,target)
         ship.selfDestruct()
     return 
-             
+               
+  def findPoints(self,centerX,centerY,radius,n):
+      pi = 3.14159265
+      #angles = [0,pi/6,pi/4,pi/3,pi/2,2*pi/3,3*pi/4,5*pi/6,pi,7*pi/6,5*pi/4,4*pi/3,3*pi/2,5*pi/3,7*pi/4,11*pi/6]
+      Xval = [(int(math.floor((centerX + math.cos(2*pi/n*x)*radius)))) for x in xrange(0,n+1)]
+#      Xval = []
+      Yval = [(int(math.floor((centerY + math.sin(2*pi/n*x)*radius)))) for x in xrange(0,n+1)]
+#      Yval = []
+#      for i in angles:
+#        Xval.append(centerX+radius*math.cos(i))
+#        Yval.append(centerY+radius*math.sin(i))
+#        print "HERE ARE THE POINTS ",centerX,centerY,radius,i,math.cos(i)
+#        print centerX+radius*math.cos(i)
+#        print centerY+radius*math.sin(i)
+      return Xval,Yval      
+  
+  def farthestPoint(self,centerX,centerY,movement,radius,shipX,shipY):
+    xPoints,yPoints = self.findPoints(centerX,centerY,radius,numPoints)
+    distance = 0
+    for i in range(len(xPoints)):
+      xP = int(xPoints[i]); yP = int(yPoints[i])
+      newDis = self.distance(shipX,centerX+xP,shipY,centerY+yP)
+      print "NEW DISTANCE",newDis
+      #Ydis = abs(shipX-math.sqrt((centerX+xP)**2))
+      #Ydis = abs(shipY-math.sqrt((centerY+yP)**2))
+#      print "shipX,shipY",shipX,shipY,"Xdis,Ydis",Xdis,Ydis,"movment",movement
+#      print "center x is",centerX,"center y is",centerY,"xP is",xP,"yP is",yP,"travel distance is", abs(shipX-(centerX+xP)) + abs(shipY-(centerY+yP)), "compared to current distance",distance,"movement is",movement
+      if newDis > distance and newDis <= movement:
+      #if abs(shipX-(centerX+xP)) + abs(shipY-(centerY+yP)) > distance and abs(shipX-(centerX+xP)) + abs(shipY-(centerY+yP)) <= movement:
+        newX = xP
+        newY = yP
+        distance = newDis
+        print "setting distance to ",distance
+    return newX,newY
+    
+#  def checkMove(self,ship,x,y,movement):
+#    if x**2 + y**2 < self.innerMapRadius():
+#      newX,newY = self.farthesPoint(x,y,movement,self.innerMapRadius())
+#      movement-=abs(x-newX)+abs(y-newY)
+#      ship.move(newX,newY)
+#      return False
+#    elif x**2 + y**2 > self.outerMapRadius():
+#      newX,newY = self.farthestPoint(x,y,movement,self.outerMapRadius())
+#      movement-=abs(x-newX)+abs(y-newY)
+#      ship.move(newX,newY)
+#      return False
+#    mines = self.mines(ship.getOwner()^1,enemyShips)
+#    for mine in mines:
+#      if abs(x-mine.getX())+abs(y-mine.getY())<=(ship.getRadius()+mine.getRange()):
+#        newX,newY = self.farthesPoint(x,y,movement,mine.getRange())
+#        movement-=abs(x-newX)+abs(y-newY)
+#        ship.move(newX,newY)
+#        return False
+#    return True
+  
   def run(self):
     #Gah, so many ships
     types=[]; warps=[]; batShips=[]; juggs=[]; mineLayers=[]; supports=[]; mines = []
