@@ -8,10 +8,10 @@ gameName = "Space"
 globals = [ Variable('turnNumber', int, 'How many turns it has been since the beginning of the game'),
   Variable('playerID', int, 'Player Number; either 0 or 1'),
   Variable('gameNumber', int, 'What number game this is for the server'),
-  Variable('round',int,'What round you are in the match'),
+  Variable('round',int,'The current round of the match'),
   Variable('victoriesNeeded', int,'How many victories a player needs to win'),
   Variable('innerMapRadius',int,'The inner radius of the map.  Center of screen is (0,0), with +x right, +y up'),
-  Variable('outerMapRadius',int,'The outer radius of the map.  Center of screen is (0,0), with +x right, +y up')
+  Variable('outerMapRadius',int,'The outer radius of the map.  Center of screen is (0,0), with +x right, +y up'),
 ]
 
 constants = [
@@ -23,26 +23,24 @@ playerData = [
   ]
 
 playerFunctions = [
-  Function('talk', [Variable('message', str)], doc='Allows a player to display messages on the screen')
+  Function('talk', [Variable('message', str)], doc='Allows a player to display messages on the screen'),
   ]
 
 Ship = Model('Ship',
-  data=[ Variable('owner', int, 'The owner of the piece'),
-    Variable('x', int, 'Position x'),
-    Variable('y', int, 'Position y'),
-    Variable('radius', int, 'Ship size radius'),
+  data=[ Variable('owner', int, 'The owner of the ship'),
+    Variable('x', int, 'X position of the ship'),
+    Variable('y', int, 'Y position of the ship'),
+    Variable('radius', int, 'The radius of the ship'),
     Variable('type', str, 'The ship type'),
-	  Variable('attacksLeft', int, 'How many more attacks it has'),
-	  Variable('movementLeft', int, 'How much more movement it has'),
-	  Variable('maxMovement', int, 'The largest possible movement'),
-	  Variable('maxAttacks', int, 'The max number of attacks it has'),
-	  Variable('damage', int, 'The strength of its attacks'),
-	  Variable('range', int, 'The range of its attacks'),
+	  Variable('attacksLeft', int, 'How many more attacks this ship has'),
+	  Variable('movementLeft', int, 'How much more movement this ship has'),
+	  Variable('maxMovement', int, 'The largest possible movement for this ship'),
+	  Variable('maxAttacks', int, 'The max number of attacks for this ship'),
+	  Variable('damage', int, 'The strength of attacks for this ship'),
+	  Variable('range', int, 'The range of attacks for this ship'),
 	  Variable('health', int, 'The total health of the ship'),
 	  Variable('maxHealth', int, 'The max health possible for the ship'),
-	  Variable('selfDestructDamage', int, 'The amount of damage done when this ship blows up'),
-    Variable('isStealthed', int, 'Tells whether or not the ship is stealthed'),
-    Variable('isEMPd', int, 'Tells whether or not this ship is EMPd'),
+	  Variable('selfDestructDamage', int, 'The amount of damage done when this ship self destructs'),
     ],
   doc='A space ship!',
   functions=[ 
@@ -90,12 +88,12 @@ stealth = Animation('stealth',
     ],
   )
   
-playerTalk = Animation('playerTalk',
-  data=[
-    Variable('actingID', int),
-    Variable('message', str),
-    ],
-  )
+#playerTalk = Animation('playerTalk',
+  #data=[
+    #Variable('actingID', int),
+    #Variable('message', str),
+    #],
+  #)
 
 deStealth = Animation('deStealth',
   data=[

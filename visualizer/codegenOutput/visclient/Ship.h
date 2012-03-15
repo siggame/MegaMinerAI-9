@@ -21,38 +21,34 @@ class Ship {
   // Accessors
   ///Unique Identifier
   int id();
-  ///The owner of the piece
+  ///The owner of the ship
   int owner();
-  ///Position x
+  ///X position of the ship
   int x();
-  ///Position y
+  ///Y position of the ship
   int y();
-  ///Ship size radius
+  ///The radius of the ship
   int radius();
   ///The ship type
   char* type();
-  ///How many more attacks it has
+  ///How many more attacks this ship has
   int attacksLeft();
-  ///How much more movement it has
+  ///How much more movement this ship has
   int movementLeft();
-  ///The largest possible movement
+  ///The largest possible movement for this ship
   int maxMovement();
-  ///The max number of attacks it has
+  ///The max number of attacks for this ship
   int maxAttacks();
-  ///The strength of its attacks
+  ///The strength of attacks for this ship
   int damage();
-  ///The range of its attacks
+  ///The range of attacks for this ship
   int range();
   ///The total health of the ship
   int health();
   ///The max health possible for the ship
   int maxHealth();
-  ///The amount of damage done when this ship blows up
+  ///The amount of damage done when this ship self destructs
   int selfDestructDamage();
-  ///Tells whether or not the ship is stealthed
-  int isStealthed();
-  ///Tells whether or not this ship is EMPd
-  int isEMPd();
 
   // Actions
   ///Command a ship to move to a specified position

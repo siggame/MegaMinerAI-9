@@ -261,24 +261,6 @@ static bool parseShip(Ship& object, sexp_t* expression)
   object.selfDestructDamage = atoi(sub->val);
   sub = sub->next;
 
-  if ( !sub ) 
-  {
-    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.isStealthed = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.isEMPd = atoi(sub->val);
-  sub = sub->next;
-
   return true;
 
 }
@@ -294,7 +276,7 @@ static bool parseMove(move& object, sexp_t* expression)
     cerr << "Error in parsemove.\n Parsing: " << *expression << endl;
     return false;
   }
-  object.acting = atoi(sub->val);
+  object.actingID = atoi(sub->val);
   sub = sub->next;
   if( !sub ) 
   {
@@ -338,7 +320,7 @@ static bool parseSelfDestruct(selfDestruct& object, sexp_t* expression)
     cerr << "Error in parseselfDestruct.\n Parsing: " << *expression << endl;
     return false;
   }
-  object.acting = atoi(sub->val);
+  object.actingID = atoi(sub->val);
   sub = sub->next;
   return true;
 
@@ -354,14 +336,14 @@ static bool parseAttack(attack& object, sexp_t* expression)
     cerr << "Error in parseattack.\n Parsing: " << *expression << endl;
     return false;
   }
-  object.acting = atoi(sub->val);
+  object.actingID = atoi(sub->val);
   sub = sub->next;
   if( !sub ) 
   {
     cerr << "Error in parseattack.\n Parsing: " << *expression << endl;
     return false;
   }
-  object.target = atoi(sub->val);
+  object.targetID = atoi(sub->val);
   sub = sub->next;
   return true;
 
@@ -377,7 +359,7 @@ static bool parseStealth(stealth& object, sexp_t* expression)
     cerr << "Error in parsestealth.\n Parsing: " << *expression << endl;
     return false;
   }
-  object.acting = atoi(sub->val);
+  object.actingID = atoi(sub->val);
   sub = sub->next;
   return true;
 
@@ -393,7 +375,7 @@ static bool parseDeStealth(deStealth& object, sexp_t* expression)
     cerr << "Error in parsedeStealth.\n Parsing: " << *expression << endl;
     return false;
   }
-  object.acting = atoi(sub->val);
+  object.actingID = atoi(sub->val);
   sub = sub->next;
   return true;
 
