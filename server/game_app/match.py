@@ -95,7 +95,7 @@ class Match(DefaultGameWorld):
     for player in self.objects.players:
       #Give players energy initially each round
       player.energy = self.startEnergy
-      player.warpGate = self.addObject(Ship, [player.id, (player.id * 2 - 1) * self.outerMapRadius / 2, 0] + self.warpGate + [False, False]).id
+      player.warpGate = self.addObject(Ship, [player.id, (player.id * 2 - 1) * self.outerMapRadius / 2, 0] + self.warpGate).id
     
     # Ensure you have at least 5 ships in the chain
     if len(self.shipChain) < self.shipsPerRound:

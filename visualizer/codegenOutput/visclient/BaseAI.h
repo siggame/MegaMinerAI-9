@@ -34,7 +34,7 @@ public:
   int playerID();
   ///What number game this is for the server
   int gameNumber();
-  ///What round you are in the match
+  ///The current round of the match
   int round();
   ///How many victories a player needs to win
   int victoriesNeeded();

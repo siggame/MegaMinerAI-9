@@ -57,25 +57,25 @@ class Ship
     validify();
     return Client.INSTANCE.shipGetId(ptr);
   }
-  ///The owner of the piece
+  ///The owner of the ship
   public int getOwner()
   {
     validify();
     return Client.INSTANCE.shipGetOwner(ptr);
   }
-  ///Position x
+  ///X position of the ship
   public int getX()
   {
     validify();
     return Client.INSTANCE.shipGetX(ptr);
   }
-  ///Position y
+  ///Y position of the ship
   public int getY()
   {
     validify();
     return Client.INSTANCE.shipGetY(ptr);
   }
-  ///Ship size radius
+  ///The radius of the ship
   public int getRadius()
   {
     validify();
@@ -87,37 +87,37 @@ class Ship
     validify();
     return Client.INSTANCE.shipGetType(ptr);
   }
-  ///How many more attacks it has
+  ///How many more attacks this ship has
   public int getAttacksLeft()
   {
     validify();
     return Client.INSTANCE.shipGetAttacksLeft(ptr);
   }
-  ///How much more movement it has
+  ///How much more movement this ship has
   public int getMovementLeft()
   {
     validify();
     return Client.INSTANCE.shipGetMovementLeft(ptr);
   }
-  ///The largest possible movement
+  ///The largest possible movement for this ship
   public int getMaxMovement()
   {
     validify();
     return Client.INSTANCE.shipGetMaxMovement(ptr);
   }
-  ///The max number of attacks it has
+  ///The max number of attacks for this ship
   public int getMaxAttacks()
   {
     validify();
     return Client.INSTANCE.shipGetMaxAttacks(ptr);
   }
-  ///The strength of its attacks
+  ///The strength of attacks for this ship
   public int getDamage()
   {
     validify();
     return Client.INSTANCE.shipGetDamage(ptr);
   }
-  ///The range of its attacks
+  ///The range of attacks for this ship
   public int getRange()
   {
     validify();
@@ -135,23 +135,11 @@ class Ship
     validify();
     return Client.INSTANCE.shipGetMaxHealth(ptr);
   }
-  ///The amount of damage done when this ship blows up
+  ///The amount of damage done when this ship self destructs
   public int getSelfDestructDamage()
   {
     validify();
     return Client.INSTANCE.shipGetSelfDestructDamage(ptr);
-  }
-  ///Tells whether or not the ship is stealthed
-  public int getIsStealthed()
-  {
-    validify();
-    return Client.INSTANCE.shipGetIsStealthed(ptr);
-  }
-  ///Tells whether or not this ship is EMPd
-  public int getIsEMPd()
-  {
-    validify();
-    return Client.INSTANCE.shipGetIsEMPd(ptr);
   }
 
 }

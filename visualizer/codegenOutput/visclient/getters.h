@@ -42,8 +42,6 @@ DLLEXPORT int shipGetRange(_Ship* ptr);
 DLLEXPORT int shipGetHealth(_Ship* ptr);
 DLLEXPORT int shipGetMaxHealth(_Ship* ptr);
 DLLEXPORT int shipGetSelfDestructDamage(_Ship* ptr);
-DLLEXPORT int shipGetIsStealthed(_Ship* ptr);
-DLLEXPORT int shipGetIsEMPd(_Ship* ptr);
 
 
 
