@@ -339,8 +339,6 @@ void parseShip(Connection* c, _Ship* object, sexp_t* expression)
   sub = sub->next;
   object->selfDestructDamage = atoi(sub->val);
   sub = sub->next;
-  sub = sub->next;
-  sub = sub->next;
 
 }
 

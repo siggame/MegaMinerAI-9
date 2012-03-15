@@ -42,7 +42,7 @@ class Player:
 
 
 class Ship:
-  def __init__(self, game, id, owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, range, health, maxHealth, selfDestructDamage, isStealthed, isEMPd):
+  def __init__(self, game, id, owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, range, health, maxHealth, selfDestructDamage):
     self.game = game
     self.id = id
     self.owner = owner
@@ -59,8 +59,7 @@ class Ship:
     self.health = health
     self.maxHealth = maxHealth
     self.selfDestructDamage = selfDestructDamage
-    self.isStealthed = isStealthed
-    self.isEMPd = isEMPd
+    self.isStealthed = False
     self.targeted = set()
 
   def toList(self):
@@ -80,8 +79,6 @@ class Ship:
       self.health,
       self.maxHealth,
       self.selfDestructDamage,
-      self.isStealthed,
-      self.isEMPd,
       ]
     return value
     
@@ -99,7 +96,6 @@ class Ship:
     for warp in self.game.objects.players[self.game.playerID].warping:
       #Uses a list of ship values in the config to get all of the ships stats
       shipStats = [cfgUnits[warp[0]][value] for value in self.game.ordering] 
-      shipStats.extend([False, False])
       #Adds the ship with the retreived stats to the game
       self.game.addObject(Ship, [self.game.playerID, warp[1], warp[2]] + shipStats)
       #Remove the created ship from the queue
@@ -110,20 +106,20 @@ class Ship:
     #Healing other ships in range of engineering ship      
     if self.owner != self.game.playerID and self.type == "Support":
       for healed in self.allInRange(self.owner):
-        healed.health += healed.maxHealth * self.damage / 100.0
-        if healed.health > healed.maxHealth:
-          healed.health = healed.maxHealth
+        if healed.id != self.id:
+          healed.health += healed.maxHealth * self.damage / 100.0
+          if healed.health > healed.maxHealth:
+            healed.health = healed.maxHealth
           
     if self.owner == self.game.playerID:
       if self.movementLeft == -1 and self.attacksLeft == -1:
         self.movementLeft = 0
         self.attacksLeft = 0
       else:
-        self.isEMPd == False
         self.movementLeft = self.maxMovement         
         self.attacksLeft = self.maxAttacks
-      if self.isStealthed == False:
-        self.isStealthed == True
+      if self.type == "Stealth":
+        self.isStealthed = True
                     
   def move(self, x, y):
     if self.owner != self.game.playerID:
@@ -131,6 +127,8 @@ class Ship:
     #moved is the distance they've moved, where they were to where they're going
     moved = distance(self.x, x, self.y, y)       
     #if they're trying to move outside the map
+    #if inRange(self.x, self.y, self.radius, x, y, self.game.innerMapRadius):
+      #return "You don't want to fly into the planet!"
     if x**2 + y**2 > self.game.outerMapRadius**2:
       return "You don't want to move out of the map, you'd be lost in Space"
     elif x**2 + y**2 < self.game.innerMapRadius**2:
@@ -143,7 +141,7 @@ class Ship:
       return "Must move somewhere"
     
     #successful move, yay! 
-    self.game.animations.append(['move', self.x, self.y, x, y, self.id]) #move animation for those visualizer guys
+    self.game.animations.append(['move', self.id, self.x, self.y, x, y]) #move animation for those visualizer guys
     self.x = x
     self.y = y
     self.movementLeft -= moved
@@ -154,7 +152,7 @@ class Ship:
         if inRange(x,y,self.radius,unit.x,unit.y,unit.range):
           for attacked in self.allInRange(self.owner):
             attacked.health -= unit.damage
-            self.game.animations.append(['attack', unit, attacked])
+            self.game.animations.append(['attack', unit.id, attacked.id])
             if attacked.health <= 0 and attacked.id in self.game.objects:
               self.game.removeObject(attacked)
           self.game.removeObject(unit)
@@ -184,13 +182,13 @@ class Ship:
       return "Ship %i has no attacks left"%(self.id)
     if target.id in self.targeted and self.type == "Mine Layer":# and target.id == self.id:
        return "A mine layer can only lay one mine per turn"
-#       return "This Mine Layer %i has already laid a mine this turn"(self.id)
+       #return "This Mine Layer %i has already laid a mine this turn"(self.id)
     if target.id in self.targeted:
       return "You have already commanded %i to attack %i"%(self.id, target.id)
     if self.type == "Mine Layer" and self.id == target.id:   
       #Adding a new mine to the game
       shipStats = [cfgUnits["Mine"][value] for value in self.game.ordering]   
-      self.game.addObject(Ship, [self.game.playerID, self.x, self.y] + shipStats + [False, False])
+      self.game.addObject(Ship, [self.game.playerID, self.x, self.y] + shipStats)
       self.maxAttacks-=1
       self.targeted.add(self.id)
       return True
@@ -198,8 +196,7 @@ class Ship:
       foe = self.owner^1
       for ship in self.allInRange(foe):
         ship.attacksLeft = -1
-        ship.movementLeft = -1 
-        ship.isEMPd == True        
+        ship.movementLeft = -1         
         self.game.animations.append(['attack',self.id,ship.id])
         return True
     elif target.owner == self.owner:
@@ -221,8 +218,8 @@ class Ship:
       if target.health <= 0 and target.id in self.game.objects:
         self.game.removeObject(target)
       self.targeted.add(target.id)
-      if self.type == "Stealth" and self.isStealthed == True:
-        isStealthed == False
+      if self.type == "Stealth":
+        isStealthed = False
     return True 
     
   def inRange(self, target):

@@ -57,8 +57,6 @@ struct Ship
   int health;
   int maxHealth;
   int selfDestructDamage;
-  int isStealthed;
-  int isEMPd;
 
   friend std::ostream& operator<<(std::ostream& stream, Ship obj);
 };
@@ -71,40 +69,40 @@ struct Animation
 
 struct move : public Animation
 {
+  int actingID;
   int fromX;
   int fromY;
   int toX;
   int toY;
-  int acting;
 
   friend std::ostream& operator<<(std::ostream& stream, move obj);
 };
 
 struct selfDestruct : public Animation
 {
-  int acting;
+  int actingID;
 
   friend std::ostream& operator<<(std::ostream& stream, selfDestruct obj);
 };
 
 struct attack : public Animation
 {
-  int acting;
-  int target;
+  int actingID;
+  int targetID;
 
   friend std::ostream& operator<<(std::ostream& stream, attack obj);
 };
 
 struct stealth : public Animation
 {
-  int acting;
+  int actingID;
 
   friend std::ostream& operator<<(std::ostream& stream, stealth obj);
 };
 
 struct deStealth : public Animation
 {
-  int acting;
+  int actingID;
 
   friend std::ostream& operator<<(std::ostream& stream, deStealth obj);
 };

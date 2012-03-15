@@ -47,8 +47,6 @@ struct _Ship
   int health;
   int maxHealth;
   int selfDestructDamage;
-  int isStealthed;
-  int isEMPd;
 };
 
 }

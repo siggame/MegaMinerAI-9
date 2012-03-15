@@ -86,7 +86,7 @@ public abstract class BaseAI
   {
     return Client.INSTANCE.getGameNumber(connection);
   }
-  ///What round you are in the match
+  ///The current round of the match
   int round()
   {
     return Client.INSTANCE.getRound(connection);

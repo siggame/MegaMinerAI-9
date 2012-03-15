@@ -13,11 +13,13 @@ namespace visualizer
        game->renderer->drawQuad( -50, -50, 100, 100 );
        game->renderer->pop();*/
        
+       //game->renderer->useShader( ((Space*)game)->programs["post"] );
        game->renderer->push();
        game->renderer->translate( x + length/2, y + length/2 );
        game->renderer->rotate( degrees, 0, 0, 1 );
        game->renderer->drawTexturedQuad( -1 * length/2, -1 * length/2, length, length, texture );
        game->renderer->pop();
+       //game->renderer->useShader( 0 );
     }
     
     

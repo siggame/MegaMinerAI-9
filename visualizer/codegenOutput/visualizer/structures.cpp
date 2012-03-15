@@ -45,8 +45,6 @@ std::ostream& operator<<(std::ostream& stream, Ship ob)
   stream << "health: " << ob.health  <<'\n';
   stream << "maxHealth: " << ob.maxHealth  <<'\n';
   stream << "selfDestructDamage: " << ob.selfDestructDamage  <<'\n';
-  stream << "isStealthed: " << ob.isStealthed  <<'\n';
-  stream << "isEMPd: " << ob.isEMPd  <<'\n';
   return stream;
 }
 
@@ -55,11 +53,11 @@ std::ostream& operator<<(std::ostream& stream, Ship ob)
 std::ostream& operator<<(std::ostream& stream, move ob)
 {
   stream << "move" << "\n";
+  stream << "actingID: " << ob.actingID  <<'\n';
   stream << "fromX: " << ob.fromX  <<'\n';
   stream << "fromY: " << ob.fromY  <<'\n';
   stream << "toX: " << ob.toX  <<'\n';
   stream << "toY: " << ob.toY  <<'\n';
-  stream << "acting: " << ob.acting  <<'\n';
   return stream;
 }
 
@@ -67,7 +65,7 @@ std::ostream& operator<<(std::ostream& stream, move ob)
 std::ostream& operator<<(std::ostream& stream, selfDestruct ob)
 {
   stream << "selfDestruct" << "\n";
-  stream << "acting: " << ob.acting  <<'\n';
+  stream << "actingID: " << ob.actingID  <<'\n';
   return stream;
 }
 
@@ -75,8 +73,8 @@ std::ostream& operator<<(std::ostream& stream, selfDestruct ob)
 std::ostream& operator<<(std::ostream& stream, attack ob)
 {
   stream << "attack" << "\n";
-  stream << "acting: " << ob.acting  <<'\n';
-  stream << "target: " << ob.target  <<'\n';
+  stream << "actingID: " << ob.actingID  <<'\n';
+  stream << "targetID: " << ob.targetID  <<'\n';
   return stream;
 }
 
@@ -84,7 +82,7 @@ std::ostream& operator<<(std::ostream& stream, attack ob)
 std::ostream& operator<<(std::ostream& stream, stealth ob)
 {
   stream << "stealth" << "\n";
-  stream << "acting: " << ob.acting  <<'\n';
+  stream << "actingID: " << ob.actingID  <<'\n';
   return stream;
 }
 
@@ -92,7 +90,7 @@ std::ostream& operator<<(std::ostream& stream, stealth ob)
 std::ostream& operator<<(std::ostream& stream, deStealth ob)
 {
   stream << "deStealth" << "\n";
-  stream << "acting: " << ob.acting  <<'\n';
+  stream << "actingID: " << ob.actingID  <<'\n';
   return stream;
 }
 
