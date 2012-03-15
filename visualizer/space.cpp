@@ -45,11 +45,11 @@ namespace visualizer
   {
     if( renderer->fboSupport() )
     {
+#if 0
       renderer->useShader( programs["post"] ); 
-#if 1
       renderer->swapFBO();
-#endif
       renderer->useShader( 0 );
+#endif
 
     }
   }
