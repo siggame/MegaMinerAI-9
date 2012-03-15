@@ -30,12 +30,6 @@ namespace visualizer
     {
       delete i.second;
     }
-#if 0
-    for (auto iter = m_PersistentShips.begin(); iter != m_PersistentShips.end(); ++iter)
-    {
-      delete iter->second;
-    }
-#endif
 
     m_PersistentShips.clear();
     programs.clear();
@@ -85,9 +79,9 @@ namespace visualizer
   {
     list< int > selectedShipIDs;
 
-    for (std::map< int, PersistentShip* >::iterator iter = m_PersistentShips.begin(); iter != m_PersistentShips.end(); ++iter)
+    for ( auto& i : m_PersistentShips )
     {
-      selectedShipIDs.push_back( iter->second->id );
+      selectedShipIDs.push_back( i.second->id );
     }
     return selectedShipIDs;
   }
@@ -146,61 +140,56 @@ namespace visualizer
     {
       Warps[ state ] = vector< SmartPointer< Warp > >();
       // Loop though each PersistentShip in the current state
-      for(std::map<int, parser::Ship>::iterator i = m_game->states[ state ].ships.begin(); i != m_game->states[ state ].ships.end(); i++)
+      for(auto& i : m_game->states[ state ].ships)
       {
-        int shipID = i->second.id;
+        int shipID = i.second.id;
 
         // If the current ship's ID does not map to a PersistentShip in the map, create it and the warp for it
         if( m_PersistentShips.find(shipID) == m_PersistentShips.end() )
         {
-          m_PersistentShips[shipID] = new PersistentShip(state, i->second);
+          m_PersistentShips[shipID] = new PersistentShip(state, i.second);
 
           // Add the warps for this ship (so long as it is not a mine)
-          if( strcmp( i->second.type, "Mine" ) != 0)
+          if( strcmp( i.second.type, "Mine" ) != 0)
           {
-            Warps[ state - 1 ].push_back( new Warp( i->second.x + m_outerMapRadius, i->second.y + m_outerMapRadius, i->second.radius, i->second.owner, false ) );
-            Warps[ state ].push_back( new Warp( i->second.x + m_outerMapRadius, i->second.y + m_outerMapRadius, i->second.radius, i->second.owner, true ) );
+            Warps[ state - 1 ].push_back( new Warp( i.second.x + m_outerMapRadius, i.second.y + m_outerMapRadius, i.second.radius, i.second.owner, false ) );
+            Warps[ state ].push_back( new Warp( i.second.x + m_outerMapRadius, i.second.y + m_outerMapRadius, i.second.radius, i.second.owner, true ) );
           }
         }
 
         // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
-        m_PersistentShips[shipID]->points.push_back( SpacePoint( i->second.x, i->second.y ) );
-        m_PersistentShips[shipID]->healths.push_back( i->second.health );
+        m_PersistentShips[shipID]->points.push_back( SpacePoint( i.second.x, i.second.y ) );
+        m_PersistentShips[shipID]->healths.push_back( i.second.health );
         m_PersistentShips[shipID]->emps.push_back( false );
 
         // Check for this ship's animations in the gamelog
-        for
-          (
-           std::vector< SmartPointer< parser::Animation > >::iterator j = m_game->states[ state ].animations[ shipID ].begin();
-           j != m_game->states[ state ].animations[ shipID ].end();
-           j++
-          )
+        for( auto& j : m_game->states[state].animations[shipID] )
+        {
+          switch( j->type )
           {
-            switch( (*j)->type )
-            {
-              // Attack animation
-              case parser::ATTACK:
-                {
-                  parser::attack &attack = (parser::attack&)*(*j);
-                  m_PersistentShips[shipID]->AddAttack( m_PersistentShips[m_game->states[ state - 1 ].ships[ attack.targetID ].id], state );
+            // Attack animation
+            case parser::ATTACK:
+              {
+                parser::attack &attack = (parser::attack&)*j;
+                m_PersistentShips[shipID]->AddAttack( m_PersistentShips[m_game->states[ state - 1 ].ships[ attack.targetID ].id], state );
 
-                } break;
-              case parser::STEALTH:
-                {
-                  m_PersistentShips[shipID]->AddStealth( state );
-                }
-              case parser::DESTEALTH:
-                {
-                  m_PersistentShips[shipID]->AddDeStealth( state );
-                }
-            }
+              } break;
+            case parser::STEALTH:
+              {
+                m_PersistentShips[shipID]->AddStealth( state );
+              }
+            case parser::DESTEALTH:
+              {
+                m_PersistentShips[shipID]->AddDeStealth( state );
+              }
           }
+        }
       }
     }
 
-    for (std::map< int, PersistentShip* >::iterator iter = m_PersistentShips.begin(); iter != m_PersistentShips.end(); ++iter)
+    for ( auto& i : m_PersistentShips )
     {
-      iter->second->Finalize();
+      i.second->Finalize();
     }
     // END: Look through the game logs and build the m_PersistentShips
 
@@ -236,14 +225,14 @@ namespace visualizer
 
 
       // For each of our PersistentShips
-      for (std::map< int, PersistentShip* >::iterator iter = m_PersistentShips.begin(); iter != m_PersistentShips.end(); ++iter)
+      for( auto& i : m_PersistentShips )
       {
         // If it exists
-        if(iter->second->ExistsAtTurn(state))
+        if(i.second->ExistsAtTurn(state))
         {
           // Then and and draw it
           SmartPointer<PersistentShipAnim> ship = new PersistentShipAnim();
-          ship->addKeyFrame( new DrawPersistentShip( iter->second, state, &m_outerMapRadius ) );
+          ship->addKeyFrame( new DrawPersistentShip( i.second, state, &m_outerMapRadius ) );
           turn.addAnimatable( ship );
         }
       }
