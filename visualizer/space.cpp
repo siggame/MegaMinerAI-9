@@ -160,9 +160,7 @@ namespace visualizer
         // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
         m_PersistentShips[shipID]->points.push_back( SpacePoint( i->second.x, i->second.y ) );
         m_PersistentShips[shipID]->healths.push_back( i->second.health );
-        //cout << "EMPED: " << (i->second.isEMPd ? "true" : "false") << endl;
-        //cout << "STEALTH: " << (i->second.isStealthed ? "true" : "false") << endl;
-        m_PersistentShips[shipID]->emps.push_back( i->second.isEMPd );
+        m_PersistentShips[shipID]->emps.push_back( false );
 
         // Check for this ship's animations in the gamelog
         for
@@ -178,7 +176,7 @@ namespace visualizer
               case parser::ATTACK:
                 {
                   parser::attack &attack = (parser::attack&)*(*j);
-                  m_PersistentShips[shipID]->AddAttack( m_PersistentShips[m_game->states[ state - 1 ].ships[ attack.target ].id], state );
+                  m_PersistentShips[shipID]->AddAttack( m_PersistentShips[m_game->states[ state - 1 ].ships[ attack.targetID ].id], state );
 
                 } break;
               case parser::STEALTH:
