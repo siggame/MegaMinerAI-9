@@ -151,7 +151,7 @@ namespace visualizer
         // If the current ship's ID does not map to a PersistentShip in the map, create it and the warp for it
         if( m_PersistentShips.find(shipID) == m_PersistentShips.end() )
         {
-          m_PersistentShips[shipID] = new PersistentShip(state, i.second);
+          m_PersistentShips[shipID] = new PersistentShip(state, m_game->states[ state ].round, i.second);
 
           // Add the warps for this ship (so long as it is not a mine)
           if( strcmp( i.second.type, "Mine" ) != 0)
@@ -208,6 +208,8 @@ namespace visualizer
     }
     // END: Look through the game logs and build the m_PersistentShips
 
+
+
     // BEGIN: Add every draw animation
     for(int state = 0; state < (int)m_game->states.size(); state++)
     {
@@ -217,7 +219,7 @@ namespace visualizer
       SmartPointer<Background> background = new Background();
       background->outerRadius = m_outerMapRadius;
       background->innerRadius = m_innerMapRadius;
-      background->turn = state;
+      background->turn = m_game->states[ state ].turnNumber;
       background->addKeyFrame( new DrawBackground( background ) );
       turn.addAnimatable( background );
 
@@ -241,7 +243,7 @@ namespace visualizer
       for( auto& i : m_PersistentShips )
       {
         // If it exists
-        if(i.second->ExistsAtTurn(state))
+        if(i.second->ExistsAtTurn( state, m_game->states[ state ].round ))
         {
           turn[i.first]["Health"] = i.second->HealthOn(state, 0); 
           turn[i.first]["MaxHealth"] = i.second->maxHealth;
@@ -252,6 +254,34 @@ namespace visualizer
           turn.addAnimatable( ship );
         }
       }
+      
+        // Add the RoundHUD
+        int roundWinnerID = -1;
+        if( m_game->states.size() == state+1 )
+        {
+            roundWinnerID = m_game->winner;
+        }
+        else
+        {
+            if( m_game->states[ state + 1 ].players[0].victories > m_game->states[ state ].players[0].victories )
+            {
+                roundWinnerID = 0;
+            }
+            if( m_game->states[ state + 1 ].players[1].victories > m_game->states[ state ].players[1].victories )
+            {
+                if( roundWinnerID == 0 )
+                {
+                    roundWinnerID = -1;
+                }
+                else
+                {
+                    roundWinnerID = 1;
+                }
+            }
+        }
+        SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].round, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_outerMapRadius, state+1 == m_game->states.size() || m_game->states[ state ].round < m_game->states[ state + 1 ].round );
+        roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
+        turn.addAnimatable( roundHUD );
 
       addFrame( turn );
     }

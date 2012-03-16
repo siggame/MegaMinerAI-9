@@ -10,6 +10,7 @@
 #include <sstream>
 #include <fstream>
 #include <memory>
+#include <cmath>
 
 #include "game.h"
 #include "network.h"
@@ -217,6 +218,10 @@ DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  
+  //Game state update
+  Connection * c = object->_c;
+  c->Players[c->playerID].energy -= object->cost;
   return 1;
 }
 
@@ -244,6 +249,11 @@ DLLEXPORT int shipMove(_Ship* object, int x, int y)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  
+  //Game state update
+  object->movementLeft = object->movementLeft - sqrt(pow(x - object->x,2)+pow(y-object->y,2));
+  object->x = x;
+  object->y = y;
   return 1;
 }
 
@@ -255,6 +265,20 @@ DLLEXPORT int shipSelfDestruct(_Ship* object)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  
+  //Game state update
+  object->health = 0;
+  Connection * c = object->_c;
+  for(int i = 0; i < c->ShipCount; i++)
+  {
+    if(c->Ships[i].owner != object->owner)
+    {
+      if(sqrt(pow(c->Ships[i].x - object->x,2)+pow(c->Ships[i].y - object->y,2)) <= c->Ships[i].radius + object->radius)
+      {
+        c->Ships[i].health -= object->selfDestructDamage;
+      }
+    }
+  }
   return 1;
 }
 
@@ -267,6 +291,22 @@ DLLEXPORT int shipAttack(_Ship* object, _Ship* target)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  
+  //Game state update
+  Connection * c = object->_c;
+  object->attacksLeft -= 1;
+  int modifier = 1;
+  for(int i = 0; i < c->ShipCount; i++)
+  {
+    if(c->Ships[i].owner == object->owner and c->Ships[i].type == "Support")
+    {
+      if(sqrt(pow(c->Ships[i].x - target->x,2)+pow(c->Ships[i].y - target->y,2)) <= c->Ships[i].range + target->radius)
+      {
+        modifier += (c->Ships[i].damage)/100;
+      }
+    }
+  }
+  target->health -= object->damage*modifier;
   return 1;
 }
 
