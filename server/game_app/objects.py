@@ -118,7 +118,7 @@ class Ship:
       else:
         self.movementLeft = self.maxMovement         
         self.attacksLeft = self.maxAttacks
-      if self.type == "Stealth":
+      if self.type == "Stealth" and self.owner == self.game.playerID:
         self.isStealthed = True
                     
   def move(self, x, y):
