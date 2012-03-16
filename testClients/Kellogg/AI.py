@@ -9,7 +9,7 @@ myPlayer = []
 foePlayer = []
 allTypes = ['Warp Gate', 'Battleship','Juggernaut', 'Mine Layer', 'Support', 'EMP', 'Stealth', 'Cruiser','Weapons Platform', 'Interceptor', 'Bomber','Mine']
 myShips = []
-numPoints = 50
+numPoints = 100
 
 class AI(BaseAI):
   """The class implementing gameplay logic."""
@@ -114,9 +114,9 @@ class AI(BaseAI):
   
   def warpControl(self,enemyListDict,myListDict):
     for w in myListDict['Warp Gate']:
- #     self.smartWarp(w)
+#      self.smartWarp(w)
       nearest = self.findNearest(w,enemyShips)
-      self.moveTo(w,w.getX(),w.getY(),nearest.getX(),nearest.getY(),w.getMaxMovement())
+      self.moveTo(w,w.getX(),w.getY(),nearest.getX(),nearest.getY(),w.getMaxMovement(),"toward")
   
   def batShipControl(self,enemyListDict,myListDict):
     #Move towards enemy warp gate. if not in range of warp gate, attack enemy with most health that you can kill
@@ -278,10 +278,14 @@ class AI(BaseAI):
         target = ship    
     return target
                 
-  def moveTo(self,ship,fromX,fromY,toX,toY,movement):
-      dx = toX-fromX; dy = toY-fromY
+  def moveTo(self,ship,fromX,fromY,toX,toY,movement,direction):
+      if direction == "toward":
+        dx = toX-fromX; dy = toY-fromY
+      elif direction == "away":
+        dx = fromX-toX; dy = fromY-toY
+        
       while movement > 0 and abs(toX-fromX)+abs(toY-fromY)>0:
-        if abs(dx+dy)>movement+1:
+        if abs(dx+dy)>movement:
           dx/=2
           dy/=2
           print "halving dx,dy, movement ",dx,dy,movement
@@ -289,22 +293,22 @@ class AI(BaseAI):
             break
         else:
             newX = fromX+dx; newY = fromY+dy
-#            print "NEWX, NEWY",newX,newY
-            if abs(newX)+abs(newY) < self.innerMapRadius():
+            if int(math.sqrt(newX**2+newY**2)) < self.innerMapRadius():
               print "moving out of inner"
-              newX,newY = self.farthestPoint(0,0,movement,self.innerMapRadius(),fromX,fromY)
+              newX,newY = self.farthestPoint(0,0,movement,self.innerMapRadius(),fromX,fromY,"outer")
               movement-=abs(fromX-newX)+abs(fromY-newY);fromX=newX; fromY=newY; 
               ship.move(newX,newY)
-            elif abs(newX)+abs(newY) > self.outerMapRadius():
-              print "moving out of outer"
-              newX,newY = self.farthestPoint(0,0,movement,self.outerMapRadius(),fromX,fromY)
+            elif int(math.sqrt(newX**2+newY**2)) > self.outerMapRadius():
+              print "moving inside of outer"
+              newX,newY = self.farthestPoint(0,0,movement,self.outerMapRadius(),fromX,fromY,"inner")
               fromX=newX; fromY=newY; movement-=abs(fromX-newX)+abs(fromY-newY)
               ship.move(newX,newY)
             else:
               mines = self.mines(ship.getOwner()^1,enemyShips)
               if len(mines)>0:
                 for mine in mines:
-                  if abs(fromX-mine.getX())+abs(fromY-mine.getY())<=(ship.getRadius()+mine.getRange()):
+                  if self.inRange(fromX,fromY,ship.getRadius(),mine.getX(),mine.getY(),mine.getRange()):
+#                  if abs(fromX-mine.getX())+abs(fromY-mine.getY())<=(ship.getRadius()+mine.getRange()):
                     print "avoiding mines"
                     newX,newY = self.farthestPoint(mine.getX(),mine.getY(),movement,mine.getRange(),fromX,fromY)
                     fromX=newX; fromY=newY; movement-=abs(fromX-newX)+abs(fromY-newY)
@@ -315,7 +319,7 @@ class AI(BaseAI):
                     fromX+=dx; fromY+=dy
                     movement -=abs(dx+dy)
               else: 
-#                print "easier move"
+                print "from moveTo, newX,newY",newX,newY
                 ship.move(newX,newY)
                 fromX+=dx; fromY+=dy
                 movement -=abs(dx+dy)
@@ -436,13 +440,21 @@ class AI(BaseAI):
         self.moveToTarget(ship,target)
         ship.selfDestruct()
     return 
-               
-  def findPoints(self,centerX,centerY,radius,n):
-      pi = 3.14159265
+  
+  def findInnerPoints(self,centerX,centerY,radius,n):
+      radius-=radius/10
+      pi = 3.1415926535897932384626433832795028841971693993751058209
+      Xval = [(int(math.floor((centerX + math.cos(2*pi/n*x)*radius)))) for x in range(0,n+1)]
+      Yval = [(int(math.floor((centerY + math.sin(2*pi/n*y)*radius)))) for y in range(0,n+1)]
+      return Xval,Yval
+                                
+  def findOuterPoints(self,centerX,centerY,radius,n):
+      radius+=radius/10
+      pi = 3.1415926535897932384626433832795028841971693993751058209 
       #angles = [0,pi/6,pi/4,pi/3,pi/2,2*pi/3,3*pi/4,5*pi/6,pi,7*pi/6,5*pi/4,4*pi/3,3*pi/2,5*pi/3,7*pi/4,11*pi/6]
-      Xval = [(int(math.floor((centerX + math.cos(2*pi/n*x)*radius)))) for x in xrange(0,n+1)]
+      Xval = [(int(math.floor((centerX + math.cos(2*pi/n*x)*radius)))) for x in range(0,n+1)]
 #      Xval = []
-      Yval = [(int(math.floor((centerY + math.sin(2*pi/n*x)*radius)))) for x in xrange(0,n+1)]
+      Yval = [(int(math.floor((centerY + math.sin(2*pi/n*y)*radius)))) for y in range(0,n+1)]
 #      Yval = []
 #      for i in angles:
 #        Xval.append(centerX+radius*math.cos(i))
@@ -452,23 +464,28 @@ class AI(BaseAI):
 #        print centerY+radius*math.sin(i)
       return Xval,Yval      
   
-  def farthestPoint(self,centerX,centerY,movement,radius,shipX,shipY):
-    xPoints,yPoints = self.findPoints(centerX,centerY,radius,numPoints)
+  def farthestPoint(self,centerX,centerY,movement,radius,shipX,shipY,where):
+    if where == "outer":
+      xPoints,yPoints = self.findOuterPoints(centerX,centerY,radius,numPoints)
+    elif where == "inner":
+      xPoints,yPoints = self.findInnerPoints(centerX,centerY,radius,numPoints) 
+      
     distance = 0
     for i in range(len(xPoints)):
       xP = int(xPoints[i]); yP = int(yPoints[i])
       newDis = self.distance(shipX,centerX+xP,shipY,centerY+yP)
-      print "NEW DISTANCE",newDis
+     # print "NEW DISTANCE",newDis
       #Ydis = abs(shipX-math.sqrt((centerX+xP)**2))
       #Ydis = abs(shipY-math.sqrt((centerY+yP)**2))
 #      print "shipX,shipY",shipX,shipY,"Xdis,Ydis",Xdis,Ydis,"movment",movement
 #      print "center x is",centerX,"center y is",centerY,"xP is",xP,"yP is",yP,"travel distance is", abs(shipX-(centerX+xP)) + abs(shipY-(centerY+yP)), "compared to current distance",distance,"movement is",movement
-      if newDis > distance and newDis <= movement:
+      if newDis >= distance and newDis <= movement:
       #if abs(shipX-(centerX+xP)) + abs(shipY-(centerY+yP)) > distance and abs(shipX-(centerX+xP)) + abs(shipY-(centerY+yP)) <= movement:
         newX = xP
         newY = yP
         distance = newDis
         print "setting distance to ",distance
+    print "newX,newY",newX,newY
     return newX,newY
     
 #  def checkMove(self,ship,x,y,movement):
