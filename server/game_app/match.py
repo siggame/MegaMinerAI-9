@@ -148,6 +148,12 @@ class Match(DefaultGameWorld):
         gates.append(player1.warpGate)
       elif obj == player2.warpGate:  
         gates.append( player2.warpGate)     
+    
+    #TODO compare energy to lowest type cost of that rouond
+    cost = 100
+    for type in self.objects.shipTypes:
+      if type.cost <= cost:
+        cost = type.cost
     if len(gates) < 2:
     #SWAPPED WHICH PLAYER WINS
       if len(gates) == 1:
@@ -160,7 +166,7 @@ class Match(DefaultGameWorld):
         player1.victories += 1
         player2.victories += 1
       self.nextRound()
-    elif self.turnNumber >= self.turnLimit:
+    elif self.turnNumber >= self.turnLimit or player1.energy < cost and player2.energy < cost and len(self.objects.ships)==2:
       # Warp gate health
       if self.objects[player1.warpGate].health > self.objects[player2.warpGate].health:
         player1.victories += 1

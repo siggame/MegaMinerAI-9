@@ -114,6 +114,7 @@ class AI(BaseAI):
   
   def warpControl(self,enemyListDict,myListDict):
     for w in myListDict['Warp Gate']:
+#      self.testWarp(w)
       self.smartWarp(w)
       nearest = self.findNearest(w,enemyShips)
       self.moveAway(w,nearest)
@@ -349,13 +350,14 @@ class AI(BaseAI):
                                               
   def testWarp(self,warpShip):
      typeDict = {}
+     type = 'Weapons Platform'
      for type in self.shipTypes:
        typeDict[type.getType()] = type
      energy = myPlayer[0].getEnergy()
-     if 'Support' in typeDict:
-       while energy >= typeDict['Support'].getCost():
-         typeDict['Support'].warpIn(warpShip.getX(),warpShip.getY())                      
-         energy-=typeDict['Support'].getCost()
+     if type in typeDict:
+       while energy >= typeDict[type].getCost():
+         typeDict[type].warpIn(warpShip.getX(),warpShip.getY())                      
+         energy-=typeDict[type].getCost()
             
   def smartWarp(self,warpShip):
      #TODO: make smarterer
@@ -442,7 +444,7 @@ class AI(BaseAI):
     
     
   def seppuku(self,ship):
-    if ship.getHealth() <= ship.getMaxHealth()/3 or ship.getMaxAttacks() == 0:
+    if ship.getHealth() <= ship.getMaxHealth()/5 or ship.getMaxAttacks() == 0:
       if ship.getType()!= 'Warp Gate':
         target = self.findNearest(ship,enemyShips)
         self.moveToTarget(ship,target)
@@ -563,9 +565,10 @@ class AI(BaseAI):
     
     #end dictionary magic
     
-    for ship in myShips:
-      self.seppuku(ship)
-
+#    for ship in myShips:
+#      self.seppuku(ship)
+    for ship in self.ships:
+      ship.selfDestruct()
     return 1
 
   def __init__(self, conn):
