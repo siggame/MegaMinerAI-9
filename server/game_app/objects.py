@@ -129,9 +129,10 @@ class Ship:
     #if they're trying to move outside the map
     #if inRange(self.x, self.y, self.radius, x, y, self.game.innerMapRadius):
       #return "You don't want to fly into the planet!"
-    if x**2 + y**2 > self.game.outerMapRadius**2:
+#    if x**2 + y**2 > self.game.outerMapRadius:
+    if distance(0,x,0,y) + self.radius > self.game.outerMapRadius:
       return "You don't want to move out of the map, you'd be lost in Space"
-    elif x**2 + y**2 < self.game.innerMapRadius**2:
+    elif distance(0,x,0,y) - self.radius < self.game.innerMapRadius:
       return "You don't want to fly into the planet!"
     #check if they can't move that far
     elif self.movementLeft - moved < 0:
