@@ -199,6 +199,7 @@ class Ship:
       for ship in self.allInRange(foe):
         ship.attacksLeft = -1
         ship.movementLeft = -1         
+        self.maxAttacks-=1
         self.game.animations.append(['attack',self.id,ship.id])
         return True
     elif target.owner == self.owner:

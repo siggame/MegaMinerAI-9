@@ -8,6 +8,8 @@ import os
 import itertools
 import scribe
 import random
+import copy
+#from sets import Set
 
 Scribe = scribe.Scribe
 
@@ -101,9 +103,15 @@ class Match(DefaultGameWorld):
     if len(self.shipChain) < self.shipsPerRound:
       # Add a random permutation of the types to the chain
       random.shuffle(self.spawnableTypes)
-      self.shipChain += self.spawnableTypes
+      self.shipChain += self.spawnableTypes   
     # use the next 5
+    desired = set(self.shipChain)
+    while len(desired) < self.shipsPerRound: 
+      desired.add(random.choice(self.spawnableTypes))
+
     using, self.shipChain = self.shipChain[:self.shipsPerRound], self.shipChain[self.shipsPerRound:]
+
+
     for shipType in using:
       self.addObject(ShipType, [shipType, cfgUnits[shipType]["cost"]])
     self.nextTurn()
