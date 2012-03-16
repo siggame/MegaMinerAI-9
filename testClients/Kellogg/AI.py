@@ -9,7 +9,7 @@ myPlayer = []
 foePlayer = []
 allTypes = ['Warp Gate', 'Battleship','Juggernaut', 'Mine Layer', 'Support', 'EMP', 'Stealth', 'Cruiser','Weapons Platform', 'Interceptor', 'Bomber','Mine']
 myShips = []
-numPoints = 100
+numPoints = 720
 
 class AI(BaseAI):
   """The class implementing gameplay logic."""
@@ -114,15 +114,17 @@ class AI(BaseAI):
   
   def warpControl(self,enemyListDict,myListDict):
     for w in myListDict['Warp Gate']:
-#      self.smartWarp(w)
+      self.smartWarp(w)
       nearest = self.findNearest(w,enemyShips)
-      self.moveTo(w,w.getX(),w.getY(),nearest.getX(),nearest.getY(),w.getMaxMovement(),"toward")
+      self.moveAway(w,nearest)
+#      self.moveTo(w,w.getX(),w.getY(),nearest.getX(),nearest.getY(),w.getMaxMovement(),"toward")
   
   def batShipControl(self,enemyListDict,myListDict):
     #Move towards enemy warp gate. if not in range of warp gate, attack enemy with most health that you can kill
     #once in range of warp gate, attack. if health is below x%, fire and self destruct
     warp = enemyListDict['Warp Gate'][0]
     for ship in myListDict['Battleship']:
+#      self.moveTo(ship,ship.getX(),ship.getY(),warp.getX(),warp.getY(),ship.getMaxMovement(),"toward")
       self.moveToTarget(ship,warp)
       if self.inRange(ship.getX(),ship.getY(),ship.getRange(),warp.getX(),warp.getY(),warp.getRadius()):
         ship.attack(warp)
@@ -145,6 +147,7 @@ class AI(BaseAI):
       for i in move:
         ship.move(ship.getX()-ship.getMaxMovement()/5,ship.getY()+ship.getMaxMovement()/2)
         if ship.getAttacksLeft()>0:
+          pass
           ship.attack(ship)
               
   def supportControl(self,enemyListDict,myListDict):
@@ -152,21 +155,14 @@ class AI(BaseAI):
     target = myListDict['Warp Gate'][0]
     if myListDict['Warp Gate'][0].getHealth() <= myListDict['Warp Gate'][0].getMaxHealth()/2:
       for ship in myListDict['Support']:
+#          self.moveTo(ship,ship.getX(),ship.getY(),target.getX(),target.getY(),target.getMaxMovement(),"toward")
           self.moveToTarget(myListDict['Support'][0],myListDict['Warp Gate'][0])
-    
-   # elif len(myListDict['Support'])>=2:
-   #    if len(myListDict['Weapons Platform'])>0:
-   #      self.moveToTarget(myListDict['Support'][0],myListDict['Weapons Platform'][0])
-   #    for ship in myListDict['Support'][1:]:
-   #      target2 = self.findCluster(ship,ship.getOwner(),myShips)
-   #      if isinstance(target2,Ship) and target2.getType()!= 'Mine' and target2.getType()!='Support':
-   #         target = target2
-   #      self.moveToTarget(ship,target)
     else:
      for ship in myListDict['Support']:  
         target2 = self.findCluster(ship,ship.getOwner(),myShips)
         if isinstance(target2,Ship) and target2.getType() != 'Mine':# and target2.getType()!='Support':
           target = target2
+#        self.moveTo(ship,ship.getX(),ship.getY(),target.getX(),target.getY(),target.getMaxMovement(),"toward")
         self.moveToTarget(ship,target)
            
   def empControl(self,enemyListDict,myListDict):
@@ -176,6 +172,7 @@ class AI(BaseAI):
       target2 = self.findCluster(ship,foePlayer[0].getId(),enemyShips)
       if isinstance(target2,Ship):
         target = target2
+#      self.moveTo(ship,ship.getX(),ship.getY(),target.getX(),target.getY(),target.getMaxMovement(),"toward")
       self.moveToTarget(ship,target)
       foe = self.bestUseAttack(ship)
       if len(foe) > 0 and ship.getAttacksLeft()>0:
@@ -288,7 +285,7 @@ class AI(BaseAI):
         if abs(dx+dy)>movement:
           dx/=2
           dy/=2
-          print "halving dx,dy, movement ",dx,dy,movement
+  #        print "halving dx,dy, movement ",dx,dy,movement
           if dx == -1 and dy == -1 and movement == 1:
             break
         else:
@@ -319,7 +316,7 @@ class AI(BaseAI):
                     fromX+=dx; fromY+=dy
                     movement -=abs(dx+dy)
               else: 
-                print "from moveTo, newX,newY",newX,newY
+ #               print "from moveTo, newX,newY",newX,newY
                 ship.move(newX,newY)
                 fromX+=dx; fromY+=dy
                 movement -=abs(dx+dy)
@@ -465,6 +462,7 @@ class AI(BaseAI):
       return Xval,Yval      
   
   def farthestPoint(self,centerX,centerY,movement,radius,shipX,shipY,where):
+    print "calling Farthest Point"
     if where == "outer":
       xPoints,yPoints = self.findOuterPoints(centerX,centerY,radius,numPoints)
     elif where == "inner":
@@ -474,6 +472,7 @@ class AI(BaseAI):
     for i in range(len(xPoints)):
       xP = int(xPoints[i]); yP = int(yPoints[i])
       newDis = self.distance(shipX,centerX+xP,shipY,centerY+yP)
+      #print "xP,yP",xP,yP,"newDis",newDis,"movement",movement,"x,y",shipX,shipY
      # print "NEW DISTANCE",newDis
       #Ydis = abs(shipX-math.sqrt((centerX+xP)**2))
       #Ydis = abs(shipY-math.sqrt((centerY+yP)**2))
@@ -484,8 +483,8 @@ class AI(BaseAI):
         newX = xP
         newY = yP
         distance = newDis
-        print "setting distance to ",distance
-    print "newX,newY",newX,newY
+#        print "setting distance to ",distance
+#    print "newX,newY",newX,newY
     return newX,newY
     
 #  def checkMove(self,ship,x,y,movement):
