@@ -39,6 +39,33 @@ namespace visualizer
         game->renderer->drawArc(500, 500, 500, 50 );
     }
     
+    void DrawRoundHUD::animate( const float& t, AnimData * d, IGame* game )
+    {
+        stringstream round;
+        round << "Round: " << (m_RoundHUD->round + 1) << "  Turn: " << m_RoundHUD->turn;
+        game->renderer->setColor( Color( 1, 1, 1, 1 ) );
+        game->renderer->drawText( m_RoundHUD->mapRadius, 1, "Roboto", round.str(), 100, IRenderer::Center);
+        
+        // Draw the t "hand"
+        //game->renderer->drawArc( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius, m_RoundHUD->mapRadius, 60, 0, 360.0f * t );
+        
+        if( m_RoundHUD->drawWinScreen )
+        {
+            float op = t;
+            stringstream winnerText;
+            winnerText << "Winner: " << m_RoundHUD->winner;
+            
+            Color textColor = m_RoundHUD->winnerID == -1 ? Color( 0.1, 0.1, 0.1, op ) : ( m_RoundHUD->winnerID ? Color( 0, 0.4, 1, op ) : Color(1, 0, 0, op) );
+            Color backgroundColor = Color( 1, 1, 1, op );
+            
+            game->renderer->setColor( backgroundColor );
+            game->renderer->drawQuad( 0, 0, m_RoundHUD->mapRadius*2, m_RoundHUD->mapRadius*2 );
+            
+            game->renderer->setColor( textColor );
+            game->renderer->drawText( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius - 30, "Roboto", winnerText.str(), 300, IRenderer::Center );
+        }
+    }
+    
     void DrawPersistentShip::animate( const float& t, AnimData * d, IGame* game )
     {
         // BEGIN: Variables we will need
@@ -186,20 +213,21 @@ namespace visualizer
     
     void DrawPlayerHUD::animate( const float& t, AnimData * d, IGame* game )
     {
+        IRenderer::Alignment align = m_PlayerHUD->id ? IRenderer::Left : IRenderer::Right;
         
         game->renderer->setColor( m_PlayerHUD->id ? Color(0, 0.4f, 1, 1) : Color(1, 0, 0, 1) );
         // Draw the player's name
-        game->renderer->drawText( m_PlayerHUD->NameX(), 20, "Roboto", m_PlayerHUD->name, 200 );
+        game->renderer->drawText( m_PlayerHUD->NameX(), 20, "Roboto", m_PlayerHUD->name, 200 , align);
         
         // Draw the player's energy
         stringstream energy;
         energy << "Energy: " << m_PlayerHUD->energy;
-        game->renderer->drawText( m_PlayerHUD->EnergyX(), 70, "Roboto", energy.str(), 100 );
+        game->renderer->drawText( m_PlayerHUD->EnergyX(), 70, "Roboto", energy.str(), 100, align );
         
         // Draw the player's victories
         stringstream victories;
         victories << "Victories: " << m_PlayerHUD->victories;
-        game->renderer->drawText( m_PlayerHUD->VictoriesX(), 100, "Roboto", victories.str(), 100 );
+        game->renderer->drawText( m_PlayerHUD->VictoriesX(), 100, "Roboto", victories.str(), 100, align );
         
         // Draw the player's time left
         game->renderer->drawText( m_PlayerHUD->TimeX(), 870, "Roboto", "Time Left:", 100 );

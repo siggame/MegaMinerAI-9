@@ -13,10 +13,8 @@ detonate = True
 priorityList = {"Battleship" : 6.5,"Juggernaut" : 4,"Mine Layer" : 8.5,"Support" : 8, "Warp Gate" : 0, \
     "EMP" : 7,"Stealth" : 10,"Cruiser" : 3,"Weapons Platform" : 9,"Interceptor" : 1,"Bomber" : 2, "Mine" : -2}
 
-
 #FEATURE LIST:
   #Move to support ships
-  #Figure out freezing issue
   #Optimize code       
     
 class AI(BaseAI):
@@ -53,7 +51,7 @@ class AI(BaseAI):
   def moveToInjured(self, ship):
     weakestShip = myShips[0]
     for myShip in myShips:
-      if (myShip.getHealth()/myShip.getMaxHealth())  < (weakestShip.getHealth() / weakestShip.getMaxHealth()) and myShip.getId() != ship.getId() \
+      if (myShip.getHealth()/myShip.getMaxHealth())  <= (weakestShip.getHealth() / weakestShip.getMaxHealth()) and myShip.getId() != ship.getId() \
       and myShip.getType() != "Mine":
         weakestShip = myShip
     move = self.moveTo(ship, weakestShip.getX(), weakestShip.getY(), locs, detonate)
@@ -86,7 +84,8 @@ class AI(BaseAI):
     for friend in myShips:
       if self.getRange(finalX, finalY, ship.getRadius(), friend.getX(), friend.getY(), friend.getRadius()/2):  
         goodMove = False
-    if finalX**2 + finalY**2 > self.outerMapRadius()**2 or finalX**2 + finalY**2 < self.innerMapRadius()**2:
+    if self.distance(0, finalX, 0, finalY) + ship.getRadius() > self.outerMapRadius() \
+    or self.distance(0, finalX, 0, finalY) - ship.getRadius() < self.innerMapRadius():
       goodMove = False
     if ship.getType() == "Mine Layer":
       for mine in myMines:
@@ -100,12 +99,13 @@ class AI(BaseAI):
       #Iterate through all of these points to find which is the "best"
       for point in points:
         #Check to see if ship is within bounds of map
-        if point[0]**2 + point[1]**2 < self.outerMapRadius()**2 and point[0]**2 + point[1]**2 > self.innerMapRadius()**2:
+        if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.outerMapRadius() \
+        and self.distance(0, point[0], 0, point[1]) - ship.getRadius() > self.innerMapRadius():
           goodMove = True
           #Check for mines
           for enemy in theirShips:
             if enemy.getType() == "Mine":
-              if self.getRange(point[0], point[1], ship.getRadius()+5, enemy.getX(), enemy.getY(), enemy.getRange()+5) and detonate == False:  
+              if self.getRange(point[0], point[1], ship.getRadius()+5, enemy.getX(), enemy.getY(), enemy.getRange()+5):  
                 goodMove = False
           #Check for friendly ships. Locs contains a list of all of the moves that have occured.
           for loc in locs:
@@ -123,11 +123,11 @@ class AI(BaseAI):
               finalX = point[0]
               finalY = point[1]
     #Check to see if my best move is on a mine. If so, set detonate to false so no other ships will blow up.
-    if detonate == True:
-      for enemy in theirShips:
-        if enemy.getType() == "Mine":
-          if self.getRange(finalX, finalY, ship.getRadius()+5, enemy.getX(), enemy.getY(), enemy.getRange()+5):  
-            detonate = False
+     # if detonate == True:
+        #for enemy in theirShips:
+          #if enemy.getType() == "Mine":
+            #if self.getRange(finalX, finalY, ship.getRadius()+5, enemy.getX(), enemy.getY(), enemy.getRange()+5):  
+              #detonate = False
     return [finalX, finalY]
    
   #Moves ship away from the nearest enemy
@@ -138,7 +138,8 @@ class AI(BaseAI):
     points.extend(self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()/2,24))
     distance = 0
     for point in points:
-      if point[0]**2 + point[1]**2 < self.outerMapRadius()**2 and point[0]**2 + point[1]**2 > self.innerMapRadius()**2:
+      if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.outerMapRadius() \
+      and self.distance(0, point[0], 0, point[1]) - ship.getRadius() > self.innerMapRadius():
         goodMove = True
         for enemy in theirShips:
           if enemy.getType() == "Mine":
@@ -162,7 +163,7 @@ class AI(BaseAI):
         if availShips["Bomber"] != 0:
           availShips["Bomber"].warpIn(agressiveWarp[0],agressiveWarp[1])
           energyStart -= availShips["Bomber"].getCost()
-        if availShips["Interceptor"] != 0:
+        if availShips["Interceptor"] != 0 and availShips["Battleship"] == 0:
           availShips["Interceptor"].warpIn(agressiveWarp[0],agressiveWarp[1])
           energyStart -= availShips["Interceptor"].getCost()
     return energyStart
@@ -268,6 +269,7 @@ class AI(BaseAI):
           ship.attack(target)
           attacksLeft-=1
           attackList.remove(target)
+          print ship.getId(), ship.getAttacksLeft(), attacksLeft
         else:
           attackList.remove(target)
       del attackList[0:len(attackList)]  
