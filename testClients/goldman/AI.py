@@ -3,50 +3,75 @@ from BaseAI import BaseAI
 from GameObject import *
 import random
 import math
-def distance(fromX, fromY, toX, toY):
-  return int(math.ceil(math.sqrt((fromX-toX)**2 + (fromY-toY)**2)))
 
-def inRange(x1, y1, rad1, x2, y2, rad2):
-  return distance(x1, y1, x2, y2) <= rad1 + rad2
+class Vect(object):
+  def __init__(self, x, y):
+    self.x = int(x)
+    self.y = int(y)
+
+  def getX(self): return self.x
+  def getY(self): return self.y
+
+  @property
+  def magnitude(self):
+    return int(math.ceil(math.sqrt(self.x ** 2 + self.y ** 2)))
   
-def travelDist(x1, y1, rad1, x2, y2, rad2):
-  return distance(x1, y1, x2, y2) - (rad1 + rad2)
+  @staticmethod
+  def vectorize(ship, target):
+    return Vect(ship.getX() - target.getX(), ship.getY() - target.getY())
 
-def getMeThere(x1, y1, rad1, x2, y2, rad2, movementLeft, retreat=False, reverse=False):
-  move = distance(x1, y1, x2, y2) - (rad1 + rad2)
-  heading = 1
-  if reverse:
-    heading = -1
+  @staticmethod
+  def randVect(maxMag):
+    angle = random.uniform(0, math.pi * 2)
+    mag = random.uniform(0, maxMag)
+    v = Vect(mag*math.cos(angle), mag*math.sin(angle))
+    if not (0 <= v.magnitude <= maxMag):
+      raise Exception("Random vector too long")
+    return v
+ 
+  def makeUnit(self):
+    ret = Vect(self.x, self.y)
+    startMag = self.magnitude
+    if 0 != startMag != 1:
+      ret.x/=startMag
+      ret.y/=startMag
+    if 0 != ret.magnitude != 1:
+      raise Exception("Make Unit Fail")
+    return ret
   
-  if move < 0 and not retreat:
-    return [x1, y1]
-  if abs(move) > movementLeft:
-    move = movementLeft if move > 0 else -movementLeft
-
-  dx, dy = x2-x1, y2-y1
-  if dx != 0:
-    angle = math.atan(dy / float(dx))
-    x = move * math.cos(angle) * cmp(dx, 0) * heading + x1
-    y = move * math.sin(angle) * cmp(dy, 0) * heading + y1
-  else:
-    x = x1
-    y = move * cmp(dy, 0) * heading + y1  
-  return map(int, (x, y))
+  def scale(self, scalar):
+    ret = Vect(self.x, self.y)
+    ret.x *= scalar
+    ret.y *= scalar
+    return ret
   
-def safeMove(ship, move):
-  if (ship.getX(), ship.getY()) != tuple(move) and distance(move[0], move[1], 0, 0) < 500:
-    ship.move(*move)
+  def diff(self, other):
+    return Vect(other.x - self.x, other.y - self.y)
+  
+  def startFrom(self, ship):
+    return (ship.getX() + self.x, ship.getY() + self.y)
+  
+  def startFromV(self, ship):
+    return Vect(*self.startFrom(ship))
+  
+  def moveShip(self, ship):
+    ship.move(*self.startFrom(ship))
+  
+  def __repr__(self):
+    return "(%i, %i, %i)"%(self.x, self.y, self.magnitude)
 
+  def __str__(self):
+    return repr(self)
 
 class AI(BaseAI):
   """The class implementing gameplay logic."""
   @staticmethod
   def username():
-    return "goldman"
+    return "Shell AI"
 
   @staticmethod
   def password():
-    return "ROBOTHOUSE"
+    return "password"
 
   ##This function is called once, before your first turn
   def init(self):
@@ -56,72 +81,41 @@ class AI(BaseAI):
   def end(self):
     pass
 
+  def validPos(self, ship, pos):
+    if not (self.innerMapRadius() + ship.getRadius() <= pos.magnitude <= self.outerMapRadius() - ship.getRadius()):
+      #print pos, self.innerMapRadius(), pos.magnitude, self.outerMapRadius()
+      return False
+    return True
 
-  def spendEnergy(self):
-    cheapEnough = lambda shipType: shipType.getCost() <= self.players[self.playerID()].getEnergy()
-    for shipType in filter(cheapEnough, self.shipTypes):
-      if shipType.getType() == "Mine Layer":
-        shipType.warpIn(self.myGate.getX(), self.myGate.getY())
-        shipType.warpIn(self.myGate.getX(), self.myGate.getY())
-        shipType.warpIn(self.myGate.getX(), self.myGate.getY())
-      if shipType.getType() == "Weapons Platform":
-        shipType.warpIn(self.myGate.getX(), self.myGate.getY())
-    while True:
-      canBuy = filter(cheapEnough, self.shipTypes)
-      try:
-        spammers = filter(lambda shipType: shipType.getType() in ["BattleShip", "Juggernaught", "Bomber", "Interceptor"], canBuy)
-        if len(spammers) > 0:
-          canBuy = spammers
-        
-        random.choice(canBuy).warpIn(self.myGate.getX(), self.myGate.getY())
-      except IndexError:
-        break
-  def setup(self):
-    self.myShips = filter(lambda ship: ship.getOwner() == self.playerID(), self.ships)
-    self.theirShips = filter(lambda ship: ship.getOwner() != self.playerID(), self.ships)
-    self.myGate = filter(lambda ship: ship.getType() == "Warp Gate", self.myShips)[0]
-    self.theirGate = filter(lambda ship: ship.getType() == "Warp Gate", self.theirShips)[0]
-    
+  def validMove(self, ship, vect):
+    pos = vect.startFromV(ship)
+    return self.validPos(ship, pos)
+
+  def spreadMove(self, ship, target):
+    possible = [Vect.randVect(ship.getMovementLeft()).startFromV(ship) for _ in range(1000)]
+    possible = filter(lambda pos: self.validPos(ship, pos), possible)
+    #possible.append(Vect(ship.getX(), ship.getY()))
+    move = min(possible, key=lambda pos: Vect.vectorize(target, pos).magnitude)
+    print move
+    if move.x != ship.getX() or move.y != ship.getY():
+            
+      ship.move(move.x, move.y)
+
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
-    self.setup()
-    self.spendEnergy()
-    mines = filter(lambda target: target.getType() == "Mine" and target.getOwner() != self.playerID(), self.theirShips)
-    for ship in self.myShips:
-      attackable = filter(lambda target: target.getHealth() > 0 and target.getType() != "Mine", self.theirShips)
-      if ship.getMaxAttacks() == 0 and ship.getSelfDestructDamage() != 0:
-        ship.selfDestruct()
-      while ship.getAttacksLeft() > 0 and len(attackable) > 0:
-        if ship.getType() == "Mine Layer":
-          target = min(attackable, key=lambda target: (target.getDamage() == 0, 
-                                                       travelDist(ship.getX(), ship.getY(), ship.getRange(), target.getX(), target.getY(), target.getRadius())))
-          move = getMeThere(ship.getX(), ship.getY(), 0, target.getX(), target.getY(), 0, ship.getMovementLeft())
-          safeMove(ship, move)
-          if inRange(ship.getX(), ship.getY(), 45, target.getX(), target.getY(), target.getRadius()):
-            ship.attack(ship)
-            attackable.remove(target)
-          break
-        else:
-          target = min(attackable, key=lambda target: (target.getType() != "Weapons Platform", 
-                                                       travelDist(ship.getX(), ship.getY(), ship.getRange(), target.getX(), target.getY(), target.getRadius())))
-          move = getMeThere(ship.getX(), ship.getY(), ship.getRange(), target.getX(), target.getY(), target.getRadius(), ship.getMovementLeft())
-          safeMove(ship, move)
-          if inRange(ship.getX(), ship.getY(), ship.getRange(), target.getX(), target.getY(), target.getRadius()):
-            ship.attack(target)
-            attackable.remove(target)
-          else:
+    for ship in self.ships:
+      if ship.getOwner() == self.playerID():
+        for target in self.ships:
+          if target.getOwner() != self.playerID():
+            self.spreadMove(ship, target)
+            #move = Vect.vectorize(ship, target)
+            #print move, move.makeUnit(), move.makeUnit().scale(ship.getMovementLeft())
+            #move = move.makeUnit().scale(ship.getMovementLeft())
+            #if self.validMove(ship, move):
+            #  move.moveShip(ship)
             break
-      #if ship.getMovementLeft() > 0:
-      #  direction = random.choice([(0, 1), (1, 0), (-1, 0), (0, -1)])
-      #  move = ship.getMovementLeft()*direction
-      #  move = move[0] + ship.getX(), move[1] + ship.getY()
-      #  print "WOO", direction, ship.getMovementLeft(), ship.getType()
-      #  safeMove(ship, move)
-      #if ship.getMovementLeft() > 0:
-      #  move = getMeThere(ship.getX(), ship.getY(), 0, self.theirGate.getX(), self.theirGate.getY(), 0, ship.getMovementLeft(), reverse=True)
-      #  safeMove(ship, move)
-    return 1
+    return True
 
   def __init__(self, conn):
       BaseAI.__init__(self, conn)
