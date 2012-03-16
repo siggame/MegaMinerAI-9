@@ -161,13 +161,22 @@ namespace visualizer
         m_PersistentShips[shipID]->points.push_back( SpacePoint( i.second.x, i.second.y ) );
         m_PersistentShips[shipID]->healths.push_back( i.second.health );
         m_PersistentShips[shipID]->emps.push_back( false );
-
+        
+        vector< SpacePoint > moves;
         // Check for this ship's animations in the gamelog
         for( auto& j : m_game->states[state].animations[shipID] )
         {
           switch( j->type )
           {
-            // Attack animation
+            case parser::MOVE:
+            {
+                parser::move &move = (parser::move&)*j;
+                if( !m_PersistentShips[shipID]->HasMoves() )
+                {
+                    moves.push_back( SpacePoint( move.fromX, move.fromY ) );
+                }
+                moves.push_back( SpacePoint( move.toX, move.toY ) );
+            } break;
             case parser::ATTACK:
               {
                 parser::attack &attack = (parser::attack&)*j;
@@ -184,6 +193,8 @@ namespace visualizer
               }
           }
         }
+        
+        m_PersistentShips[shipID]->AddTurn( state, moves );
       }
     }
 
