@@ -163,9 +163,11 @@ class AI(BaseAI):
         if availShips["Bomber"] != 0:
           availShips["Bomber"].warpIn(agressiveWarp[0],agressiveWarp[1])
           energyStart -= availShips["Bomber"].getCost()
-        if availShips["Interceptor"] != 0 and availShips["Battleship"] == 0:
+        if availShips["Interceptor"] != 0:
           availShips["Interceptor"].warpIn(agressiveWarp[0],agressiveWarp[1])
           energyStart -= availShips["Interceptor"].getCost()
+        else:
+          return energyLeft
     return energyStart
 
   def spawnBig(self, energyLeft, availShips, safeWarp, defensiveWarp, agressiveWarp):   
@@ -269,7 +271,7 @@ class AI(BaseAI):
           ship.attack(target)
           attacksLeft-=1
           attackList.remove(target)
-          print ship.getId(), ship.getAttacksLeft(), attacksLeft
+          #print ship.getId(), ship.getAttacksLeft(), attacksLeft
         else:
           attackList.remove(target)
       del attackList[0:len(attackList)]  
