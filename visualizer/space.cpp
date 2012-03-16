@@ -120,6 +120,10 @@ namespace visualizer
     
     resourceManager->loadResourceFile( "./plugins/space/resources.r" );
 
+    QStringList header;
+    header << "Health" << "MaxHealth";
+    gui->setDebugHeader( header );
+
     int p = programs["test"] = renderer->createShaderProgram();
     renderer->attachShader( p, "testShader" );
     renderer->buildShaderProgram( p );
@@ -233,16 +237,17 @@ namespace visualizer
         SmartPointer<PlayerHUD> hud = new PlayerHUD( m_game->states[state].players[playerid], (m_game->winner == playerid) );
         hud->addKeyFrame( new DrawPlayerHUD(hud) );
         turn.addAnimatable( hud );
-      }     
-
-
-
+      }
+        
       // For each of our PersistentShips
       for( auto& i : m_PersistentShips )
       {
         // If it exists
         if(i.second->ExistsAtTurn( state, m_game->states[ state ].round ))
         {
+          turn[i.first]["Health"] = i.second->HealthOn(state, 0); 
+          turn[i.first]["MaxHealth"] = i.second->maxHealth;
+
           // Then and and draw it
           SmartPointer<PersistentShipAnim> ship = new PersistentShipAnim();
           ship->addKeyFrame( new DrawPersistentShip( i.second, state, &m_outerMapRadius ) );

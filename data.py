@@ -44,18 +44,18 @@ Ship = Model('Ship',
     ],
   doc='A space ship!',
   functions=[ 
-    Function('move', [Variable('x', int), Variable('y', int)], doc='Command a ship to move to a specified position'),
-    Function ('selfDestruct', [], doc='Blow yourself up, damage those around you'),
+    Function('move', [Variable('x', int), Variable('y', int)], doc='Command a ship to move to a specified position. If the position specified by this function is not legal, the position of the ship will be updated, but the movement will be rejected by the server.'),
+    Function ('selfDestruct', [], doc='Blow yourself up, damage those around you, reduces the ship to 0 health.'),
   ],
 )
 
-Ship.addFunctions([Function("attack", [Variable("target", Ship)], doc='Commands your ship to attack a target')])
+Ship.addFunctions([Function("attack", [Variable("target", Ship)], doc='Commands your ship to attack a target. Making an attack will reduce the number of attacks available to the ship, even if the attack is rejected by the game server.')])
 
 ShipType = Model('ShipType',
   data=[ Variable('type', str, 'The ship type'),
     Variable('cost', int, 'The amount of money required to purchase this type of ship'),
     ],
-  functions=[Function('warpIn', [Variable('x', int), Variable('y', int)], doc='Sends in a new ship of this type'),
+  functions=[Function('warpIn', [Variable('x', int), Variable('y', int)], doc='Sends in a new ship of this type. Ships must be warped in with the radius of the player\'s warp ship.'),
     ],
   doc='An available ship type',
   )
