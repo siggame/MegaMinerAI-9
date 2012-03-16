@@ -148,10 +148,11 @@ class Ship:
     self.movementLeft -= moved
     
     #Check to see if they moved onto a mine, TWAS A TRAP!
+    radius = self.radius
     for unit in self.game.objects.ships:
       if unit.owner != self.owner and unit.type == "Mine": 
-        if inRange(x,y,self.radius,unit.x,unit.y,unit.range):
-          for attacked in self.allInRange(self.owner):
+        if inRange(x,y,radius,unit.x,unit.y,unit.range):
+          for attacked in self.allInRange(self.owner,unit.range):
             attacked.health -= unit.damage
             self.game.animations.append(['attack', unit.id, attacked.id])
             if attacked.health <= 0 and attacked.id in self.game.objects:

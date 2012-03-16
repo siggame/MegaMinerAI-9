@@ -343,7 +343,7 @@ class AI(BaseAI):
        dy = int(math.copysign(maxMove/2,dy))
      totX = (ship.getX()+dx)**2
      totY = (ship.getY()+dy)**2
-     if abs(dx)+abs(dy)> 0 and totX + totY <= self.outerMapRadius()**2:
+     if abs(dx)+abs(dy)> 0 and totX**2 + totY**2 <= self.outerMapRadius()**2:
        ship.move(ship.getX()+dx,ship.getY()+dy)
        maxMove-=dist
                                               
@@ -422,7 +422,7 @@ class AI(BaseAI):
       health = 0
       damage = ship.getDamage()
       aNewList = sorted(targets, key=lambda x: x.getHealth())
-      print aNewList
+      print "A NEW LIST IS ",aNewList
       guy = aNewList[0]    
       result.append(aNewList[0])
       for target in targets:
