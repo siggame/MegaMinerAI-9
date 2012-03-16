@@ -64,7 +64,21 @@ namespace visualizer
             { return 1; }
         private:
             PlayerHUD* m_PlayerHUD;
-    }; // DrawPersistentShip
+    }; // DrawPLayerHUD
+    
+    class DrawRoundHUD: public Anim
+    {
+        public:
+            DrawRoundHUD( RoundHUD* hud ) { m_RoundHUD = hud; }
+            void animate( const float& t, AnimData *d, IGame* game );
+
+            float controlDuration() const
+            { return 1; }
+            float totalDuration() const
+            { return 1; }
+        private:
+            RoundHUD* m_RoundHUD;
+    }; // DrawRoundHUD
     
     class DrawWarp: public Anim
     {

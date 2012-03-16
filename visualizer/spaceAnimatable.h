@@ -47,6 +47,27 @@ namespace visualizer
         int VictoriesX() { return (id ? 840 : 10); }
     };
     
+    class RoundHUD: public Animatable
+    {
+        public:
+            int turn;
+            int round;
+            string winner;
+            int winnerID;
+            int mapRadius;
+            bool drawWinScreen;
+            
+            RoundHUD( int n, int t, string win, int id, int r, bool b )
+            {
+                round = n;
+                turn = t;
+                winner = win;
+                winnerID = id;
+                mapRadius = r;
+                drawWinScreen = b;
+            }
+    };
+    
     class Warp: public Animatable
     {
         public:

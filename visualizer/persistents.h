@@ -107,7 +107,7 @@ namespace visualizer
             int maxHealth;
             string type;
             
-            PersistentShip(int createdAt, parser::Ship ship)
+            PersistentShip(int createdAt, int round, parser::Ship ship)
             {
                 createdAtTurn = createdAt;
                 id = ship.id;
@@ -118,6 +118,7 @@ namespace visualizer
                 type = (ship.type == NULL ? "default" : ship.type);
                 m_X = ship.x;
                 m_Y = ship.y;
+                m_Round = round;
                 
                 // have it stealth now (only Stealth ships care...)
                 AddStealth( createdAt );
@@ -144,9 +145,9 @@ namespace visualizer
             
             bool HasMoves() { return m_Moves.size() > 0; }
             
-            bool ExistsAtTurn(int turn)
+            bool ExistsAtTurn(int turn, int round)
             {
-                return ( turn >= createdAtTurn && turn < createdAtTurn + (int)healths.size() );
+                return ( turn >= createdAtTurn && turn < createdAtTurn + (int)healths.size() && m_Round == round );
             }
             
             SpacePoint LocationOn(int turn, float t)
@@ -269,6 +270,7 @@ namespace visualizer
             map< int, vector < PersistentShip* > > m_AttackVictims;
             vector< pair< int, char > > m_Stealths;  // int represents the turn, char 's' represents that it went into stealth, 'd' is destealth
             vector< SpaceMove > m_Moves;
+            int m_Round;
             
             int PreviousTurn(int turn)
             {
