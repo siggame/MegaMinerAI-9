@@ -41,10 +41,10 @@ namespace visualizer
             winner = win;
         }
         
-        int NameX() { return (id ? 770 : 10); }
-        int EnergyX() { return (id ? 810 : 10); }
+        int NameX() { return (id ? 770 : 230); }
+        int EnergyX() { return (id ? 810 : 190); }
         int TimeX() { return (id ? 850 : 40); }
-        int VictoriesX() { return (id ? 840 : 10); }
+        int VictoriesX() { return (id ? 840 : 160); }
     };
     
     class RoundHUD: public Animatable

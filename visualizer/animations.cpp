@@ -47,7 +47,7 @@ namespace visualizer
         game->renderer->drawText( m_RoundHUD->mapRadius, 1, "Roboto", round.str(), 100, IRenderer::Center);
         
         // Draw the t "hand"
-        game->renderer->drawArc( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius, m_RoundHUD->mapRadius, 60, 0, 360.0f * t );
+        //game->renderer->drawArc( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius, m_RoundHUD->mapRadius, 60, 0, 360.0f * t );
         
         if( m_RoundHUD->drawWinScreen )
         {
@@ -213,20 +213,21 @@ namespace visualizer
     
     void DrawPlayerHUD::animate( const float& t, AnimData * d, IGame* game )
     {
+        IRenderer::Alignment align = m_PlayerHUD->id ? IRenderer::Left : IRenderer::Right;
         
         game->renderer->setColor( m_PlayerHUD->id ? Color(0, 0.4f, 1, 1) : Color(1, 0, 0, 1) );
         // Draw the player's name
-        game->renderer->drawText( m_PlayerHUD->NameX(), 20, "Roboto", m_PlayerHUD->name, 200 );
+        game->renderer->drawText( m_PlayerHUD->NameX(), 20, "Roboto", m_PlayerHUD->name, 200 , align);
         
         // Draw the player's energy
         stringstream energy;
         energy << "Energy: " << m_PlayerHUD->energy;
-        game->renderer->drawText( m_PlayerHUD->EnergyX(), 70, "Roboto", energy.str(), 100 );
+        game->renderer->drawText( m_PlayerHUD->EnergyX(), 70, "Roboto", energy.str(), 100, align );
         
         // Draw the player's victories
         stringstream victories;
         victories << "Victories: " << m_PlayerHUD->victories;
-        game->renderer->drawText( m_PlayerHUD->VictoriesX(), 100, "Roboto", victories.str(), 100 );
+        game->renderer->drawText( m_PlayerHUD->VictoriesX(), 100, "Roboto", victories.str(), 100, align );
         
         // Draw the player's time left
         game->renderer->drawText( m_PlayerHUD->TimeX(), 870, "Roboto", "Time Left:", 100 );
