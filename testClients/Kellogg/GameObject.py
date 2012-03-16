@@ -167,22 +167,22 @@ class Ship(GameObject):
     self.validify()
     return library.shipGetId(self.ptr)
 
-  ##The owner of the piece
+  ##The owner of the ship
   def getOwner(self):
     self.validify()
     return library.shipGetOwner(self.ptr)
 
-  ##Position x
+  ##X position of the ship
   def getX(self):
     self.validify()
     return library.shipGetX(self.ptr)
 
-  ##Position y
+  ##Y position of the ship
   def getY(self):
     self.validify()
     return library.shipGetY(self.ptr)
 
-  ##ship size radius
+  ##The radius of the ship
   def getRadius(self):
     self.validify()
     return library.shipGetRadius(self.ptr)
@@ -192,47 +192,47 @@ class Ship(GameObject):
     self.validify()
     return library.shipGetType(self.ptr)
 
-  ##how many more attacks it has
+  ##How many more attacks this ship has
   def getAttacksLeft(self):
     self.validify()
     return library.shipGetAttacksLeft(self.ptr)
 
-  ##how much more movement it has
+  ##How much more movement this ship has
   def getMovementLeft(self):
     self.validify()
     return library.shipGetMovementLeft(self.ptr)
 
-  ##the largest possible movement
+  ##The largest possible movement for this ship
   def getMaxMovement(self):
     self.validify()
     return library.shipGetMaxMovement(self.ptr)
 
-  ##the max number of attacks it has
+  ##The max number of attacks for this ship
   def getMaxAttacks(self):
     self.validify()
     return library.shipGetMaxAttacks(self.ptr)
 
-  ##the strength of its attacks
+  ##The strength of attacks for this ship
   def getDamage(self):
     self.validify()
     return library.shipGetDamage(self.ptr)
 
-  ##the range of its attacks
+  ##The range of attacks for this ship
   def getRange(self):
     self.validify()
     return library.shipGetRange(self.ptr)
 
-  ##the total health of the ship
+  ##The total health of the ship
   def getHealth(self):
     self.validify()
     return library.shipGetHealth(self.ptr)
 
-  ##the max health possible for the ship
+  ##The max health possible for the ship
   def getMaxHealth(self):
     self.validify()
     return library.shipGetMaxHealth(self.ptr)
 
-  ##the amount of damage done when this ship blows up
+  ##The amount of damage done when this ship self destructs
   def getSelfDestructDamage(self):
     self.validify()
     return library.shipGetSelfDestructDamage(self.ptr)

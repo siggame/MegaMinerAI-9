@@ -75,8 +75,25 @@ namespace visualizer
                 x = posX;
                 y = posY;
             }
+            
+            void operator=( const SpacePoint & rhs )
+            {
+                x = rhs.x;
+                y = rhs.y;
+            }
     };  
     
+    class SpaceMove
+    {
+        public:
+            SpacePoint point;
+            float start;
+            float end;
+            
+            bool InRange(float time) { return start < time && end >= time; }
+            bool IsAfter(float time) { return start > time; }
+            bool IsBefore(float time) { return end < time; }
+    };
 
 
     class PersistentShip
@@ -99,6 +116,8 @@ namespace visualizer
                 range = ship.range;
                 maxHealth = ship.maxHealth;
                 type = (ship.type == NULL ? "default" : ship.type);
+                m_X = ship.x;
+                m_Y = ship.y;
                 
                 // have it stealth now (only Stealth ships care...)
                 AddStealth( createdAt );
@@ -109,6 +128,22 @@ namespace visualizer
             vector< int > healths;
             vector< bool > emps;
             
+            void AddTurn( int turn, vector< SpacePoint > &moves )
+            {
+                float span = 1.0f / moves.size();
+                for(float i = 0; i < (float)moves.size(); i++)
+                {
+                    SpaceMove move;
+                    move.point = moves[i];
+                    move.start = (float)turn + i * span;
+                    move.end = (float)turn + (i+1) * span;
+                    
+                    m_Moves.push_back( move );
+                }
+            }
+            
+            bool HasMoves() { return m_Moves.size() > 0; }
+            
             bool ExistsAtTurn(int turn)
             {
                 return ( turn >= createdAtTurn && turn < createdAtTurn + (int)healths.size() );
@@ -116,81 +151,14 @@ namespace visualizer
             
             SpacePoint LocationOn(int turn, float t)
             {
-                turn -= createdAtTurn;
-                
-                int i = turn;
-                
-	            SpacePoint p;
-	            int step = 1;
-	            	
-	            int v1 = i-step;		
-	            int v2 = i;
-	            int v3 = i+step;
-	            int v4 = i+step*2;
-
-	            if( i-step < 0 )
-		            v1=0;
-	            if( points.size() <= i+step )
-		            v3=points.size()-1;
-	            if( points.size() <= i+step*2 )
-		            v4=points.size()-1;		
-	            
-	            double c1,c2,c3,c4;   
-
-                c1 = M12*points[v2].x;   
-                c2 = M21*points[v1].x + M23*points[v3].x;   
-                c3 = M31*points[v1].x + M32*points[v2].x + M33*points[v3].x + M34*points[v4].x;   
-                c4 = M41*points[v1].x + M42*points[v2].x + M43*points[v3].x + M44*points[v4].x;   
-
-                float x = (((c4*t + c3)*t +c2)*t + c1);
-
-                c1 = M12*points[v2].y;   
-                c2 = M21*points[v1].y + M23*points[v3].y;   
-                c3 = M31*points[v1].y + M32*points[v2].y + M33*points[v3].y + M34*points[v4].y;   
-                c4 = M41*points[v1].y + M42*points[v2].y + M43*points[v3].y + M44*points[v4].y;   
-
-                float y = (((c4*t + c3)*t +c2)*t + c1);
-
-                return SpacePoint( x, y );
+                auto lah = SplineOn(turn, t);
+                return lah.first;
             }
             
             float HeadingOn(int turn, float t)
             {
-                turn -= createdAtTurn;
-                
-                int i = turn;
-
-	            int step = 1;
-	            	
-	            int v1 = i-step;		
-	            int v2 = i;
-	            int v3 = i+step;
-	            int v4 = i+step*2;
-
-	            if( i-step < 0 )
-		            v1=0;
-	            if( points.size() <= i+step )
-		            v3=points.size()-1;
-	            if( points.size() <= i+step*2 )
-		            v4=points.size()-1;		
-	            
-	            double c1,c2,c3,c4;   
-
-                c1 = M12*points[v2].x;   
-                c2 = M21*points[v1].x + M23*points[v3].x;   
-                c3 = M31*points[v1].x + M32*points[v2].x + M33*points[v3].x + M34*points[v4].x;   
-                c4 = M41*points[v1].x + M42*points[v2].x + M43*points[v3].x + M44*points[v4].x;   
-
-                float x = (3*c4*t + 2*c3)*t +c2;
-
-                c1 = M12*points[v2].y;   
-                c2 = M21*points[v1].y + M23*points[v3].y;   
-                c3 = M31*points[v1].y + M32*points[v2].y + M33*points[v3].y + M34*points[v4].y;   
-                c4 = M41*points[v1].y + M42*points[v2].y + M43*points[v3].y + M44*points[v4].y;   
-
-                float y = (3*c4*t + 2*c3)*t +c2;
-
-                return atan2( y, x );
+                auto lah = SplineOn(turn, t);
+                return lah.second;
             }
             
             float HealthOn(int turn, float t)
@@ -263,37 +231,7 @@ namespace visualizer
             
             float StealthOn( int turn, float t)
             {
-                // if this is not a stealth ship just return 1, as other's can't stealth
-                if(strcmp("Stealth", type.c_str()) != 0)
-                {
-                    return 1;
-                }
-                
-                for(int i = 0; i < (int)m_Stealths.size(); i++)
-                {
-                    // if the current turn is the turn it stealthed or destealthed
-                    if(m_Stealths[i].first == turn)
-                    {
-                        return (m_Stealths[i].second == 'd' ? (t * 0.75f) + 0.25f : 1 - (t * 0.75f));
-                    }
-                    
-                    // if the turn it did something is larger than the current turn, it is in the state last time it did something
-                    if(m_Stealths[i].first > turn)
-                    {
-                        if(i == 0) // if the turn that is larger is so far in the future the ship hasn't done anything else, it's stealthed
-                        {
-                            return 0.25f;
-                        }
-                        else // else return if it currently stealthed or not stealthed based on the last stealth animation
-                        {
-                            return (m_Stealths[i - 1].second == 'd' ? 1.0f : 0.25f);
-                        }
-                    }
-                }
-                
-                cout << "Stealth: should not reach here?" << endl;
-                return 0.25f;
-                
+                return (strcmp("Stealth", type.c_str()) != 0) ? 1 : 0.3f;
             }
             
             float ExplodingOn( int turn )
@@ -305,6 +243,12 @@ namespace visualizer
             {
                 healths.push_back(0);
                 points.push_back( SpacePoint( points.back().x, points.back().y ) );
+                
+                for(int i = 0; i < m_Moves.size(); i++)
+                {
+                    cout << id << ": #" << i << ":  (" << m_Moves[i].point.x << "," << m_Moves[i].point.y << ") @" << m_Moves[i].start << " to " << m_Moves[i].end << endl;
+                }
+                
             }
             
             bool RenderShield()
@@ -319,16 +263,139 @@ namespace visualizer
             
         private:
             int createdAtTurn;
+            float m_X;
+            float m_Y;
             //map< int, vector< SpacePoint > > m_AttackLocations;
             map< int, vector < PersistentShip* > > m_AttackVictims;
             vector< pair< int, char > > m_Stealths;  // int represents the turn, char 's' represents that it went into stealth, 'd' is destealth
+            vector< SpaceMove > m_Moves;
             
             int PreviousTurn(int turn)
             {
                 return (turn > 0 ? turn - 1 : 0);
             }
             
+            pair<SpacePoint, float> SplineOn(int turn, float t)
+            {
+                turn -= createdAtTurn;
+                
+                int i = turn;
+                
+	            int step = 1;
+	            	
+	            int v1 = i-step;		
+	            int v2 = i;
+	            int v3 = i+step;
+	            int v4 = i+step*2;
+
+	            if( i-step < 0 )
+		            v1=0;
+	            if( points.size() <= i+step )
+		            v3=points.size()-1;
+	            if( points.size() <= i+step*2 )
+		            v4=points.size()-1;		
+	            
+	            double c1,c2,c3,c4;   
+
+                c1 = M12*points[v2].x;   
+                c2 = M21*points[v1].x + M23*points[v3].x;   
+                c3 = M31*points[v1].x + M32*points[v2].x + M33*points[v3].x + M34*points[v4].x;   
+                c4 = M41*points[v1].x + M42*points[v2].x + M43*points[v3].x + M44*points[v4].x;   
+
+                float px = (((c4*t + c3)*t +c2)*t + c1);
+                float hx = (3*c4*t + 2*c3)*t +c2;
+
+                c1 = M12*points[v2].y;   
+                c2 = M21*points[v1].y + M23*points[v3].y;   
+                c3 = M31*points[v1].y + M32*points[v2].y + M33*points[v3].y + M34*points[v4].y;   
+                c4 = M41*points[v1].y + M42*points[v2].y + M43*points[v3].y + M44*points[v4].y;   
+
+                float py = (((c4*t + c3)*t +c2)*t + c1);
+                float hy = (3*c4*t + 2*c3)*t +c2;
+
+                return make_pair( SpacePoint( px, py ), atan2( hy, hx ) );
+            }
             
+            pair<SpacePoint, float> NewSplineOn(int turn, float t)
+            {
+                if( m_Moves.size() == 0 )
+                {
+                    return make_pair( SpacePoint( m_X, m_Y ), 0.0f );
+                }
+                
+                int v1 = -1, v2 = -1, v3 = -1, v4 = -1;
+                float time = (float)turn + t;
+                bool needNewT = true;
+                
+                for(int i = 0; i < m_Moves.size(); i++)
+                {
+                    if( m_Moves[i].InRange( time ) )
+                    {
+                        v2 = i;
+                        break;
+                    }
+                    else if( m_Moves[i].IsAfter( time ) )
+                    {
+                        if( i == 0 )
+                        {
+                            v2 = 0;
+                            break;
+                        }
+                        
+                        if( m_Moves[i - 1].IsBefore( time ) )
+                        {
+                            v2 = i - 1;
+                            t = 1;
+                            needNewT = false;
+                            break;
+                        }
+                    }
+                }
+                
+	            v1 = v2-1;
+	            v3 = v2+1;
+	            v4 = v2+2;
+
+	            if( v1 < 0 )
+		            v1=0;
+	            if( v2 < 0 )
+	                v2=0;
+	            if( m_Moves.size() <= v3 )
+		            v3=m_Moves.size()-1;
+	            if( m_Moves.size() <= v4 )
+		            v4=m_Moves.size()-1;		
+	            
+	            if( needNewT )
+	            {
+	                // new_t = (t - start) / (end - start)
+	                int dt = int(m_Moves[v2].start);
+	                t = (t - (m_Moves[v2].start - dt)) / ( (m_Moves[v2].end - dt) - (m_Moves[v2].start - dt) );
+	                if(t > 1 || t < 0)
+	                {
+	                    cout << "WTF t is: " << t << endl;
+	                }
+	            }
+	            
+	            double c1,c2,c3,c4;   
+
+                c1 = M12*m_Moves[v2].point.x;   
+                c2 = M21*m_Moves[v1].point.x + M23*m_Moves[v3].point.x;   
+                c3 = M31*m_Moves[v1].point.x + M32*m_Moves[v2].point.x + M33*m_Moves[v3].point.x + M34*m_Moves[v4].point.x;   
+                c4 = M41*m_Moves[v1].point.x + M42*m_Moves[v2].point.x + M43*m_Moves[v3].point.x + M44*m_Moves[v4].point.x;   
+
+                float px = (((c4*t + c3)*t +c2)*t + c1);
+                float hx = (3*c4*t + 2*c3)*t +c2;
+
+                c1 = M12*m_Moves[v2].point.y;   
+                c2 = M21*m_Moves[v1].point.y + M23*m_Moves[v3].point.y;   
+                c3 = M31*m_Moves[v1].point.y + M32*m_Moves[v2].point.y + M33*m_Moves[v3].point.y + M34*m_Moves[v4].point.y;   
+                c4 = M41*m_Moves[v1].point.y + M42*m_Moves[v2].point.y + M43*m_Moves[v3].point.y + M44*m_Moves[v4].point.y;   
+
+                float py = (((c4*t + c3)*t +c2)*t + c1);
+                float hy = (3*c4*t + 2*c3)*t +c2;
+
+                return make_pair( SpacePoint( px, py ), atan2( hy, hx ) );
+            }
     };
 }
 
