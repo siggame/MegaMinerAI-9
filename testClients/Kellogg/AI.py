@@ -143,12 +143,9 @@ class AI(BaseAI):
   #create mine field around warp gate, if x amount of mines already near warp gate and have mines left, move towards
   #largest cluster dropping mines 
     for ship in myListDict['Mine Layer']:
-      move = [0,0,0,0]
-      for i in move:
-        ship.move(ship.getX()-ship.getMaxMovement()/5,ship.getY()+ship.getMaxMovement()/2)
-        if ship.getAttacksLeft()>0:
-          pass
-          ship.attack(ship)
+      ship.move(ship.getX()-ship.getMaxMovement()/5,ship.getY()+ship.getMaxMovement()/2)
+      if ship.getAttacksLeft()>0:
+        ship.attack(ship)
               
   def supportControl(self,enemyListDict,myListDict):
     #if warpgate is below x health, move towards and heal warp Gate, else if wp in game,  move a support to them,  else move with largest cluster of friendly units
@@ -156,7 +153,7 @@ class AI(BaseAI):
     if myListDict['Warp Gate'][0].getHealth() <= myListDict['Warp Gate'][0].getMaxHealth()/2:
       for ship in myListDict['Support']:
 #          self.moveTo(ship,ship.getX(),ship.getY(),target.getX(),target.getY(),target.getMaxMovement(),"toward")
-          self.moveToTarget(myListDict['Support'][0],myListDict['Warp Gate'][0])
+          self.moveToTarget(ship,target)
     else:
      for ship in myListDict['Support']:  
         target2 = self.findCluster(ship,ship.getOwner(),myShips)
@@ -181,12 +178,21 @@ class AI(BaseAI):
   def stealthControl(self,enemyListDict,myListDict):
   #stick with other stealth ships, move towards most isolated enemy, or target emps or other priority targets, swarm them, then flee
     for ship in myListDict['Stealth']:
-      ship.move(ship.getX()+ship.getMaxMovement(),ship.getY())
+      nearest = self.findNearest(ship,enemyShips)
+      self.moveToTarget(ship,nearest)
+      target = self.bestUseAttack(ship)
+      if len(target) > 0:
+        ship.attack(target[0])
+      
          
   def cruiserControl(self,enemyListDict,myListDict):
     #mini battleship/big bomber
     for ship in myListDict['Cruisers']:
-      ship.move(ship.getX()+ship.getMaxMovement()/3,ship.getY()+2*ship.getMaxMovement()/3)
+      nearest = self.findNearest(ship,enemyShips)
+      self.moveToTarget(ship,nearest)
+      target = self.bestUseAttack(ship)
+      if len(target) > 0:
+        ship.attack(target[0])
   
   def weapPlatControl(self,enemyListDict,myListDict):
     #stay far from enemy units, snipe priority targets (emp,stealth, etc)
@@ -224,7 +230,11 @@ class AI(BaseAI):
   def bomberControl(self,enemyListDict,myListDict):
     #attack stuff 
     for ship in myListDict['Bomber']:
-      ship.move(ship.getX()+ship.getMaxMovement()/3,ship.getY()-2*ship.getMaxMovement()/3)
+      nearest = self.findNearest(ship,enemyShips)
+      self.moveToTarget(ship,nearest)
+      target = self.bestUseAttack(ship)
+      if len(target) > 0:
+        ship.attack(target[0])
              
   def end(self):
     pass
@@ -239,6 +249,7 @@ class AI(BaseAI):
   def allInRange(self, source, side, range):
     result = []
     for ship in self.ships:
+      if ship.getType()!= 'Mine':
         if ship.getOwner() == side and self.inRange(source.getX(), source.getY(), range, ship.getX(), ship.getY(), ship.getRadius()):
           result.append(ship)
     return result
