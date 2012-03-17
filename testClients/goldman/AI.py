@@ -64,7 +64,7 @@ class AI(BaseAI):
   """The class implementing gameplay logic."""
   @staticmethod
   def username():
-    return "Shell AI"
+    return "goldman"
 
   @staticmethod
   def password():
@@ -82,17 +82,20 @@ class AI(BaseAI):
     if not (self.innerMapRadius + ship.radius <= pos.magnitude <= self.outerMapRadius - ship.radius):
       #print pos, self.innerMapRadius(), pos.magnitude, self.outerMapRadius()
       return False
+    for block in self.ships:
+      if Vect.vectorize(pos, block).magnitude <= ship.radius + block.range and block.type == "Mine" and block.owner != self.playerID:
+        return False
     return True
 
   def validMove(self, ship, vect):
     pos = vect.startFromV(ship)
     return self.validPos(ship, pos)
 
-  def spreadMove(self, ship, target):
-    possible = [Vect.randVect(ship.movementLeft).startFromV(ship) for _ in range(1000)]
+  def spreadMove(self, ship, targets):
+    possible = [Vect.randVect(ship.movementLeft).startFromV(ship) for _ in range(100)]
     possible = filter(lambda pos: self.validPos(ship, pos), possible)
-    #possible.append(Vect(ship.x, ship.y))
-    move = min(possible, key=lambda pos: Vect.vectorize(target, pos).magnitude)
+    possible.append(Vect(ship.x, ship.y))
+    move = min(possible, key=lambda pos: min(Vect.vectorize(target, pos).magnitude for target in targets))
     print move
     if move.x != ship.x or move.y != ship.y:
       ship.move(move.x, move.y)
@@ -100,17 +103,25 @@ class AI(BaseAI):
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
-    for ship in self.ships:
-      if ship.owner == self.playerID:
-        for target in self.ships:
-          if target.owner != self.playerID:
-            self.spreadMove(ship, target)
-            #move = Vect.vectorize(ship, target)
-            #print move, move.makeUnit(), move.makeUnit().scale(ship.movementLeft)
-            #move = move.makeUnit().scale(ship.movementLeft)
-            #if self.validMove(ship, move):
-            #  move.moveShip(ship)
-            break
+    self.myShips = filter(lambda ship: ship.owner == self.playerID and ship.type != "Mine", self.ships)
+    self.theirShips = filter(lambda ship: ship.owner != self.playerID and ship.type != "Mine", self.ships)
+    self.myGate = filter(lambda ship: ship.type == "Warp Gate", self.myShips)[0]
+    self.theirGate = filter(lambda ship: ship.type == "Warp Gate", self.theirShips)[0]
+    
+    while True:
+      afford = filter(lambda shipType: shipType.cost <= self.players[self.playerID].energy, self.shipTypes)
+      if len(afford) == 0:
+        break
+      #min(afford, key=lambda ship: (ship.type == "Mine Layer", ship.cost)).warpIn(self.myGate.x, self.myGate.y)
+      random.choice(afford).warpIn(self.myGate.x, self.myGate.y)
+
+    for ship in self.myShips:
+      self.spreadMove(ship, self.theirShips)
+      for target in sorted(filter(lambda ship: ship.health > 0, self.theirShips),key=lambda ship: ship.health):
+        if ship.attacksLeft == 0:
+          break
+        if Vect.vectorize(ship, target).magnitude <= ship.range + target.radius:
+          ship.attack(target)
     return True
 
   def __init__(self, conn):
