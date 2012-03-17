@@ -22,7 +22,7 @@ class ShipType {
   int cost();
 
   // Actions
-  ///Sends in a new ship of this type
+  ///Sends in a new ship of this type. Ships must be warped in with the radius of the player's warp ship.
   int warpIn(int x, int y);
 
   // Properties

@@ -23,7 +23,7 @@ class AI(BaseAI):
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
-      return 1
+    return 1
 
   def __init__(self, conn):
-      BaseAI.__init__(self, conn)
+    BaseAI.__init__(self, conn)

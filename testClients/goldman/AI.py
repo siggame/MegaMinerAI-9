@@ -98,7 +98,6 @@ class AI(BaseAI):
     move = min(possible, key=lambda pos: Vect.vectorize(target, pos).magnitude)
     print move
     if move.x != ship.getX() or move.y != ship.getY():
-            
       ship.move(move.x, move.y)
 
   ##This function is called each time it is your turn

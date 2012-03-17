@@ -29,19 +29,19 @@ class Ship
 
     //commands
 
-  ///Command a ship to move to a specified position
+  ///Command a ship to move to a specified position. If the position specified by this function is not legal, the position of the ship will be updated, but the movement will be rejected by the server.
   int move(int x, int y)
   {
     validify();
     return Client.INSTANCE.shipMove(ptr, x, y);
   }
-  ///Blow yourself up, damage those around you
+  ///Blow yourself up, damage those around you, reduces the ship to 0 health.
   int selfDestruct()
   {
     validify();
     return Client.INSTANCE.shipSelfDestruct(ptr);
   }
-  ///Commands your ship to attack a target
+  ///Commands your ship to attack a target. Making an attack will reduce the number of attacks available to the ship, even if the attack is rejected by the game server.
   int attack(Ship target)
   {
     validify();
