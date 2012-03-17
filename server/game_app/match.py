@@ -88,7 +88,7 @@ class Match(DefaultGameWorld):
     self.turn = self.players[-1]
     #Handles logic for starting a new round:
       #first get rid of all shiptypes and ships available that round, then put into a new subset of available ship types
-    print "YOU ARE ENTERING A NEW ROUND", self.round
+    print "YOU ARE ENTERING A NEW ROUND", self.round, 'Score:', [player.victories for player in self.objects.players]
 
     for obj in self.objects.values():
       if isinstance(obj, ShipType) or isinstance(obj, Ship):

@@ -149,15 +149,15 @@ class Ship:
     
     #Check to see if they moved onto a mine, TWAS A TRAP!
     radius = self.radius
-    for unit in self.game.objects.ships:
-      if unit.owner != self.owner and unit.type == "Mine": 
-        if inRange(x,y,radius,unit.x,unit.y,unit.range):
-          for attacked in self.allInRange(self.owner,unit.range):
-            attacked.health -= unit.damage
-            self.game.animations.append(['attack', unit.id, attacked.id])
+    for mine in self.game.objects.ships:
+      if mine.owner != self.owner and mine.type == "Mine": 
+        if inRange(x,y,radius,mine.x,mine.y,mine.range):
+          for attacked in mine.allInRange(self.owner,mine.range):
+            attacked.health -= mine.damage
+            self.game.animations.append(['attack', mine.id, attacked.id])
             if attacked.health <= 0 and attacked.id in self.game.objects:
               self.game.removeObject(attacked)
-          self.game.removeObject(unit)
+          self.game.removeObject(mine)
     return True
 
   def selfDestruct(self):
@@ -165,7 +165,7 @@ class Ship:
       return "You cannot explode your Warp Gate"
     if self.owner != self.game.playerID:
       return "The enemy ship refuses to blow itself up, sorry"
-    for target in self.allInRange(self.owner^1):     
+    for target in self.allInRange(self.owner^1):  
       if self.id in self.game.objects:
         target.health -= self.selfDestructDamage
         if target.health <= 0 and target.id in self.game.objects:
@@ -174,7 +174,7 @@ class Ship:
         self.game.animations.append(['selfDestruct', self.id])
     return True
     
-  def attack(self, target):        
+  def attack(self, target):
     if target.type == "Mine":
       return "You cannot attack mines"
     modifier = 1
@@ -187,7 +187,7 @@ class Ship:
        #return "This Mine Layer %i has already laid a mine this turn"(self.id)
     if target.id in self.targeted:
       return "You have already commanded %i to attack %i"%(self.id, target.id)
-    if self.type == "Mine Layer" and self.id == target.id:   
+    if self.type == "Mine Layer":
       #Adding a new mine to the game
       shipStats = [cfgUnits["Mine"][value] for value in self.game.ordering]   
       self.game.addObject(Ship, [self.game.playerID, self.x, self.y] + shipStats)
@@ -206,7 +206,7 @@ class Ship:
       return 'No friendly fire please'
     elif not self.inRange(target):
       return "Target too far away"           
-    else:       
+    else:
       #Factor in damage buff for Support ships neat opponent
       for unit in self.game.objects.ships:
         if unit.owner == self.owner:
@@ -272,7 +272,7 @@ class ShipType:
       return "You need to not be poor to buy that kind of ship"
     elif not inRange(warpX,warpY,cfgUnits["Warp Gate"]["range"],x,y,0):
       return "You must spawn that ship closer to your Warp Gate"
-    else:    
+    else:
       #spawn the unit with its stats, from units.cfg in config directory
       #Add unit to queue to be warped in at the beginning of this player's next turn
       self.game.objects.players[self.game.playerID].warping.append([self.type,x,y])
