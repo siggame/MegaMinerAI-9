@@ -119,9 +119,10 @@ namespace visualizer
     renderer->setGridDimensions( m_game->states[0].outerMapRadius * 2, m_game->states[0].outerMapRadius * 2 );
     
     resourceManager->loadResourceFile( "./plugins/space/resources.r" );
-
+    
+    // Build the Debug Table's Headers
     QStringList header;
-    header << "Health" << "MaxHealth";
+    header << "Owner" << "Type" << "Locations" << "Health" << "Attacks";
     gui->setDebugHeader( header );
 
     int p = programs["test"] = renderer->createShaderProgram();
@@ -160,6 +161,7 @@ namespace visualizer
             Warps[ state ].push_back( new Warp( i.second.x + m_outerMapRadius, i.second.y + m_outerMapRadius, i.second.radius, i.second.owner, true ) );
           }
         }
+
 
         // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
         m_PersistentShips[shipID]->points.push_back( SpacePoint( i.second.x, i.second.y ) );
@@ -245,8 +247,15 @@ namespace visualizer
         // If it exists
         if(i.second->ExistsAtTurn( state, m_game->states[ state ].round ))
         {
-          turn[i.first]["Health"] = i.second->HealthOn(state, 0); 
-          turn[i.first]["MaxHealth"] = i.second->maxHealth;
+          stringstream dto; // debug table output
+          turn[i.first]["Owner"] = i.second->owner; 
+          turn[i.first]["Type"] = i.second->type.c_str();
+          turn[i.first]["Locations"] = i.second->PointsOn( state ).c_str();
+          dto.str("");
+          dto << i.second->HealthOn(state, 0) << "/" << i.second->maxHealth;
+          turn[i.first]["Health"] = dto.str().c_str();
+          dto.str("");
+          turn[i.first]["Attacks"] = i.second->AttacksWhoOn( state ).c_str();
 
           // Then and and draw it
           SmartPointer<PersistentShipAnim> ship = new PersistentShipAnim();

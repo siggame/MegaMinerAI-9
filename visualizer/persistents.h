@@ -50,6 +50,7 @@
 #include <math.h>
 #include <map>
 #include <utility>
+#include <sstream>
 
 namespace visualizer
 {
@@ -260,6 +261,51 @@ namespace visualizer
             bool RenderRange()
             {
                 return (strcmp( "Mine", type.c_str() ) == 0) || (strcmp( "Support", type.c_str() ) == 0);
+            }
+            
+            string PointsOn( int turn )
+            {
+                stringstream pts;
+                
+                bool nothing = true;
+                for( auto& spacemove : m_Moves )
+                {
+                    if( (int)spacemove.start == turn - 1)
+                    {
+                        pts << "(" << spacemove.point.x << "," << spacemove.point.y << ")";
+                        nothing = false;
+                    }
+                    else if( spacemove.start > (float)turn )
+                    {
+                        break;
+                    }
+                }
+                
+                // if it didn't move in that timespan
+                if( nothing )
+                {
+                    pts.str("");
+                    pts << "(" << m_X << "," << m_Y << ")";
+                }
+                
+                return pts.str();
+            }
+            
+            string AttacksWhoOn( int turn )
+            {
+                if( m_AttackVictims.find( turn ) == m_AttackVictims.end() )
+                    return "none";
+                
+                stringstream victims;
+                
+                for(unsigned int i = 0; i < m_AttackVictims[turn].size()-1; i++)
+                {
+                    victims << m_AttackVictims[turn][i]->id << ", ";
+                }
+                
+                victims << m_AttackVictims[turn].back()->id;
+                
+                return victims.str();
             }
             
         private:
