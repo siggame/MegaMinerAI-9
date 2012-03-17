@@ -9,16 +9,13 @@ class Vect(object):
     self.x = int(x)
     self.y = int(y)
 
-  def getX(self): return self.x
-  def getY(self): return self.y
-
   @property
   def magnitude(self):
     return int(math.ceil(math.sqrt(self.x ** 2 + self.y ** 2)))
   
   @staticmethod
   def vectorize(ship, target):
-    return Vect(ship.getX() - target.getX(), ship.getY() - target.getY())
+    return Vect(ship.x - target.x, ship.y - target.y)
 
   @staticmethod
   def randVect(maxMag):
@@ -49,7 +46,7 @@ class Vect(object):
     return Vect(other.x - self.x, other.y - self.y)
   
   def startFrom(self, ship):
-    return (ship.getX() + self.x, ship.getY() + self.y)
+    return (ship.x + self.x, ship.y + self.y)
   
   def startFromV(self, ship):
     return Vect(*self.startFrom(ship))
@@ -82,7 +79,7 @@ class AI(BaseAI):
     pass
 
   def validPos(self, ship, pos):
-    if not (self.innerMapRadius() + ship.getRadius() <= pos.magnitude <= self.outerMapRadius() - ship.getRadius()):
+    if not (self.innerMapRadius + ship.radius <= pos.magnitude <= self.outerMapRadius - ship.radius):
       #print pos, self.innerMapRadius(), pos.magnitude, self.outerMapRadius()
       return False
     return True
@@ -92,25 +89,25 @@ class AI(BaseAI):
     return self.validPos(ship, pos)
 
   def spreadMove(self, ship, target):
-    possible = [Vect.randVect(ship.getMovementLeft()).startFromV(ship) for _ in range(1000)]
+    possible = [Vect.randVect(ship.movementLeft).startFromV(ship) for _ in range(1000)]
     possible = filter(lambda pos: self.validPos(ship, pos), possible)
-    #possible.append(Vect(ship.getX(), ship.getY()))
+    #possible.append(Vect(ship.x, ship.y))
     move = min(possible, key=lambda pos: Vect.vectorize(target, pos).magnitude)
     print move
-    if move.x != ship.getX() or move.y != ship.getY():
+    if move.x != ship.x or move.y != ship.y:
       ship.move(move.x, move.y)
 
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
     for ship in self.ships:
-      if ship.getOwner() == self.playerID():
+      if ship.owner == self.playerID:
         for target in self.ships:
-          if target.getOwner() != self.playerID():
+          if target.owner != self.playerID:
             self.spreadMove(ship, target)
             #move = Vect.vectorize(ship, target)
-            #print move, move.makeUnit(), move.makeUnit().scale(ship.getMovementLeft())
-            #move = move.makeUnit().scale(ship.getMovementLeft())
+            #print move, move.makeUnit(), move.makeUnit().scale(ship.movementLeft)
+            #move = move.makeUnit().scale(ship.movementLeft)
             #if self.validMove(ship, move):
             #  move.moveShip(ship)
             break
