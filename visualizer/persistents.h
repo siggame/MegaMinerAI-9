@@ -107,6 +107,7 @@ namespace visualizer
             int range;
             int maxHealth;
             string type;
+            bool selected;
             
             PersistentShip(int createdAt, int round, parser::Ship ship)
             {
@@ -120,6 +121,7 @@ namespace visualizer
                 m_X = ship.x;
                 m_Y = ship.y;
                 m_Round = round;
+                selected = false;
                 
                 // have it stealth now (only Stealth ships care...)
                 AddStealth( createdAt );
@@ -148,7 +150,7 @@ namespace visualizer
             
             bool ExistsAtTurn(int turn, int round)
             {
-                return ( turn >= createdAtTurn && turn < createdAtTurn + (int)healths.size() && m_Round == round );
+                return ( turn >= createdAtTurn && turn < createdAtTurn + (int)healths.size() && (m_Round == round || round == -1) );
             }
             
             SpacePoint LocationOn(int turn, float t)
@@ -248,7 +250,7 @@ namespace visualizer
                 
                 for(int i = 0; i < m_Moves.size(); i++)
                 {
-                    cout << id << ": #" << i << ":  (" << m_Moves[i].point.x << "," << m_Moves[i].point.y << ") @" << m_Moves[i].start << " to " << m_Moves[i].end << endl;
+                    //cout << id << ": #" << i << ":  (" << m_Moves[i].point.x << "," << m_Moves[i].point.y << ") @" << m_Moves[i].start << " to " << m_Moves[i].end << endl;
                 }
                 
             }
@@ -285,7 +287,7 @@ namespace visualizer
                 if( nothing )
                 {
                     pts.str("");
-                    pts << "(" << m_X << "," << m_Y << ")";
+                    pts << "(" << points[turn].x << "," << points[turn].y << ")";
                 }
                 
                 return pts.str();
@@ -379,6 +381,7 @@ namespace visualizer
                 {
                     if( m_Moves[i].InRange( time ) )
                     {
+                        //cout << i << "    m_Moves[i].start = " << m_Moves[i].start << "  m_Moves[i].end = " << m_Moves[i].end << endl;
                         v2 = i;
                         break;
                     }
@@ -396,6 +399,10 @@ namespace visualizer
                             t = 1;
                             needNewT = false;
                             break;
+                        }
+                        else
+                        {
+                            cout << "Impossible?\n";
                         }
                     }
                 }
@@ -416,11 +423,12 @@ namespace visualizer
 	            if( needNewT )
 	            {
 	                // new_t = (t - start) / (end - start)
-	                int dt = int(m_Moves[v2].start);
-	                t = (t - (m_Moves[v2].start - dt)) / ( (m_Moves[v2].end - dt) - (m_Moves[v2].start - dt) );
+	                float oldT = t;
+	                t = (turn + t - m_Moves[v2].start) / ( m_Moves[v2].end - m_Moves[v2].start );
 	                if(t > 1 || t < 0)
 	                {
-	                    cout << "WTF t is: " << t << endl;
+	                    //cout << "WTF t is: " << t << endl;
+	                    //cout << "old t: " << oldT << "  turn: " << turn << "  start: " << m_Moves[v2].start << "  end: " << m_Moves[v2].end << "   time:" <<  time << "   v2: " << v2 << endl;
 	                }
 	            }
 	            

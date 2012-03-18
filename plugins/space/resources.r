@@ -126,3 +126,4 @@ texture emped-blue textures/effects/blue-emped.png
 texture planet textures/effects/planet.png
 fshader testShader shaders/shockwave.frag
 fshader post1 shaders/post.frag
+texture selected textures/effects/selected.png

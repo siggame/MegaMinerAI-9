@@ -38,7 +38,21 @@ namespace visualizer
 
   void Space::preDraw()
   {
-    //cout << "PRE" << endl;
+    const Input& input = gui->getInput();
+    if( input.leftRelease )
+    {
+      int turn = timeManager->getTurn();
+      int x = input.x - m_outerMapRadius, sx = input.sx - m_outerMapRadius, y = input.y - m_outerMapRadius, sy = input.sy - m_outerMapRadius;
+      for ( auto& i : m_PersistentShips )
+      {
+        if( i.second->ExistsAtTurn( turn, -1 ) )
+        {
+          int shipX = i.second->points[ turn ].x;
+          int shipY = i.second->points[ turn ].y;
+          i.second->selected = ( x <= shipX && sx >= shipX && y <= shipY && sy >= shipY );
+        }
+      }
+    }
   }
 
   void Space::postDraw()
@@ -74,6 +88,7 @@ namespace visualizer
     options->loadOptionFile( "./plugins/space/space.xml", "space" );
 
   }
+  
 
   list<int> Space::getSelectedUnits()
   {
@@ -81,7 +96,10 @@ namespace visualizer
 
     for ( auto& i : m_PersistentShips )
     {
-      selectedShipIDs.push_back( i.second->id );
+      if( i.second->selected )
+      {
+        selectedShipIDs.push_back( i.second->id );
+      }
     }
     return selectedShipIDs;
   }
@@ -122,7 +140,7 @@ namespace visualizer
     
     // Build the Debug Table's Headers
     QStringList header;
-    header << "Owner" << "Type" << "Locations" << "Health" << "Attacks";
+    header << "Owner" << "Type" << "Locations" << "Health" << "Attacks Who";
     gui->setDebugHeader( header );
 
     int p = programs["test"] = renderer->createShaderProgram();
@@ -255,7 +273,7 @@ namespace visualizer
           dto << i.second->HealthOn(state, 0) << "/" << i.second->maxHealth;
           turn[i.first]["Health"] = dto.str().c_str();
           dto.str("");
-          turn[i.first]["Attacks"] = i.second->AttacksWhoOn( state ).c_str();
+          turn[i.first]["Attacks Who"] = i.second->AttacksWhoOn( state ).c_str();
 
           // Then and and draw it
           SmartPointer<PersistentShipAnim> ship = new PersistentShipAnim();

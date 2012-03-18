@@ -77,6 +77,7 @@ namespace visualizer
         float shipStealth = m_PersistentShip->StealthOn(m_Turn, t);
         bool shipIsEMPed = m_PersistentShip->EMPedOn(m_Turn);
         bool shipIsEMP = strcmp( "EMP", m_PersistentShip->type.c_str() ) == 0;
+        bool shipIsSelected = m_PersistentShip->selected;
         
         float shipRadius = m_PersistentShip->radius;
         bool shipIsExploding = m_PersistentShip->ExplodingOn(m_Turn);
@@ -147,6 +148,12 @@ namespace visualizer
         // END: Variables we will need
         
         
+        
+        if( shipIsSelected )
+        {
+          game->renderer->setColor( Color(1, 1, 1) );
+          game->renderer->drawTexturedQuad(shipCenter.x - shipRadius * 1.5, shipCenter.y - shipRadius * 1.5, shipRadius * 3.0f, shipRadius * 3.0f, "selected");
+        }
         
         
         if(shipIsExploding)
