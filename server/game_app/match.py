@@ -105,7 +105,7 @@ class Match(DefaultGameWorld):
       if len(self.shipChain) == 0:
         self.shipChain += self.spawnableTypes
       # randomly select a new ship that is not already in use
-      choice = random.choice(filter(lambda shipType: shipType not in using, self.shipChain))
+      choice = random.choice([shipType for shipType in self.shipChain if shipType not in using])
       # add to the set and remove from the chain
       using.add(choice)
       self.shipChain.remove(choice)
