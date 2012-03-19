@@ -82,6 +82,10 @@ class AI(BaseAI):
     distance = (((ship.getX() - x)**2) + ((ship.getY() - y)**2))**.5
     startDist = distance
     distRatio = 0
+    range = 0
+    #This is how far I can get and still attack their ship
+    if ship.getType() == "Cruiser" or ship.getType() == "Battleship" or ship.getType() == "Bomber":
+      range = ship.getRange() + 25
     if distance == 0:
       return [x,y]
     #Factoring my ships radius and my range
@@ -123,7 +127,8 @@ class AI(BaseAI):
     #Otherwise, just move to that optimal location
     if goodMove == False:
       points = self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()-5,32)
-      points.extend(self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()/2,24))
+      if ship.getType() != "Mine Layer":
+        points.extend(self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()/2,24))
       distance = 10000
       #Iterate through all of these points to find which is the "best"
       for point in points:
@@ -149,15 +154,18 @@ class AI(BaseAI):
                 goodMove = False 
           #If all criteria met, check to see if this point is closer to target                
           if goodMove == True:
-            if self.distance(point[0], x ,point[1], y) < distance:
+            if self.distance(point[0], x ,point[1], y) < distance and self.distance(point[0], x ,point[1], y) >= range:
               distance = self.distance(point[0], x , point[1], y)
               finalX = point[0]
               finalY = point[1]
               
     #If I have moved a lot, but only got a little bit closer I assume a mine is in the way.
     #If that is the case, find a path that ignores mines and move there    
-    if startDist - self.distance(finalX, x, finalY, y) < ship.getMaxMovement()/2 and ship.getMovementLeft() < 20:
+    if startDist - self.distance(finalX, x, finalY, y) < ship.getMaxMovement()/10 and \
+    self.distance(ship.getX(), finalX, ship.getY(), finalY) > ship.getMaxMovement()*.75:
       print "It happened", ship.getId(), self.turnNumber()
+      points = self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()-5,32)
+      points.extend(self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()/2,24))
       for point in points:
         #Check to see if ship is within bounds of map
         if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.outerMapRadius() \
