@@ -166,13 +166,12 @@ class Ship:
       return "You cannot explode your Warp Gate"
     if self.owner != self.game.playerID:
       return "The enemy ship refuses to blow itself up, sorry"
-    for target in self.allInRange(self.owner^1):  
-      if self.id in self.game.objects:
-        target.health -= self.selfDestructDamage
-        if target.health <= 0 and target.id in self.game.objects:
-          self.game.removeObject(target)
-        self.game.removeObject(self)
-        self.game.animations.append(['selfDestruct', self.id])
+    for target in self.allInRange(self.owner^1, self.radius):   
+      target.health -= self.selfDestructDamage
+      if target.health <= 0 and target.id in self.game.objects:
+        self.game.removeObject(target)
+    self.game.removeObject(self)
+    self.game.animations.append(['selfDestruct', self.id])
     return True
     
   def attack(self, target):
@@ -200,9 +199,8 @@ class Ship:
       for ship in self.allInRange(foe):
         ship.attacksLeft = -1
         ship.movementLeft = -1         
-        self.maxAttacks-=1
+        self.maxAttacks -= 1
         self.game.animations.append(['attack',self.id,ship.id])
-        return True
     elif target.owner == self.owner:
       return 'No friendly fire please'
     elif not self.inRange(target):
