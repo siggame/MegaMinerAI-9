@@ -35,6 +35,19 @@ class Player:
 
   def nextTurn(self):
     pass
+#  #Mine checking stuff   
+#    radius = cfgUnits['Mine']['range']
+#    for mine in self.game.objects.ships:
+#      if mine.owner == self.id and mine.type == "Mine":
+        #if inRange(x,y,radius,mine.x,mine.y,mine.range):
+#        attack = mine.allInRange(self.id^1,mine.range)
+#        if len(attack)>0:
+#          for attacked in attack:
+#            attacked.health -= mine.damage
+#            self.game.animations.append(['attack', mine.id, attacked.id])
+#            if attacked.health <= 0 and attacked.id in self.game.objects:
+#              self.game.removeObject(attacked)
+#            self.game.removeObject(mine)
 
   def talk(self, message):
     self.game.animations.append(['playerTalk', self.id, message])
@@ -100,7 +113,8 @@ class Ship:
       self.game.addObject(Ship, [self.game.playerID, warp[1], warp[2]] + shipStats)
       #Remove the created ship from the queue
       self.game.objects.players[self.game.playerID].warping.remove(warp)
-
+                                                                                            
+    
     #Healing other ships in range of support ship      
     self.targeted = set()
     #Healing other ships in range of engineering ship      
@@ -148,7 +162,8 @@ class Ship:
     self.y = y
     self.movementLeft -= moved
     
-    #Check to see if they moved onto a mine, TWAS A TRAP!
+    #Moved to next turn
+    #Check to see if they moved onto a mine, TWAS A TRAP!#
     radius = self.radius
     for mine in self.game.objects.ships:
       if mine.owner != self.owner and mine.type == "Mine": 
