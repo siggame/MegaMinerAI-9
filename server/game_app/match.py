@@ -164,7 +164,7 @@ class Match(DefaultGameWorld):
         player1.victories += 1
         player2.victories += 1
       self.nextRound()
-    elif self.turnNumber >= self.turnLimit or player1.energy < cost and player2.energy < cost and len(self.objects.ships)==2:
+    elif self.turnNumber >= self.turnLimit or (player1.energy < cost and player2.energy < cost and len(self.objects.ships)==2):
       # Warp gate health
       if self.objects[player1.warpGate].health > self.objects[player2.warpGate].health:
         player1.victories += 1

@@ -223,7 +223,7 @@ class Ship:
         self.game.removeObject(target)
       self.targeted.add(target.id)
       if self.type == "Stealth":
-        isStealthed = False
+        self.isStealthed = False
     return True 
     
   def inRange(self, target):
