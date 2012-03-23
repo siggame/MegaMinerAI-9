@@ -35,19 +35,6 @@ class Player:
 
   def nextTurn(self):
     pass
-#  #Mine checking stuff   
-#    radius = cfgUnits['Mine']['range']
-#    for mine in self.game.objects.ships:
-#      if mine.owner == self.id and mine.type == "Mine":
-        #if inRange(x,y,radius,mine.x,mine.y,mine.range):
-#        attack = mine.allInRange(self.id^1,mine.range)
-#        if len(attack)>0:
-#          for attacked in attack:
-#            attacked.health -= mine.damage
-#            self.game.animations.append(['attack', mine.id, attacked.id])
-#            if attacked.health <= 0 and attacked.id in self.game.objects:
-#              self.game.removeObject(attacked)
-#            self.game.removeObject(mine)
 
   def talk(self, message):
     self.game.animations.append(['playerTalk', self.id, message])
@@ -147,8 +134,8 @@ class Ship:
     if distance(0,x,0,y) + self.radius > self.game.outerMapRadius:
       return "We're deep in Space, corner of No and Where. You take extra care to not move out of the map."
       ###return "You don't want to move out of the map, you'd be lost in Space"
-    elif distance(0,x,0,y) - self.radius < self.game.innerMapRadius:
-      return "You don't want to fly into the planet!"
+#    elif distance(0,x,0,y) - self.radius < self.game.innerMapRadius:
+#      return "You don't want to fly into the planet!"
     #check if they can't move that far
     elif self.movementLeft - moved < 0:
       return "You cannot move that far, your engines lack the power"#think of something clever here
@@ -164,16 +151,16 @@ class Ship:
     
     #Moved to next turn
     #Check to see if they moved onto a mine, TWAS A TRAP!#
-    radius = self.radius
-    for mine in self.game.objects.ships:
-      if mine.owner != self.owner and mine.type == "Mine": 
-        if inRange(x,y,radius,mine.x,mine.y,mine.range):
-          for attacked in mine.allInRange(self.owner,mine.range):
-            attacked.health -= mine.damage
-            self.game.animations.append(['attack', mine.id, attacked.id])
-            if attacked.health <= 0 and attacked.id in self.game.objects:
-              self.game.removeObject(attacked)
-          self.game.removeObject(mine)
+#    radius = self.radius
+#    for mine in self.game.objects.ships:
+#      if mine.owner != self.owner and mine.type == "Mine": 
+#        if inRange(x,y,radius,mine.x,mine.y,mine.range):
+#          for attacked in mine.allInRange(self.owner,mine.range):
+#            attacked.health -= mine.damage
+#            self.game.animations.append(['attack', mine.id, attacked.id])
+#            if attacked.health <= 0 and attacked.id in self.game.objects:
+#              self.game.removeObject(attacked)
+#          self.game.removeObject(mine)
     return True
 
   def selfDestruct(self):
@@ -190,8 +177,8 @@ class Ship:
     return True
     
   def attack(self, target):
-    if target.type == "Mine":
-      return "You cannot attack mines"
+ #   if target.type == "Mine":
+ #     return "You cannot attack mines"
     modifier = 1
     if self.owner != self.game.playerID:
        return "You cannot make enemy ships attack"

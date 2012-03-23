@@ -10,6 +10,7 @@ foePlayer = []
 allTypes = ['Warp Gate', 'Battleship','Juggernaut', 'Mine Layer', 'Support', 'EMP', 'Stealth', 'Cruiser','Weapons Platform', 'Interceptor', 'Bomber','Mine']
 myShips = []
 numPoints = 100
+typePriority = ['Support','Stealth','Battleship','Weapons Platorm','Cruiser','Bomber','Mine Layer','EMP','Interceptor','Juggernaut','Warp Gate']
 
 class AI(BaseAI):
   """The class implementing gameplay logic."""
@@ -35,14 +36,13 @@ class AI(BaseAI):
         list.append(ship)
     return list
   
-  def warpControl(self,enemyListDict,myListDict):
+  def warpControl(self,myListDict,enemyListDict):
     for w in myListDict['Warp Gate']:
-#      self.testWarp(w)
       self.smartWarp(w)
       nearest = self.findNearest(w,enemyShips)
       self.moveAway(w,nearest)
   
-  def batShipControl(self,enemyListDict,myListDict):
+  def batShipControl(self,myListDict,enemyListDict):
     #Move towards enemy warp gate. if not in range of warp gate, attack enemy with most health that you can kill
     #once in range of warp gate, attack. if health is below x%, fire and self destruct
     warp = enemyListDict['Warp Gate'][0]
@@ -51,28 +51,33 @@ class AI(BaseAI):
       if self.inRange(ship.getX(),ship.getY(),ship.getRange(),warp.getX(),warp.getY(),warp.getRadius()):
         ship.attack(warp)
       else:
-        target = self.bestUseAttack(ship,enemyShips)
-        if isinstance(target,Ship):
-          ship.attack(target)
-          if target.getHealth()<1 and target in enemyShips:
-            enemyShips.remove(target)
+        for mine in enemyListDict['Mine']:
+          ship.attack(mine)
+        self.smartAttack(ship,enemyListDict)
+#        target = self.bestUseAttack(ship,enemyShips)
+#        if isinstance(target,Ship):
+#          ship.attack(target)
+#          if target.getHealth()<1 and target in enemyShips:
+#            enemyShips.remove(target)
   
-  def juggControl(self,enemyListDict,myListDict):
+  def juggControl(self,myListDict,enemyListDict):
     #move towards largest cluster of enemies within a distance equal to attack range, attack each enemy, if you have attacks left, start
     #towards new cluster, if you have movement left, move to relative safety, if not paired with an emp
     for ship in myListDict['Juggernaut']:
-      ship.move(ship.getX()-ship.getMaxMovement()/2,ship.getY()-ship.getMaxMovement()/2)
+#      ship.move(ship.getX()-ship.getMaxMovement()/2,ship.getY()-ship.getMaxMovement()/2)
       attacksLeft = ship.getAttacksLeft()
       
-  def mineLayerControl(self,enemyListDict,myListDict):
+  def mineLayerControl(self,myListDict,enemyListDict):
   #create mine field around warp gate, if x amount of mines already near warp gate and have mines left, move towards
   #largest cluster dropping mines 
     for ship in myListDict['Mine Layer']:
-      ship.move(ship.getX()-ship.getMaxMovement()/5,ship.getY()+ship.getMaxMovement()/2)
+      nearest = self.findNearest(ship,enemyShips)
+#      nearest = self.findNearest(ship,enemyShips)
+      self.moveTo(ship,nearest)
       if ship.getAttacksLeft()>0:
         ship.attack(ship)
               
-  def supportControl(self,enemyListDict,myListDict):
+  def supportControl(self,myListDict,enemyListDict):
     #if warpgate is below x health, move towards and heal warp Gate, else if wp in game,  move a support to them,  else move with largest cluster of friendly units
     target = myListDict['Warp Gate'][0]
     if target.getHealth() <= target.getMaxHealth()/2:
@@ -85,7 +90,7 @@ class AI(BaseAI):
           target = target2
         self.moveTo(ship,target)
            
-  def empControl(self,enemyListDict,myListDict):
+  def empControl(self,myListDict,enemyListDict):
     #move towards largest cluster of enemy units, stun them. Works well with multi attackers
     target = enemyListDict['Warp Gate'][0]
     for ship in myListDict['EMP']:
@@ -94,83 +99,95 @@ class AI(BaseAI):
         target = target2
       self.moveTo(ship,target)
       foe = self.bestUseAttack(ship,enemyShips)
-      if isinstance(foe,Ship)> 0 and ship.getAttacksLeft()>0:
+      if isinstance(foe,Ship) and ship.getAttacksLeft()>0:
         ship.attack(ship)
                        
-  def stealthControl(self,enemyListDict,myListDict):
+  def stealthControl(self,myListDict,enemyListDict):
   #stick with other stealth ships, move towards most isolated enemy, or target emps or other priority targets, swarm them, then flee
     for ship in myListDict['Stealth']:
       nearest = self.findNearest(ship,enemyShips)
       self.moveTo(ship,nearest)
-      target = self.bestUseAttack(ship,enemyShips)
-      if isinstance(target,Ship):
-        ship.attack(target)
-        if target.getHealth()<1:
-          enemyShips.remove(target)
+      self.smartAttack(ship,enemyListDict)
+	  #target = self.bestUseAttack(ship,enemyShips)
+      #if isinstance(target,Ship):
+      #  ship.attack(target)
+      #  if target.getHealth()<1:
+      #    enemyShips.remove(target)
       
          
-  def cruiserControl(self,enemyListDict,myListDict):
+  def cruiserControl(self,myListDict,enemyListDict):
     #mini battleship/big bomber
     for ship in myListDict['Cruiser']:
       nearest = self.findNearest(ship,enemyShips)
       self.moveTo(ship,nearest)
-      target = self.bestUseAttack(ship,enemyShips)
-      if isinstance(target,Ship) > 0:
-        ship.attack(target)
-        if target.getHealth() <1:
-          enemyShips.remove(target)
+      self.smartAttack(ship,enemyListDict)
+#	  target = self.bestUseAttack(ship,enemyShips)
+#     if isinstance(target,Ship) > 0:
+#        ship.attack(target)
+#        if target.getHealth() <1:
+#         enemyShips.remove(target)
   
-  def weapPlatControl(self,enemyListDict,myListDict):
+  def weapPlatControl(self,myListDict,enemyListDict):
     #stay far from enemy units, snipe priority targets (emp,stealth, etc)
     #TODO make attacking more efficient
     for ship in myListDict['Weapons Platform']:
-      attacks = ship.getMaxAttacks()
-      if attacks > 0:
-        for support in enemyListDict['Support']:
-          ship.attack(support)
-          if support.getHealth()<1:
-            enemyShips.remove(support)
-          attacks-=1
-      if attacks > 0:
-        for wp in enemyListDict['Weapons Platform']:
-          ship.attack(wp)
-          if wp.getHealth()<1:
-            enemyShips.remove(wp)
-          attacks-=1
-      if attacks > 0:
-        for miner in enemyListDict['Mine Layer']:
-         if miner.getAttacksLeft()>0:
-           ship.attack(miner)
-           if miner.getHealth()<1:
-             enemyShips.remove(miner)
-           attacks-=1
-      if attacks > 0:
-        for stealth in enemyListDict['Stealth']:
-          ship.attack(stealth)
-          if stealth.getHealth()<1:
-            enemyShips.remove(stealth)
-          attacks -= 1
-      if attacks > 0:
-          ship.attack(enemyListDict['Warp Gate'][0])
+      self.smartAttack(ship,enemyListDict)
+#	  attacks = ship.getMaxAttacks()
+#     if attacks > 0:
+#        for support in enemyListDict['Support']:
+#          ship.attack(support)
+#          if support.getHealth()<1:
+#            enemyShips.remove(support)
+#          attacks-=1
+#      if attacks > 0:
+#        for wp in enemyListDict['Weapons Platform']:
+#          ship.attack(wp)
+#          if wp.getHealth()<1:
+#            enemyShips.remove(wp)
+#          attacks-=1
+#      if attacks > 0:
+#        for miner in enemyListDict['Mine Layer']:
+#         if miner.getAttacksLeft()>0:
+#           ship.attack(miner)
+#           if miner.getHealth()<1:
+#             enemyShips.remove(miner)
+#           attacks-=1
+#      if attacks > 0:
+#        for stealth in enemyListDict['Stealth']:
+#          ship.attack(stealth)
+#          if stealth.getHealth()<1:
+#            enemyShips.remove(stealth)
+#          attacks -= 1
+#      if attacks > 0:
+#          ship.attack(enemyListDict['Warp Gate'][0])
       #TODO make it so they attack anything that is shooting them
       nearest = self.findNearest(ship,enemyShips)
       self.moveAway(ship,nearest)
 
-  def intercepControl(self,enemyListDict,myListDict):
+  def intercepControl(self,myListDict,enemyListDict):
   #mini juggernauts,
-    for ship in myListDict['Interceptor']:
-      ship.move(ship.getX()-2*ship.getMaxMovement()/3,ship.getY()+ship.getMaxMovement()/3)
+    pass
+ #   for ship in myListDict['Interceptor']:
+ #     ship.move(ship.getX()-2*ship.getMaxMovement()/3,ship.getY()+ship.getMaxMovement()/3)
            
-  def bomberControl(self,enemyListDict,myListDict):
+  def bomberControl(self,myListDict,enemyListDict):
     #attack stuff 
     for ship in myListDict['Bomber']:
       nearest = self.findNearest(ship,enemyShips)
       self.moveTo(ship,nearest)
-      target = self.bestUseAttack(ship,enemyShips)
-      if isinstance(target,Ship):
-        ship.attack(target)
-        if target.getHealth()<1:
-          enemyShips.remove(target)
+      self.smartAttack(ship,enemyListDict)
+#	  target = self.bestUseAttack(ship,enemyShips)
+#      if isinstance(target,Ship):
+#        ship.attack(target)
+#        if target.getHealth()<1:
+#         enemyShips.remove(target)
+             
+  def mineControl(self,myListDict,enemyListDict):
+    for ship in myListDict['Mine']:
+      print "HEY THERE I'M A MINE"
+      targets = self.allInRange(ship,ship.getRadius(),enemyShips)
+      if len(targets)>=1:
+        ship.selfDestruct()
              
   def end(self):
     pass
@@ -185,7 +202,7 @@ class AI(BaseAI):
   def allInRange(self, source, range,ships):
     result = []
     for ship in ships:
-      if ship.getType()!= 'Mine':
+#      if ship.getType()!= 'Mine':
         if self.inRange(source.getX(), source.getY(), range, ship.getX(), ship.getY(), ship.getRadius()):
           result.append(ship)
     return result
@@ -194,12 +211,12 @@ class AI(BaseAI):
   #returns the ship that has the ships in your effective range
   def findCluster(self,seeker,side,ships):
     groupSize = 0
-    if side == myPlayer[0].getId():
-      findShips = myShips
-    else:
-      findShips = enemyShips
+    ships = []
+    for ship in self.ships:
+     if ship.getOwner()==side:
+      ships.append(ship)
     for ship in ships:
-      currentSize = len(self.allInRange(ship,seeker.getRange(),findShips))
+      currentSize = len(self.allInRange(ship,seeker.getRange(),ships))
       if currentSize > groupSize:
         groupSize = currentSize
         centerShip = ship
@@ -265,7 +282,6 @@ class AI(BaseAI):
        typeDict['EMP'].warpIn(warpShip.getX(),warpShip.getY())
        energy-=typeDict['EMP'].getCost()
      while energy >= minCost:
-       print energy
        if 'Stealth' in typeDict and energy >= typeDict['Stealth'].getCost():
         typeDict['Stealth'].warpIn(warpShip.getX(),warpShip.getY())
         energy-=typeDict['Stealth'].getCost()
@@ -282,19 +298,61 @@ class AI(BaseAI):
 #TODO have it return a list, or take a list of attackable targets                                                                                                                                                                                                                                                                                     
   #goes through all enemies in range, and returns the a list of the enemy whose current health is closest to, but less than, that
   # ship's damage. If no such enemy fits this (i.e., no enemey has less health than damage), returns a list of the enemy with lowest health
-  def bestUseAttack(self,ship,ships):
+#  def bestUseAttack(self,ship,ships):
+#    foe = ship.getOwner()^1
+#    targets = self.allInRange(ship,ship.getRange(),ships)
+#    print "best use attack ships are ",ships
+#    guy = 1
+#    if len(targets) > 0:
+#      health = 0
+#      damage = ship.getDamage()
+#      for target in targets:
+#        if target.getHealth() > health and target.getHealth() <= damage:# and target.getMaxHealth() > maxHealth:
+#          guy = target
+#          health = target.getHealth()
+#    return guy
+   
+
+
+  def bestUseAttack(self,ship,targets):
     foe = ship.getOwner()^1
-    targets = self.allInRange(ship,ship.getRange(),ships)
     guy = 1
-    if len(targets) > 0:
-      health = 0
-      damage = ship.getDamage()
-      for target in targets:
-        if target.getHealth() > health and target.getHealth() <= damage:# and target.getMaxHealth() > maxHealth:
-          guy = target
-          health = target.getHealth()
+    health = 0
+    damage = ship.getDamage()
+    for target in targets:
+      if target.getHealth() > health and target.getHealth() <= damage:# and target.getMaxHealth() > maxHealth:
+        guy = target
+        health = target.getHealth()
     return guy
     
+    
+  def priorityAttack(self,ship,enemyListDict):
+    attacksLeft = ship.getAttacksLeft()
+    for type in typePriority:
+      if type in enemyListDict:
+        for ship in enemyListDict[type]:
+          if ship in self.ships:
+            return ship   
+      
+  def smartAttack(self,ship,enemyListDict):
+    ships = []
+    for foe in self.ships:
+      if foe.getType()!='Mine' and ship.getOwner()!=foe.getOwner():
+        ships.append(foe)
+    targets = self.allInRange(ship,ship.getRange(),ships)
+    if len(targets)>0:
+      target = self.bestUseAttack(ship,targets)
+      if isinstance(target,Ship):
+        ship.attack(target)
+        if target.getHealth()<1 and target in self.ships:
+          enemyShips.remove(target)
+      elif isinstance(target,int):
+        target = self.priorityAttack(ship,enemyListDict)                                        
+        if isinstance(target,Ship):
+          ship.attack(target)
+          if target.getHealth()<1:
+     	    enemyShips.remove(target)
+            enemyListDict[target.getType()].remove(target)   
     
   def seppuku(self,ship):
     if ship.getHealth() <= ship.getMaxHealth()/5 or ship.getMaxAttacks() == 0:
@@ -317,20 +375,22 @@ class AI(BaseAI):
       return False
     elif self.distance(0,x,0,y)+radius > self.outerMapRadius():
       return False
-    else:
-      mines = self.typeList(foePlayer[0].getId(),enemyShips,'Mine')
-      for mine in mines:
-        if self.inRange(x,y,radius,mine.getX(),mine.getY(),mine.getRange()):
-          return False
-#      for ship in myShips:
-#        if myShip.getId() != ship.getId() and self.inRange(x,y,radius,ship.getX(),ship.getY(),ship.getRadius()):
+#    else:
+#      mines = self.typeList(foePlayer[0].getId(),enemyShips,'Mine')
+#      for mine in mines:
+#        if self.inRange(x,y,radius,mine.getX(),mine.getY(),mine.getRange()):
+#          return False
+
+
+#      for ship in self.ships:
+#        if self.inRange(x,y,radius,ship.getX(),ship.getY(),ship.getRadius()):
 #          return False
     return True
   
 
   def moveTo(self,ship,target):
     Xpoints,Ypoints = self.findPoints(ship.getX(),ship.getY(),ship.getMaxMovement(),numPoints)
-    distance = 1005; x = -9999;y=-9999
+    distance = 1005; x=-9999;y=-9999
     for i in range(len(Xpoints)):
       newDis = self.distance(Xpoints[i],target.getX(),Ypoints[i],target.getY())
       if newDis < distance and self.checkMove(Xpoints[i],Ypoints[i],ship.getRadius(),ship):
@@ -383,7 +443,7 @@ class AI(BaseAI):
 #    funDict = {'Warp Gate':self.warp,'Battleship':self.battleship,'Juggernaut':self.juggernaut,'Mine Layer':self.mineLays,'Support':self.support,'EMP':self.emp,'Stealth':self.stealth,'Cruiser':self.cruiser,'Weapons Platform':self.weapons,'Interceptor':self.interceptor,'Bomber':self.bomber,'Mine':self.mines}
     myListDict = {'Warp Gate':warps,'Battleship':batShips,'Juggernaut':juggs,'Mine Layer':mineLayers,'Support':supports,'EMP':emps,'Stealth':stealths,'Cruiser':cruisers,'Weapons Platform':weapPlats,'Interceptor':interceps,'Bomber':bombers,'Mine':mines}
     enemyListDict = {'Warp Gate':foewarps,'Battleship':foebatShips,'Juggernaut':foejuggs,'Mine Layer':foemineLayers,'Support':foesupports,'EMP':foeemps,'Stealth':foestealths,'Cruiser':foecruisers,'Weapons Platform':foeweapPlats,'Interceptor':foeinterceps,'Bomber':foebombers,'Mine':foemines}
-    controlDict = {'Warp Gate':self.warpControl,'Battleship':self.batShipControl,'Juggernaut':self.juggControl,'Mine Layer':self.mineLayerControl,'Support':self.supportControl,'EMP':self.empControl,'Stealth':self.stealthControl,'Cruiser':self.cruiserControl,'Weapons Platform':self.weapPlatControl,'Interceptor':self.intercepControl,'Bomber':self.bomberControl}
+    controlDict = {'Warp Gate':self.warpControl,'Battleship':self.batShipControl,'Juggernaut':self.juggControl,'Mine Layer':self.mineLayerControl,'Support':self.supportControl,'EMP':self.empControl,'Stealth':self.stealthControl,'Cruiser':self.cruiserControl,'Weapons Platform':self.weapPlatControl,'Interceptor':self.intercepControl,'Bomber':self.bomberControl,'Mine':self.mineControl}
 	
     for ty in types:
       try:
@@ -396,7 +456,7 @@ class AI(BaseAI):
    
     for ty in myListDict:
        try:
-         controlDict[ty](enemyListDict,myListDict)
+         controlDict[ty](myListDict,enemyListDict)
        except KeyError:
          pass #print ty
     
