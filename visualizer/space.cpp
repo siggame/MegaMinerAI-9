@@ -7,6 +7,17 @@
 
 namespace visualizer
 {
+  bool intersects( SpacePoint selectionA, SpacePoint selectionB, SpacePoint shipA, SpacePoint shipB )
+  {
+    if (selectionB.y < shipA.y) return(false);
+    if (selectionA.y > shipB.y) return(false);
+
+    if (selectionB.x < shipA.x) return(false);
+    if (selectionA.x > shipB.x) return(false);
+    
+    return true;
+  }  
+
   Space::Space()
   {
     m_game = 0;
@@ -42,14 +53,27 @@ namespace visualizer
     if( input.leftRelease )
     {
       int turn = timeManager->getTurn();
+      float t = timeManager->getTurnPercent();
       int x = input.x - m_outerMapRadius, sx = input.sx - m_outerMapRadius, y = input.y - m_outerMapRadius, sy = input.sy - m_outerMapRadius;
+      //int x = input.x, sx = input.sx, y = input.y, sy = input.sy;
       for ( auto& i : m_PersistentShips )
       {
         if( i.second->ExistsAtTurn( turn, -1 ) )
         {
-          int shipX = i.second->points[ turn ].x;
-          int shipY = i.second->points[ turn ].y;
-          i.second->selected = ( x <= shipX && sx >= shipX && y <= shipY && sy >= shipY );
+          // rough rectangle selection
+          auto loc = i.second->LocationOn( turn, t );
+          SpacePoint selectionA, selectionB;
+          SpacePoint shipA = SpacePoint( float(loc.x - 0.75f*i.second->radius), float(loc.y - 0.75f*i.second->radius) );
+          SpacePoint shipB = SpacePoint( float(loc.x + 0.75f*i.second->radius), float(loc.y + 0.75f*i.second->radius) );
+          
+          selectionA.x = x < sx ? x : sx;
+          selectionA.y = y < sy ? y : sy;
+          selectionB.x = x > sx ? x : sx;
+          selectionB.y = y > sy ? y : sy;
+
+          i.second->selected = intersects( selectionA, selectionB, shipA, shipB );
+          cout << "locX:" << loc.x << ", locY:" << loc.y << ", x:" << x << ", y:" << y << ", sx:" << sx << ", sy:" << sy << endl;
+          cout << "selectionA: (" << selectionA.x << "," << selectionA.y << ")  selectionB: (" << selectionB.x << "," << selectionB.y << ")\n"; 
         }
       }
     }
