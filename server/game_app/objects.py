@@ -124,7 +124,7 @@ class Ship:
                     
   def move(self, x, y):
     if self.owner != self.game.playerID:
-      return "you cannot move your oppenents ships"
+      return "you cannot move your oppenent's %s %i "%(self.type,self.id)
     #moved is the distance they've moved, where they were to where they're going
     moved = distance(self.x, x, self.y, y)       
     #if they're trying to move outside the map
@@ -132,16 +132,16 @@ class Ship:
       #return "You don't want to fly into the planet!"
 #    if x**2 + y**2 > self.game.outerMapRadius:
     if distance(0,x,0,y) + self.radius > self.game.outerMapRadius:
-      return "We're deep in Space, corner of No and Where. You take extra care to not move out of the map."
+      return "We're deep in Space, corner of No and Where. You take extra care to not move your %s %i out of the map."%(self.type,self.id)
       ###return "You don't want to move out of the map, you'd be lost in Space"
 #    elif distance(0,x,0,y) - self.radius < self.game.innerMapRadius:
 #      return "You don't want to fly into the planet!"
     #check if they can't move that far
     elif self.movementLeft - moved < 0:
-      return "You cannot move that far, your engines lack the power"#think of something clever here
+      return "You cannot move your %s %i %i spaces away."%(self.type,self.id,moved)#think of something clever here
     #have to move somewhere..yeah.
     elif moved == 0:
-      return "Must move somewhere"
+      return "Must move your %s %i somewhere"%(self.type,self.id)
     
     #successful move, yay! 
     self.game.animations.append(['move', self.id, self.x, self.y, x, y]) #move animation for those visualizer guys
@@ -167,7 +167,7 @@ class Ship:
     if self.type == "Warp Gate":
       return "You cannot explode your Warp Gate"
     if self.owner != self.game.playerID:
-      return "The enemy ship refuses to blow itself up, sorry"
+      return "You can't make your opponenet's %s %i self destuct"%(self.type,self.id)
     for target in self.allInRange(self.owner^1, self.radius):   
       target.health -= self.selfDestructDamage
       if target.health <= 0 and target.id in self.game.objects:
@@ -181,14 +181,20 @@ class Ship:
  #     return "You cannot attack mines"
     modifier = 1
     if self.owner != self.game.playerID:
-       return "You cannot make enemy ships attack"
+       return "You cannot make your enemy's %s %i attack"%(self.type,self.id)
     if self.attacksLeft <= 0 or self.maxAttacks <=0:
-      return "Ship %i has no attacks left"%(self.id)
+      return "Your %s %i has no attacks left"%(self.type,self.id)
     if target.id in self.targeted and self.type == "Mine Layer":# and target.id == self.id:
-       return "A mine layer can only lay one mine per turn"
-       #return "This Mine Layer %i has already laid a mine this turn"(self.id)
+      return "A mine layer can only lay one mine per turn"
+      #return "This Mine Layer %i has already laid a mine this turn"(self.id)
+    if self.type == "Mine Layer" and target.id != self.id:
+      return "A Mine Layer lays a mine by attacking itself not %s %i"%(self.type,self.id)
+    
+    ######## MAY NOT NEED THIS, BUT MEH #############
+    elif self.type == "Support":
+      return "A support heals and buffs his comrades, he is not offensive"    
     if target.id in self.targeted:
-      return "You have already commanded %i to attack %i"%(self.id, target.id)
+      return "You have already commanded %s %i to attack %s %i"%(self.type,self.id,target.type,target.id)
     if self.type == "Mine Layer":
       #Adding a new mine to the game
       shipStats = [cfgUnits["Mine"][value] for value in self.game.ordering]   
@@ -204,9 +210,9 @@ class Ship:
         self.maxAttacks -= 1
         self.game.animations.append(['attack',self.id,ship.id])
     elif target.owner == self.owner:
-      return 'No friendly fire please'
+      return "No friendly fire. Your %s %i cannot attack your %s %i "%(self.type,self.id,target.type,target.id)
     elif not self.inRange(target):
-      return "Target too far away"           
+      return "The target %s %i is too far away"%(target.type,target.id)
     else:
       #Factor in damage buff for Support ships neat opponent
       for unit in self.game.objects.ships:
@@ -267,12 +273,12 @@ class ShipType:
       return "You cannot warp in ships on your opponent's turn",
     if x**2 + y**2 > self.game.outerMapRadius**2:
       return "That ship would be lost in space...forever"
-    elif x**2 + y**2 < self.game.innerMapRadius**2:
-      return "Warping ships on the planet does not help in the fight!"
+#    elif x**2 + y**2 < self.game.innerMapRadius**2:
+#      return "Warping ships on the planet does not help in the fight!"
     elif player.energy < self.cost:
-      return "You need to not be poor to buy that kind of ship"
+      return "You need to not be poor to buy that %s"%(self.type)
     elif not inRange(warpX,warpY,cfgUnits["Warp Gate"]["range"],x,y,0):
-      return "You must spawn that ship closer to your Warp Gate"
+      return "You must spawn that $s closer to your Warp Gate"%(self.type)
     else:
       #spawn the unit with its stats, from units.cfg in config directory
       #Add unit to queue to be warped in at the beginning of this player's next turn
