@@ -298,7 +298,7 @@ class AI(BaseAI):
       attackedList.append(ship)
       if ship.getType() == "Mine Layer":
         myMines.append([ship.getX(), ship.getY()])
-    else:
+    elif ship.getType() != "EMP" and ship.getType() != "Mine Layer":
       #While I still have targets and attacks, attack!
       while attacksLeft > 0 and len(attackList) > 0:
         target = self.highestPriorityEnemy(attackList)
@@ -316,7 +316,7 @@ class AI(BaseAI):
           attackList.remove(target) 
     #If more than 5 enemies are stacked up, self destruct on them for massive damage! Awww yeah!         
     if stacked > 4 and (ship.getType() == "Bomber" or ship.getType() == "Interceptor"):
-      print stacked
+      #print stacked
       self.blowUp(ship)     
     return [attackedList]
     
@@ -410,6 +410,13 @@ class AI(BaseAI):
     for ship in myShips:
       #If a ship is below 25% health, find the nearest enemy and self destruct
       alt = False
+      if ship.getType() == "Mine Layer":
+        unitInRange = False
+        for enemy in theirShips:
+          if self.getRange(ship.getX(), ship.getY(), ship.getRadius(), enemy.getX(), enemy.getY(), enemy.getRadius()):
+            unitInRange = True
+        if unitInRange == True:
+          ship.selfDestruct()
       if ship.getHealth() <= (ship.getMaxHealth()*.25) and ship.getType() != "Warp Gate":
         self.attackAllInRange(ship, []) 
         self.blowUp(ship)
