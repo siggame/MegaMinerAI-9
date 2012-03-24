@@ -87,6 +87,15 @@ std::ostream& operator<<(std::ostream& stream, stealth ob)
 }
 
 
+std::ostream& operator<<(std::ostream& stream, playerTalk ob)
+{
+  stream << "playerTalk" << "\n";
+  stream << "actingID: " << ob.actingID  <<'\n';
+  stream << "message: " << ob.message  <<'\n';
+  return stream;
+}
+
+
 std::ostream& operator<<(std::ostream& stream, deStealth ob)
 {
   stream << "deStealth" << "\n";
@@ -102,8 +111,7 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
   stream << "gameNumber: " << ob.gameNumber  <<'\n';
   stream << "round: " << ob.round  <<'\n';
   stream << "victoriesNeeded: " << ob.victoriesNeeded  <<'\n';
-  stream << "innerMapRadius: " << ob.innerMapRadius  <<'\n';
-  stream << "outerMapRadius: " << ob.outerMapRadius  <<'\n';
+  stream << "mapRadius: " << ob.mapRadius  <<'\n';
 
   stream << "\n\nShipTypes:\n";
   for(std::map<int,ShipType>::iterator i = ob.shipTypes.begin(); i != ob.shipTypes.end(); i++)
@@ -132,6 +140,8 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
 //      stream << *((attack*)*i) << "\n";
 //    if((*(*i)).type == STEALTH)
 //      stream << *((stealth*)*i) << "\n";
+//    if((*(*i)).type == PLAYERTALK)
+//      stream << *((playerTalk*)*i) << "\n";
 //    if((*(*i)).type == DESTEALTH)
 //      stream << *((deStealth*)*i) << "\n";
   }

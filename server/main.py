@@ -118,7 +118,7 @@ class GameApp(AccountsAppMixin, BaseApp):
   @requireTurn
   @requireTypes(None, int, int, int)
   def gameWarpIn(self, shipType, x, y):
-    """Sends in a new ship of this type"""
+    """Sends in a new ship of this type. Ships must be warped in with the radius of the player's warp ship."""
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.warpIn(shipType, x, y)
@@ -138,7 +138,7 @@ class GameApp(AccountsAppMixin, BaseApp):
   @requireTurn
   @requireTypes(None, int, int, int)
   def gameMove(self, ship, x, y):
-    """Command a ship to move to a specified position"""
+    """Command a ship to move to a specified position. If the position specified by this function is not legal, the position of the ship will be updated, but the movement will be rejected by the server."""
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.move(ship, x, y)
@@ -148,7 +148,7 @@ class GameApp(AccountsAppMixin, BaseApp):
   @requireTurn
   @requireTypes(None, int)
   def gameSelfDestruct(self, ship):
-    """Blow yourself up, damage those around you"""
+    """Blow yourself up, damage those around you, reduces the ship to 0 health."""
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.selfDestruct(ship)
@@ -158,7 +158,7 @@ class GameApp(AccountsAppMixin, BaseApp):
   @requireTurn
   @requireTypes(None, int, int)
   def gameAttack(self, ship, target):
-    """Commands your ship to attack a target"""
+    """Commands your ship to attack a target. Making an attack will reduce the number of attacks available to the ship, even if the attack is rejected by the game server."""
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.attack(ship, target)

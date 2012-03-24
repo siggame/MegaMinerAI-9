@@ -9,16 +9,14 @@ class BaseAI:
   AIs should extend this class to get a lot of builer-plate code out of the way
   The provided AI class does just that.
   """
-  #\cond
   initialized = False
   iteration = 0
   runGenerator = None
   connection = None
-  #\endcond
   shipTypes = []
   players = []
   ships = []
-  #\cond
+
   def startTurn(self):
     from GameObject import ShipType
     from GameObject import Player
@@ -42,41 +40,24 @@ class BaseAI:
       self.runGenerator = r
       return r.next()
     return r
-  #\endcond
-  #\cond
-  def getTurnNumber(self):
+  
+  def turnNumber(self):
     return library.getTurnNumber(self.connection)
-  #\endcond
-  turnNumber = property(getTurnNumber)
-  #\cond
-  def getPlayerID(self):
+
+  def playerID(self):
     return library.getPlayerID(self.connection)
-  #\endcond
-  playerID = property(getPlayerID)
-  #\cond
-  def getGameNumber(self):
+
+  def gameNumber(self):
     return library.getGameNumber(self.connection)
-  #\endcond
-  gameNumber = property(getGameNumber)
-  #\cond
-  def getRound(self):
+
+  def round(self):
     return library.getRound(self.connection)
-  #\endcond
-  round = property(getRound)
-  #\cond
-  def getVictoriesNeeded(self):
+
+  def victoriesNeeded(self):
     return library.getVictoriesNeeded(self.connection)
-  #\endcond
-  victoriesNeeded = property(getVictoriesNeeded)
-  #\cond
-  def getInnerMapRadius(self):
-    return library.getInnerMapRadius(self.connection)
-  #\endcond
-  innerMapRadius = property(getInnerMapRadius)
-  #\cond
-  def getOuterMapRadius(self):
-    return library.getOuterMapRadius(self.connection)
-  #\endcond
-  outerMapRadius = property(getOuterMapRadius)
+
+  def mapRadius(self):
+    return library.getMapRadius(self.connection)
+
   def __init__(self, connection):
     self.connection = connection

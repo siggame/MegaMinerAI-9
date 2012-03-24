@@ -57,8 +57,7 @@ DLLEXPORT Connection* createConnection()
   c->gameNumber = 0;
   c->round = 0;
   c->victoriesNeeded = 0;
-  c->innerMapRadius = 0;
-  c->outerMapRadius = 0;
+  c->mapRadius = 0;
   c->ShipTypes = NULL;
   c->ShipTypeCount = 0;
   c->Players = NULL;
@@ -425,10 +424,7 @@ DLLEXPORT int networkLoop(Connection* c)
           c->victoriesNeeded = atoi(sub->val);
           sub = sub->next;
 
-          c->innerMapRadius = atoi(sub->val);
-          sub = sub->next;
-
-          c->outerMapRadius = atoi(sub->val);
+          c->mapRadius = atoi(sub->val);
           sub = sub->next;
 
         }
@@ -548,13 +544,9 @@ DLLEXPORT int getVictoriesNeeded(Connection* c)
 {
   return c->victoriesNeeded;
 }
-DLLEXPORT int getInnerMapRadius(Connection* c)
+DLLEXPORT int getMapRadius(Connection* c)
 {
-  return c->innerMapRadius;
-}
-DLLEXPORT int getOuterMapRadius(Connection* c)
-{
-  return c->outerMapRadius;
+  return c->mapRadius;
 }
 
 }

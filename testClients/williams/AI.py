@@ -114,8 +114,7 @@ class AI(BaseAI):
       if self.getRange(finalX, finalY, ship.getRadius(), myShip.getX(), myShip.getY(), myShip.getRadius()/2) \
       and myShip.getType() != "Mine" and myShip.getMovementLeft() != myShip.getMaxMovement():  
         goodMove = False
-    if self.distance(0, finalX, 0, finalY) + ship.getRadius() > self.outerMapRadius() \
-    or self.distance(0, finalX, 0, finalY) - ship.getRadius() < self.innerMapRadius():
+    if self.distance(0, finalX, 0, finalY) + ship.getRadius() > self.mapRadius:
       goodMove = False
     if ship.getType() == "Mine Layer":
       for mine in myMines:
@@ -133,8 +132,7 @@ class AI(BaseAI):
       #Iterate through all of these points to find which is the "best"
       for point in points:
         #Check to see if ship is within bounds of map
-        if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.outerMapRadius() \
-        and self.distance(0, point[0], 0, point[1]) - ship.getRadius() > self.innerMapRadius():
+        if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.mapRadius():
           goodMove = True
           #Check for mines
           for enemy in theirShips:
@@ -170,8 +168,7 @@ class AI(BaseAI):
       points.extend(self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()/3,24))
       for point in points:
         #Check to see if ship is within bounds of map
-        if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.outerMapRadius() \
-        and self.distance(0, point[0], 0, point[1]) - ship.getRadius() > self.innerMapRadius(): 
+        if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.mapRadius():
           if self.distance(point[0], x ,point[1], y) < distance:
             distance = self.distance(point[0], x , point[1], y)
             finalX = point[0]
@@ -188,8 +185,7 @@ class AI(BaseAI):
     points.extend(self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()/3,24))
     distance = 0
     for point in points:
-      if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.outerMapRadius() \
-      and self.distance(0, point[0], 0, point[1]) - ship.getRadius() > self.innerMapRadius():
+      if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.mapRadius():
         goodMove = True
         for enemy in theirShips:
           if enemy.getType() == "Mine":
@@ -333,8 +329,7 @@ class AI(BaseAI):
     points.extend(self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()/3,24))
     distance = 10000
     for point in points:
-      if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.outerMapRadius() \
-      and self.distance(0, point[0], 0, point[1]) - ship.getRadius() > self.innerMapRadius():             
+      if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.mapRadius():            
         if self.distance(point[0], dest[0] ,point[1], dest[1]) < distance:
           distance = self.distance(point[0], dest[0] , point[1], dest[1])
           finalX = point[0]
@@ -449,11 +444,11 @@ class AI(BaseAI):
         elif ship.getType() == "Weapons Platform": 
           if availShips["Mine Layer"] != 0:       
             if player == 0:
-              move = self.moveTo(ship,((self.outerMapRadius()-71)*-1), 0)          
+              move = self.moveTo(ship,((self.mapRadius()-71)*-1), 0)          
               if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
                 ship.move(move[0], move[1])
             else:
-              move = self.moveTo(ship,self.outerMapRadius()-71, 0) 
+              move = self.moveTo(ship,self.mapRadius()-71, 0) 
               if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
                 ship.move(move[0],move[1])
           else:
@@ -492,11 +487,11 @@ class AI(BaseAI):
         elif ship.getType() == "Warp Gate":  
           if availShips["Mine Layer"] != 0:      
             if player == 0:
-              move = self.moveTo(ship,((self.outerMapRadius()-71)*-1),0) 
+              move = self.moveTo(ship,((self.mapRadius()-71)*-1),0) 
               if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) <= ship.getMovementLeft():
                 ship.move(move[0], move[1])
             else:
-              move = self.moveTo(ship,self.outerMapRadius()-71, 0) 
+              move = self.moveTo(ship,self.mapRadius()-71, 0) 
               if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) <= ship.getMovementLeft():
                 ship.move(move[0],move[1])
           else:

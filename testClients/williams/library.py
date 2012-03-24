@@ -71,11 +71,8 @@ library.getRound.argtypes = [c_void_p]
 library.getVictoriesNeeded.restype = c_int
 library.getVictoriesNeeded.argtypes = [c_void_p]
 
-library.getInnerMapRadius.restype = c_int
-library.getInnerMapRadius.argtypes = [c_void_p]
-
-library.getOuterMapRadius.restype = c_int
-library.getOuterMapRadius.argtypes = [c_void_p]
+library.getMapRadius.restype = c_int
+library.getMapRadius.argtypes = [c_void_p]
 
 library.getShipType.restype = c_void_p
 library.getShipType.argtypes = [c_void_p, c_int]

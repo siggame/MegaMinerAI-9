@@ -56,11 +56,8 @@ class BaseAI:
   def victoriesNeeded(self):
     return library.getVictoriesNeeded(self.connection)
 
-  def innerMapRadius(self):
-    return library.getInnerMapRadius(self.connection)
-
-  def outerMapRadius(self):
-    return library.getOuterMapRadius(self.connection)
+  def mapRadius(self):
+    return library.getMapRadius(self.connection)
 
   def __init__(self, connection):
     self.connection = connection

@@ -36,8 +36,7 @@ struct Connection
   int gameNumber;
   int round;
   int victoriesNeeded;
-  int innerMapRadius;
-  int outerMapRadius;
+  int mapRadius;
 
   _ShipType* ShipTypes;
   int ShipTypeCount;
@@ -87,8 +86,7 @@ DLLEXPORT int getPlayerID(Connection* c);
 DLLEXPORT int getGameNumber(Connection* c);
 DLLEXPORT int getRound(Connection* c);
 DLLEXPORT int getVictoriesNeeded(Connection* c);
-DLLEXPORT int getInnerMapRadius(Connection* c);
-DLLEXPORT int getOuterMapRadius(Connection* c);
+DLLEXPORT int getMapRadius(Connection* c);
 
 DLLEXPORT _ShipType* getShipType(Connection* c, int num);
 DLLEXPORT int getShipTypeCount(Connection* c);

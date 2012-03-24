@@ -18,7 +18,8 @@ const int MOVE = 0;
 const int SELFDESTRUCT = 1;
 const int ATTACK = 2;
 const int STEALTH = 3;
-const int DESTEALTH = 4;
+const int PLAYERTALK = 4;
+const int DESTEALTH = 5;
 
 struct ShipType
 {
@@ -100,6 +101,14 @@ struct stealth : public Animation
   friend std::ostream& operator<<(std::ostream& stream, stealth obj);
 };
 
+struct playerTalk : public Animation
+{
+  int actingID;
+  char* message;
+
+  friend std::ostream& operator<<(std::ostream& stream, playerTalk obj);
+};
+
 struct deStealth : public Animation
 {
   int actingID;
@@ -124,8 +133,7 @@ struct GameState
   int gameNumber;
   int round;
   int victoriesNeeded;
-  int innerMapRadius;
-  int outerMapRadius;
+  int mapRadius;
 
   std::map< int, std::vector< SmartPointer< Animation > > > animations;
   friend std::ostream& operator<<(std::ostream& stream, GameState obj);

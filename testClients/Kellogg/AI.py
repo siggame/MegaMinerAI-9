@@ -294,13 +294,13 @@ class AI(BaseAI):
     return guy
     
     
-  def priorityAttack(self,ship,enemyListDict):
+  def priorityAttack(self,ship,enemyListDict,targets):
     attacksLeft = ship.getAttacksLeft()
     for type in typePriority:
       if type in enemyListDict:
         for foe in enemyListDict[type]:
-          if foe in self.ships and self.inRange(ship.getX(),ship.getY(),ship.getRange(),foe.getX(),foe.getY(),foe.getRadius()):
-            return ship   
+          if foe in self.ships and foe in targets:
+            return foe  
       
   def smartAttack(self,ship,enemyListDict,attackables):
     side = ship.getOwner()^1
@@ -310,7 +310,7 @@ class AI(BaseAI):
       if isinstance(target,Ship) and target in self.ships:
         ship.attack(target)
       elif isinstance(target,int):
-        target = self.priorityAttack(ship,enemyListDict)                                        
+        target = self.priorityAttack(ship,enemyListDict,targets)                                        
         if isinstance(target,Ship):
           ship.attack(target)
           if target.getHealth()<1:  
