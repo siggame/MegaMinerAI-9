@@ -129,14 +129,7 @@ class Ship:
     moved = distance(self.x, x, self.y, y)       
     #if they're trying to move outside the map
     if distance(0,x,0,y) + self.radius > self.game.outerMapRadius:
-<<<<<<< HEAD
       return "We're deep in Space, corner of No and Where. You take extra care to not move your %s %i out of the map."%(self.type,self.id)
-      ###return "You don't want to move out of the map, you'd be lost in Space"
-#    elif distance(0,x,0,y) - self.radius < self.game.innerMapRadius:
-#      return "You don't want to fly into the planet!"
-=======
-      return "We're deep in Space, corner of No and Where. You take extra care to not move out of the map."
->>>>>>> 422d862f4acd623e9813203d32f6741b3258c4bf
     #check if they can't move that far
     elif self.movementLeft - moved < 0:
       return "You cannot move your %s %i %i spaces away."%(self.type,self.id,moved)#think of something clever here
@@ -188,8 +181,8 @@ class Ship:
     if target.id in self.targeted and self.type == "Mine Layer":# and target.id == self.id:
       return "A mine layer can only lay one mine per turn"
       #return "This Mine Layer %i has already laid a mine this turn"(self.id)
-    if self.type == "Mine Layer" and target.id != self.id:
-      return "A Mine Layer lays a mine by attacking itself not %s %i"%(self.type,self.id)
+    #if self.type == "Mine Layer" and target.id != self.id:
+      #return "A Mine Layer lays a mine by attacking itself not %s %i"%(self.type,self.id)
     
     ######## MAY NOT NEED THIS, BUT MEH #############
     elif self.type == "Support":
@@ -280,7 +273,7 @@ class ShipType:
     elif player.energy < self.cost:
       return "You need to not be poor to buy that %s"%(self.type)
     elif not inRange(warpX,warpY,cfgUnits["Warp Gate"]["range"],x,y,0):
-      return "You must spawn that $s closer to your Warp Gate"%(self.type)
+      return "You must spawn that %s closer to your Warp Gate"%(self.type)
     else:
       #spawn the unit with its stats, from units.cfg in config directory
       #Add unit to queue to be warped in at the beginning of this player's next turn
