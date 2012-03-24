@@ -207,7 +207,7 @@ class Ship:
     elif target.owner == self.owner:
       return "No friendly fire. Your %s %i cannot attack your %s %i "%(self.type,self.id,target.type,target.id)
     elif not self.inRange(target):
-      return "The target %s %i is too far away"%(target.type,target.id)
+      return "%s %i's target, %s %i, is too far away"%(self.type, self.id,target.type,target.id)
     else:
       #Factor in damage buff for Support ships neat opponent
       for unit in self.game.objects.ships:

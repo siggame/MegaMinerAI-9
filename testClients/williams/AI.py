@@ -59,6 +59,8 @@ class AI(BaseAI):
 
   #Moves to nearest support ship if available
   def getHelp(self,ship, availShips): 
+    if ship not in self.ships:
+      return
     nearest = 1000
     nearestSupport = myShips[0]
     haveSupport = False
@@ -77,6 +79,8 @@ class AI(BaseAI):
                
   #Returns the the furthest point along a path to target      
   def moveTo(self,ship,x,y):
+    if ship not in self.ships:
+      return [ship.getX(), ship.getY()]
     #Gets point furthest along a path between ship and target location
     distance = (((ship.getX() - x)**2) + ((ship.getY() - y)**2))**.5
     startDist = distance
@@ -177,6 +181,8 @@ class AI(BaseAI):
    
   #Moves ship away from the nearest enemy
   def moveAway(self,ship): 
+    if ship not in self.ships:
+      return
     finalX = ship.getX()
     finalY = ship.getY()
     nearest = self.findNearest(ship)
@@ -271,6 +277,8 @@ class AI(BaseAI):
     
   #Attack all enemies in range with all attacks
   def attackAllInRange(self, ship, attackedList):
+    if ship not in self.ships:
+      return []
     #Create a list of things I've attacked and things I can attack
     #AttackedList will be used if multiple attack phases occur in one turn
     attackedList = attackedList
@@ -336,11 +344,12 @@ class AI(BaseAI):
           finalY = point[1]           
     if self.distance(ship.getX(), finalX, ship.getY(), finalY) <= ship.getMovementLeft():
       ship.move(finalX,finalY)
-      ship.selfDestruct()
-      for enemy in theirShips:
-        if self.getRange(ship.getX(),ship.getY(),ship.getRadius(), enemy.getX(), enemy.getY(), enemy.getRadius()):
-          if enemy.getHealth() < 1:
-            theirShips.remove(enemy)
+      if ship in self.ships:
+        ship.selfDestruct()
+        for enemy in theirShips:
+          if self.getRange(ship.getX(),ship.getY(),ship.getRadius(), enemy.getX(), enemy.getY(), enemy.getRadius()):
+            if enemy.getHealth() < 1:
+              theirShips.remove(enemy)
       
               
   def init(self):      
