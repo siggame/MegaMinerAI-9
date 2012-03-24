@@ -10,8 +10,7 @@ globals = [ Variable('turnNumber', int, 'How many turns it has been since the be
   Variable('gameNumber', int, 'What number game this is for the server'),
   Variable('round',int,'The current round of the match'),
   Variable('victoriesNeeded', int,'How many victories a player needs to win'),
-  Variable('innerMapRadius',int,'The inner radius of the map.  Center of screen is (0,0), with +x right, +y up'),
-  Variable('outerMapRadius',int,'The outer radius of the map.  Center of screen is (0,0), with +x right, +y up'),
+  Variable('mapRadius',int,'The outer radius of the map.  Center of screen is (0,0), with +x right, +y up'),
 ]
 
 constants = [
@@ -88,12 +87,12 @@ stealth = Animation('stealth',
     ],
   )
   
-#playerTalk = Animation('playerTalk',
-  #data=[
-    #Variable('actingID', int),
-    #Variable('message', str),
-    #],
-  #)
+playerTalk = Animation('playerTalk',
+  data=[
+    Variable('actingID', int),
+    Variable('message', str),
+    ],
+  )
 
 deStealth = Animation('deStealth',
   data=[

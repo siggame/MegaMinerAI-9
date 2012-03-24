@@ -32,7 +32,7 @@ class ShipType(GameObject):
         self.iteration = BaseAI.iteration
         return True
     raise ExistentialError()
-  ##Sends in a new ship of this type
+  ##Sends in a new ship of this type. Ships must be warped in with the radius of the player's warp ship.
   def warpIn(self, x, y):
     self.validify()
     return library.shipTypeWarpIn(self.ptr, x, y)
@@ -144,17 +144,17 @@ class Ship(GameObject):
         self.iteration = BaseAI.iteration
         return True
     raise ExistentialError()
-  ##Command a ship to move to a specified position
+  ##Command a ship to move to a specified position. If the position specified by this function is not legal, the position of the ship will be updated, but the movement will be rejected by the server.
   def move(self, x, y):
     self.validify()
     return library.shipMove(self.ptr, x, y)
 
-  ##Blow yourself up, damage those around you
+  ##Blow yourself up, damage those around you, reduces the ship to 0 health.
   def selfDestruct(self):
     self.validify()
     return library.shipSelfDestruct(self.ptr)
 
-  ##Commands your ship to attack a target
+  ##Commands your ship to attack a target. Making an attack will reduce the number of attacks available to the ship, even if the attack is rejected by the game server.
   def attack(self, target):
     self.validify()
     if not isinstance(target, Ship):

@@ -47,9 +47,7 @@ public class Client {
   [DllImport("client")]
   public static extern int getVictoriesNeeded(IntPtr connection);
   [DllImport("client")]
-  public static extern int getInnerMapRadius(IntPtr connection);
-  [DllImport("client")]
-  public static extern int getOuterMapRadius(IntPtr connection);
+  public static extern int getMapRadius(IntPtr connection);
 
   [DllImport("client")]
   public static extern IntPtr getShipType(IntPtr connection, int num);

@@ -364,6 +364,31 @@ static bool parseStealth(stealth& object, sexp_t* expression)
   return true;
 
 }
+static bool parsePlayerTalk(playerTalk& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  object.type = PLAYERTALK;
+  sub = expression->list->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parseplayerTalk.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.actingID = atoi(sub->val);
+  sub = sub->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parseplayerTalk.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.message = new char[strlen(sub->val)+1];
+  strncpy(object.message, sub->val, strlen(sub->val));
+  object.message[strlen(sub->val)] = 0;
+  sub = sub->next;
+  return true;
+
+}
 static bool parseDeStealth(deStealth& object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -414,10 +439,7 @@ static bool parseSexp(Game& game, sexp_t* expression)
           gs.victoriesNeeded = atoi(sub->val);
           sub = sub->next;
           if ( !sub ) return false;
-          gs.innerMapRadius = atoi(sub->val);
-          sub = sub->next;
-          if ( !sub ) return false;
-          gs.outerMapRadius = atoi(sub->val);
+          gs.mapRadius = atoi(sub->val);
           sub = sub->next;
       }
       else if(string(sub->val) == "ShipType")
@@ -498,6 +520,14 @@ static bool parseSexp(Game& game, sexp_t* expression)
       {
         SmartPointer<stealth> animation = new stealth;
         if ( !parseStealth(*animation, expression) )
+          return false;
+
+        animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
+      }
+      if(string(ToLower( sub->val ) ) == "player-talk")
+      {
+        SmartPointer<playerTalk> animation = new playerTalk;
+        if ( !parsePlayerTalk(*animation, expression) )
           return false;
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );

@@ -128,14 +128,8 @@ class Ship:
     #moved is the distance they've moved, where they were to where they're going
     moved = distance(self.x, x, self.y, y)       
     #if they're trying to move outside the map
-    #if inRange(self.x, self.y, self.radius, x, y, self.game.innerMapRadius):
-      #return "You don't want to fly into the planet!"
-#    if x**2 + y**2 > self.game.outerMapRadius:
     if distance(0,x,0,y) + self.radius > self.game.outerMapRadius:
       return "We're deep in Space, corner of No and Where. You take extra care to not move out of the map."
-      ###return "You don't want to move out of the map, you'd be lost in Space"
-#    elif distance(0,x,0,y) - self.radius < self.game.innerMapRadius:
-#      return "You don't want to fly into the planet!"
     #check if they can't move that far
     elif self.movementLeft - moved < 0:
       return "You cannot move that far, your engines lack the power"#think of something clever here
@@ -196,7 +190,8 @@ class Ship:
       self.maxAttacks-=1
       self.targeted.add(self.id)
       return True
-    if self.type == 'EMP' and self.id == target.id:
+    #Whenever the EMP attacks any target it will use an EMP
+    if self.type == 'EMP': #and self.id == target.id:
       foe = self.owner^1
       for ship in self.allInRange(foe):
         ship.attacksLeft = -1

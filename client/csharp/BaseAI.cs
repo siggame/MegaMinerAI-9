@@ -102,16 +102,10 @@ public abstract class BaseAI
     int value = Client.getVictoriesNeeded(connection);
     return value;
   }
-  ///The inner radius of the map.  Center of screen is (0,0), with +x right, +y up
-  public int innerMapRadius()
-  {
-    int value = Client.getInnerMapRadius(connection);
-    return value;
-  }
   ///The outer radius of the map.  Center of screen is (0,0), with +x right, +y up
-  public int outerMapRadius()
+  public int mapRadius()
   {
-    int value = Client.getOuterMapRadius(connection);
+    int value = Client.getMapRadius(connection);
     return value;
   }
 }

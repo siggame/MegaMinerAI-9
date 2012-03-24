@@ -30,8 +30,7 @@ public interface Client extends Library {
   int getGameNumber(Pointer connection);
   int getRound(Pointer connection);
   int getVictoriesNeeded(Pointer connection);
-  int getInnerMapRadius(Pointer connection);
-  int getOuterMapRadius(Pointer connection);
+  int getMapRadius(Pointer connection);
 
   Pointer getShipType(Pointer connection, int num);
   int getShipTypeCount(Pointer connection);

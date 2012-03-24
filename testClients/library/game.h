@@ -36,8 +36,7 @@ struct Connection
   int gameNumber;
   int round;
   int victoriesNeeded;
-  int innerMapRadius;
-  int outerMapRadius;
+  int mapRadius;
 
   _ShipType* ShipTypes;
   int ShipTypeCount;
@@ -65,15 +64,15 @@ extern "C"
 
 //commands
 
-  ///Sends in a new ship of this type
+  ///Sends in a new ship of this type. Ships must be warped in with the radius of the player's warp ship.
   DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y);
   ///Allows a player to display messages on the screen
   DLLEXPORT int playerTalk(_Player* object, char* message);
-  ///Command a ship to move to a specified position
+  ///Command a ship to move to a specified position. If the position specified by this function is not legal, the position of the ship will be updated, but the movement will be rejected by the server.
   DLLEXPORT int shipMove(_Ship* object, int x, int y);
-  ///Blow yourself up, damage those around you
+  ///Blow yourself up, damage those around you, reduces the ship to 0 health.
   DLLEXPORT int shipSelfDestruct(_Ship* object);
-  ///Commands your ship to attack a target
+  ///Commands your ship to attack a target. Making an attack will reduce the number of attacks available to the ship, even if the attack is rejected by the game server.
   DLLEXPORT int shipAttack(_Ship* object, _Ship* target);
 
 //derived properties
@@ -87,8 +86,7 @@ DLLEXPORT int getPlayerID(Connection* c);
 DLLEXPORT int getGameNumber(Connection* c);
 DLLEXPORT int getRound(Connection* c);
 DLLEXPORT int getVictoriesNeeded(Connection* c);
-DLLEXPORT int getInnerMapRadius(Connection* c);
-DLLEXPORT int getOuterMapRadius(Connection* c);
+DLLEXPORT int getMapRadius(Connection* c);
 
 DLLEXPORT _ShipType* getShipType(Connection* c, int num);
 DLLEXPORT int getShipTypeCount(Connection* c);
