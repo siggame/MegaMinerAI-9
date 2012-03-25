@@ -12,8 +12,7 @@ namespace visualizer
 {
     struct Background: public Animatable
     {
-        int innerRadius;
-        int outerRadius;
+        int radius;
         int turn;
     };
     

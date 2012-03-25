@@ -160,6 +160,7 @@ namespace visualizer
     Warps[ -1 ] = vector< SmartPointer< Warp > >();
 
     // Setup the renderer as mapRadius*2 x mapRadius*2
+    cout << m_game->states[0].mapRadius << endl;
     renderer->setCamera( 0, 0, m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2);
     renderer->setGridDimensions( m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2 );
     
@@ -263,7 +264,7 @@ namespace visualizer
 
       // Add and draw the background
       SmartPointer<Background> background = new Background();
-      background->outerRadius = m_mapRadius;
+      background->radius = m_mapRadius;
       background->turn = m_game->states[ state ].turnNumber;
       background->addKeyFrame( new DrawBackground( background ) );
       turn.addAnimatable( background );
