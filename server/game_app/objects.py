@@ -194,6 +194,7 @@ class Ship:
       shipStats = [cfgUnits["Mine"][value] for value in self.game.ordering]   
       self.game.addObject(Ship, [self.game.playerID, self.x, self.y] + shipStats)
       self.maxAttacks-=1
+      self.attacksLeft -= 1
       self.targeted.add(self.id)
       return True
     #Whenever the EMP attacks any target it will use an EMP
@@ -203,6 +204,7 @@ class Ship:
         ship.attacksLeft = -1
         ship.movementLeft = -1         
         self.maxAttacks -= 1
+        self.attacksLeft -= 1
         self.game.animations.append(['attack',self.id,ship.id])
     elif target.owner == self.owner:
       return "No friendly fire. Your %s %i cannot attack your %s %i "%(self.type,self.id,target.type,target.id)
