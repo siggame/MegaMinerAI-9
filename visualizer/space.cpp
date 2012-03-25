@@ -54,7 +54,10 @@ namespace visualizer
     {
       int turn = timeManager->getTurn();
       float t = timeManager->getTurnPercent();
-      int x = input.x - m_outerMapRadius, sx = input.sx - m_outerMapRadius, y = input.y - m_outerMapRadius, sy = input.sy - m_outerMapRadius;
+      int x = input.x - m_mapRadius,
+          sx = input.sx - m_mapRadius, 
+          y = input.y - m_mapRadius, 
+          sy = input.sy - m_mapRadius;
       //int x = input.x, sx = input.sx, y = input.y, sy = input.sy;
       for ( auto& i : m_PersistentShips )
       {
@@ -157,8 +160,8 @@ namespace visualizer
     Warps[ -1 ] = vector< SmartPointer< Warp > >();
 
     // Setup the renderer as mapRadius*2 x mapRadius*2
-    renderer->setCamera( 0, 0, m_game->states[0].outerMapRadius * 2, m_game->states[0].outerMapRadius * 2);
-    renderer->setGridDimensions( m_game->states[0].outerMapRadius * 2, m_game->states[0].outerMapRadius * 2 );
+    renderer->setCamera( 0, 0, m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2);
+    renderer->setGridDimensions( m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2 );
     
     resourceManager->loadResourceFile( "./plugins/space/resources.r" );
     
@@ -177,8 +180,7 @@ namespace visualizer
 
     animationEngine->registerGame( this, this );
 
-    m_outerMapRadius = m_game->states[ 0 ].outerMapRadius;
-    m_innerMapRadius = m_game->states[ 0 ].innerMapRadius;
+    m_mapRadius = m_game->states[ 0 ].mapRadius;
 
     timeManager->setNumTurns( m_game->states.size() );
 
@@ -199,8 +201,8 @@ namespace visualizer
           // Add the warps for this ship (so long as it is not a mine)
           if( strcmp( i.second.type, "Mine" ) != 0)
           {
-            Warps[ state - 1 ].push_back( new Warp( i.second.x + m_outerMapRadius, i.second.y + m_outerMapRadius, i.second.radius, i.second.owner, false ) );
-            Warps[ state ].push_back( new Warp( i.second.x + m_outerMapRadius, i.second.y + m_outerMapRadius, i.second.radius, i.second.owner, true ) );
+            Warps[ state - 1 ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, false ) );
+            Warps[ state ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, true ) );
           }
         }
 
@@ -261,8 +263,7 @@ namespace visualizer
 
       // Add and draw the background
       SmartPointer<Background> background = new Background();
-      background->outerRadius = m_outerMapRadius;
-      background->innerRadius = m_innerMapRadius;
+      background->outerRadius = m_mapRadius;
       background->turn = m_game->states[ state ].turnNumber;
       background->addKeyFrame( new DrawBackground( background ) );
       turn.addAnimatable( background );
@@ -301,7 +302,7 @@ namespace visualizer
 
           // Then and and draw it
           SmartPointer<PersistentShipAnim> ship = new PersistentShipAnim();
-          ship->addKeyFrame( new DrawPersistentShip( i.second, state, &m_outerMapRadius ) );
+          ship->addKeyFrame( new DrawPersistentShip( i.second, state, &m_mapRadius ) );
           turn.addAnimatable( ship );
         }
       }
@@ -330,7 +331,9 @@ namespace visualizer
                 }
             }
         }
-        SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].round, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_outerMapRadius, state+1 == m_game->states.size() || m_game->states[ state ].round < m_game->states[ state + 1 ].round );
+        
+        // Thankyou for making your code so readable 
+        SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].round, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].round < m_game->states[ state + 1 ].round );
         roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
         turn.addAnimatable( roundHUD );
 
