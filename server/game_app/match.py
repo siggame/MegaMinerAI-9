@@ -32,8 +32,6 @@ class Match(DefaultGameWorld):
     self.gameNumber = id
     self.round = -1
     self.victoriesNeeded = self.victories
-    self.innerMapRadius = self.innerRadius
-    self.outerMapRadius = self.outerRadius
 
   def addPlayer(self, connection, type="player"):
     connection.type = type
@@ -97,7 +95,7 @@ class Match(DefaultGameWorld):
     for player in self.objects.players:
       #Give players energy initially each round
       player.energy = self.startEnergy
-      player.warpGate = self.addObject(Ship, [player.id, (player.id * 2 - 1) * (self.outerMapRadius+self.innerMapRadius)/2, 0] + self.warpGate).id
+      player.warpGate = self.addObject(Ship, [player.id, (player.id * 2 - 1) * (self.mapRadius)/2, 0] + self.warpGate).id
     # Get the set of ships to be used this round
     using = set()
     while len(using) < self.shipsPerRound:
@@ -270,7 +268,7 @@ class Match(DefaultGameWorld):
   def status(self, connection):
     msg = ["status"]
 
-    msg.append(["game", self.turnNumber, self.playerID, self.gameNumber, self.round, self.victoriesNeeded, self.innerMapRadius, self.outerMapRadius])
+    msg.append(["game", self.turnNumber, self.playerID, self.gameNumber, self.round, self.victoriesNeeded, self.mapRadius])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])

@@ -128,7 +128,7 @@ class Ship:
     #moved is the distance they've moved, where they were to where they're going
     moved = distance(self.x, x, self.y, y)       
     #if they're trying to move outside the map
-    if distance(0,x,0,y) + self.radius > self.game.outerMapRadius:
+    if distance(0,x,0,y) + self.radius > self.game.mapRadius:
       return "We're deep in Space, corner of No and Where. You take extra care to not move your %s %i out of the map."%(self.type,self.id)
     #check if they can't move that far
     elif self.movementLeft - moved < 0:
@@ -266,10 +266,8 @@ class ShipType:
     if self.game.playerID != player.id:
       #print self.game.playerID, player.id
       return "You cannot warp in ships on your opponent's turn",
-    if x**2 + y**2 > self.game.outerMapRadius**2:
+    if distance(0,x,0,y) + cfgUnits[self.type]["radius"] > self.game.mapRadius:
       return "That ship would be lost in space...forever"
-#    elif x**2 + y**2 < self.game.innerMapRadius**2:
-#      return "Warping ships on the planet does not help in the fight!"
     elif player.energy < self.cost:
       return "You need to not be poor to buy that %s"%(self.type)
     elif not inRange(warpX,warpY,cfgUnits["Warp Gate"]["range"],x,y,0):
