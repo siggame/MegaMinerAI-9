@@ -14,6 +14,8 @@ if __name__ == '__main__':
   args = parser.parse_args()
   if isdir(args.name):
     raise Exception('Client With That Name Already Exists In This Directory')
+  if not isdir('../client/{0}'.format(args.language)):
+    raise Exception('That Language Implementation Does Not Exist!  Please choose a valid language or implement a new one.')
 
   mkdir(args.name)
   chdir(args.name)
