@@ -299,8 +299,8 @@ namespace visualizer
         auto times = glm::vec4(1, t, t*t, t*t*t);
         auto p0 = glm::vec2(points[v1].x, points[v1].y);
         auto p1 = glm::vec2(points[v2].x, points[v2].y);
-        auto m0 = glm::vec2(0, 0);//p0 - glm::vec2(points[v0].x, points[v0].y);
-        auto m1 = glm::vec2(0, 0);//glm::vec2(points[v3].x, points[v3].y) - p1;
+        auto m0 = glm::normalize(p0 - glm::vec2(points[v0].x, points[v0].y));
+        auto m1 = glm::normalize(glm::vec2(points[v3].x, points[v3].y) - p1);
 
         auto q = glm::mat4x2(p0, m0, p1, m1);
 
