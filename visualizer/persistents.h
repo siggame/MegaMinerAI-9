@@ -313,34 +313,8 @@ namespace visualizer
 
         auto q = glm::mat4x2(p0, m0, p1, m1);
 
-        //cout << m0 << m1 << endl;
-
         glm::vec4 m = times * glm::transpose(A);
-
         glm::vec2 result = q * m;
-
-
-#if 0
-        double c1,c2,c3,c4;   
-
-        c1 = M12*points[v2].x;   
-        c2 = M21*points[v1].x + M23*points[v3].x;   
-        c3 = M31*points[v1].x + M32*points[v2].x + M33*points[v3].x + M34*points[v4].x;   
-        c4 = M41*points[v1].x + M42*points[v2].x + M43*points[v3].x + M44*points[v4].x;   
-
-        float px = (((c4*t + c3)*t +c2)*t + c1);
-        float hx = (3*c4*t + 2*c3)*t +c2;
-
-        c1 = M12*points[v2].y;   
-        c2 = M21*points[v1].y + M23*points[v3].y;   
-        c3 = M31*points[v1].y + M32*points[v2].y + M33*points[v3].y + M34*points[v4].y;   
-        c4 = M41*points[v1].y + M42*points[v2].y + M43*points[v3].y + M44*points[v4].y;   
-
-        float py = (((c4*t + c3)*t +c2)*t + c1);
-        float hy = (3*c4*t + 2*c3)*t +c2;
-
-        return make_pair( SpacePoint( px, py ), atan2( hy, hx ) );
-#endif
 
         return make_pair( SpacePoint( result.x, result.y ), 0 );
       }
