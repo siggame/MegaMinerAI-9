@@ -10,6 +10,10 @@
 
 namespace visualizer
 {
+  ostream& operator <<( ostream& os, const glm::vec2& v );
+  ostream& operator <<( ostream& os, const glm::vec4& v );
+  ostream& operator <<( ostream& os, const glm::mat4x2& m );
+  ostream& operator <<( ostream& os, const glm::mat4& m );
 
   const auto A = glm::mat4( 
       1, 0, 0, 0,
@@ -295,12 +299,14 @@ namespace visualizer
         auto times = glm::vec4(1, t, t*t, t*t*t);
         auto p0 = glm::vec2(points[v1].x, points[v1].y);
         auto p1 = glm::vec2(points[v2].x, points[v2].y);
-        auto m0 = p0 - glm::vec2(points[v0].x, points[v0].y);
-        auto m1 = glm::vec2(points[v3].x, points[v3].y) - p1;
+        auto m0 = glm::vec2(0, 0);//p0 - glm::vec2(points[v0].x, points[v0].y);
+        auto m1 = glm::vec2(0, 0);//glm::vec2(points[v3].x, points[v3].y) - p1;
 
         auto q = glm::mat4x2(p0, m0, p1, m1);
 
-        glm::vec4 m = times * A;
+        cout << A << endl;
+
+        glm::vec4 m = times * glm::transpose(A);
 
         glm::vec2 result = q * m;
 
