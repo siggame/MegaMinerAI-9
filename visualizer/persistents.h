@@ -1,59 +1,23 @@
 #ifndef PERSISTENTS_H
 #define PERSISTENTS_H
-
-#if 1
-#define M11  0.0    
-#define M21 -0.5   
-#define M31  1.0   
-#define M41 -0.5   
-
-#define M12  1.0   
-#define M22  0.0   
-#define M32 -2.5   
-#define M42  1.5   
-
-#define M13  0.0   
-#define M23  0.5   
-#define M33  2.0   
-#define M43 -1.5   
-
-#define M14  0.0   
-#define M24  0.0   
-#define M34 -0.5   
-#define M44  0.5 
-#else
-// Official Cubic Hermite Spline Equation
-// See wiki
-#define M11  0.0   
-#define M21  1.0   
-#define M31 -2.0   
-#define M41  1.0   
-
-#define M12  1.0    
-#define M22  0.0   
-#define M32 -3.0   
-#define M42  2.0   
-
-#define M13  0.0   
-#define M23  0.0   
-#define M33  3.0   
-#define M43 -2.0   
-
-#define M14  0.0   
-#define M24  0.0   
-#define M34 -1.0   
-#define M44  1.0 
-#endif
-
 #include "parser/structures.h"
 #include <vector>
 #include <math.h>
 #include <map>
 #include <utility>
 #include <sstream>
+#include "glm/glm.hpp"
 
 namespace visualizer
 {
+
+  const auto A = glm::mat4( 
+      1, 0, 0, 0,
+      0, 1, 0, 0, 
+      -3, -2, 3, -1, 
+      2, 1, -2, 1
+      );
+
   class SpacePoint
   {
     public: 
@@ -215,7 +179,7 @@ namespace visualizer
         m_Stealths.push_back( pair<int,char>(turn, 'd') );
       }
 
-      float StealthOn( int turn, float t)
+      float StealthOn( int /*turn*/, float /*t*/)
       {
         return (strcmp("Stealth", type.c_str()) != 0) ? 1 : 0.3f;
       }
@@ -230,7 +194,7 @@ namespace visualizer
         healths.push_back(0);
         points.push_back( SpacePoint( points.back().x, points.back().y ) );
 
-        for(int i = 0; i < m_Moves.size(); i++)
+        for(int i = 0; i < (signed)m_Moves.size(); i++)
         {
           //cout << id << ": #" << i << ":  (" << m_Moves[i].point.x << "," << m_Moves[i].point.y << ") @" << m_Moves[i].start << " to " << m_Moves[i].end << endl;
         }
@@ -309,24 +273,39 @@ namespace visualizer
 
       pair<SpacePoint, float> SplineOn(int turn, float t)
       {
+        // Index setup from Jake F. 
+        
         turn -= createdAtTurn;
-
         int i = turn;
-
-        int step = 1;
-
-        int v1 = i-step;		
-        int v2 = i;
-        int v3 = i+step;
-        int v4 = i+step*2;
+        const int step = 1;
+        int v0 = i-step;
+        int v1 = i;
+        int v2 = i+step;
+        int v3 = i+2*step;
 
         if( i-step < 0 )
-          v1=0;
-        if( points.size() <= i+step )
-          v3=points.size()-1;
-        if( points.size() <= i+step*2 )
-          v4=points.size()-1;		
+          v0=0;
+        if( (signed)points.size() <= i+step )
+          v2=points.size()-1;
+        if( (signed)points.size() <= i+step*2 )
+          v3=points.size()-1;		
 
+        // Setting up the verticies
+
+        auto times = glm::vec4(1, t, t*t, t*t*t);
+        auto p0 = glm::vec2(points[v1].x, points[v1].y);
+        auto p1 = glm::vec2(points[v2].x, points[v2].y);
+        auto m0 = p0 - glm::vec2(points[v0].x, points[v0].y);
+        auto m1 = glm::vec2(points[v3].x, points[v3].y) - p1;
+
+        auto q = glm::mat4x2(p0, m0, p1, m1);
+
+        glm::vec4 m = times * A;
+
+        glm::vec2 result = q * m;
+
+
+#if 0
         double c1,c2,c3,c4;   
 
         c1 = M12*points[v2].x;   
@@ -346,94 +325,11 @@ namespace visualizer
         float hy = (3*c4*t + 2*c3)*t +c2;
 
         return make_pair( SpacePoint( px, py ), atan2( hy, hx ) );
+#endif
+
+        return make_pair( SpacePoint( result.x, result.y ), 0 );
       }
 
-      pair<SpacePoint, float> NewSplineOn(int turn, float t)
-      {
-        if( m_Moves.size() == 0 )
-        {
-          return make_pair( SpacePoint( m_X, m_Y ), 0.0f );
-        }
-
-        int v1 = -1, v2 = -1, v3 = -1, v4 = -1;
-        float time = (float)turn + t;
-        bool needNewT = true;
-
-        for(int i = 0; i < m_Moves.size(); i++)
-        {
-          if( m_Moves[i].InRange( time ) )
-          {
-            //cout << i << "    m_Moves[i].start = " << m_Moves[i].start << "  m_Moves[i].end = " << m_Moves[i].end << endl;
-            v2 = i;
-            break;
-          }
-          else if( m_Moves[i].IsAfter( time ) )
-          {
-            if( i == 0 )
-            {
-              v2 = 0;
-              break;
-            }
-
-            if( m_Moves[i - 1].IsBefore( time ) )
-            {
-              v2 = i - 1;
-              t = 1;
-              needNewT = false;
-              break;
-            }
-            else
-            {
-              cout << "Impossible?\n";
-            }
-          }
-        }
-
-        v1 = v2-1;
-        v3 = v2+1;
-        v4 = v2+2;
-
-        if( v1 < 0 )
-          v1=0;
-        if( v2 < 0 )
-          v2=0;
-        if( m_Moves.size() <= v3 )
-          v3=m_Moves.size()-1;
-        if( m_Moves.size() <= v4 )
-          v4=m_Moves.size()-1;		
-
-        if( needNewT )
-        {
-          // new_t = (t - start) / (end - start)
-          float oldT = t;
-          t = (turn + t - m_Moves[v2].start) / ( m_Moves[v2].end - m_Moves[v2].start );
-          if(t > 1 || t < 0)
-          {
-            //cout << "WTF t is: " << t << endl;
-            //cout << "old t: " << oldT << "  turn: " << turn << "  start: " << m_Moves[v2].start << "  end: " << m_Moves[v2].end << "   time:" <<  time << "   v2: " << v2 << endl;
-          }
-        }
-
-        double c1,c2,c3,c4;   
-
-        c1 = M12*m_Moves[v2].point.x;   
-        c2 = M21*m_Moves[v1].point.x + M23*m_Moves[v3].point.x;   
-        c3 = M31*m_Moves[v1].point.x + M32*m_Moves[v2].point.x + M33*m_Moves[v3].point.x + M34*m_Moves[v4].point.x;   
-        c4 = M41*m_Moves[v1].point.x + M42*m_Moves[v2].point.x + M43*m_Moves[v3].point.x + M44*m_Moves[v4].point.x;   
-
-        float px = (((c4*t + c3)*t +c2)*t + c1);
-        float hx = (3*c4*t + 2*c3)*t +c2;
-
-        c1 = M12*m_Moves[v2].point.y;   
-        c2 = M21*m_Moves[v1].point.y + M23*m_Moves[v3].point.y;   
-        c3 = M31*m_Moves[v1].point.y + M32*m_Moves[v2].point.y + M33*m_Moves[v3].point.y + M34*m_Moves[v4].point.y;   
-        c4 = M41*m_Moves[v1].point.y + M42*m_Moves[v2].point.y + M43*m_Moves[v3].point.y + M44*m_Moves[v4].point.y;   
-
-        float py = (((c4*t + c3)*t +c2)*t + c1);
-        float hy = (3*c4*t + 2*c3)*t +c2;
-
-        return make_pair( SpacePoint( px, py ), atan2( hy, hx ) );
-      }
   };
 }
 

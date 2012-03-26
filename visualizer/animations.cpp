@@ -24,12 +24,12 @@ namespace visualizer
 
 
 
-  void StartAnim::animate( const float& /* t */, AnimData * /* d */, IGame* game )
+  void StartAnim::animate( const float& /* t */, AnimData * /* d */, IGame* /*game*/ )
   {
   }
 
 
-  void DrawBackground::animate( const float& t, AnimData * d, IGame* game )
+  void DrawBackground::animate( const float& /*t*/, AnimData * /*d*/, IGame* game )
   {
     game->renderer->setColor( Color( 1, 1, 1, 1 ) );
     game->renderer->drawTexturedQuad(0, 0, m_Background->radius * 2, m_Background->radius * 2, "background");
@@ -38,7 +38,7 @@ namespace visualizer
     game->renderer->drawArc(500, 500, 500, 50 );
   }
 
-  void DrawRoundHUD::animate( const float& t, AnimData * d, IGame* game )
+  void DrawRoundHUD::animate( const float& t, AnimData * /* d */, IGame* game )
   {
     stringstream round;
     round << "Round: " << (m_RoundHUD->round + 1) << "  Turn: " << m_RoundHUD->turn;
@@ -65,7 +65,7 @@ namespace visualizer
     }
   }
 
-  void DrawPersistentShip::animate( const float& t, AnimData * d, IGame* game )
+  void DrawPersistentShip::animate( const float& t, AnimData * /*d*/, IGame* game )
   {
     // BEGIN: Variables we will need
     int shipOwner = m_PersistentShip->owner;
@@ -217,7 +217,7 @@ namespace visualizer
 
 
 
-  void DrawPlayerHUD::animate( const float& t, AnimData * d, IGame* game )
+  void DrawPlayerHUD::animate( const float&/* t */, AnimData * /* d*/, IGame* game )
   {
     IRenderer::Alignment align = m_PlayerHUD->id ? IRenderer::Left : IRenderer::Right;
 
@@ -244,7 +244,7 @@ namespace visualizer
 
 
 
-  void DrawWarp::animate( const float& t, AnimData * d, IGame* game )
+  void DrawWarp::animate( const float& t, AnimData * /*d*/, IGame* game )
   {
     game->renderer->setColor( Color( 1, 1, 1 ) );
     stringstream warpTexture;
