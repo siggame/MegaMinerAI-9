@@ -302,9 +302,18 @@ namespace visualizer
         auto m0 = glm::normalize(p0 - glm::vec2(points[v0].x, points[v0].y));
         auto m1 = glm::normalize(glm::vec2(points[v3].x, points[v3].y) - p1);
 
+        if( m0.x != m0.x )
+          m0 = glm::vec2(0, 0);
+
+        if( m1.x != m1.x )
+          m1 = glm::vec2(0, 0);
+
+        m0 *= 0;
+        m1 *= 0;
+
         auto q = glm::mat4x2(p0, m0, p1, m1);
 
-        cout << A << endl;
+        //cout << m0 << m1 << endl;
 
         glm::vec4 m = times * glm::transpose(A);
 
