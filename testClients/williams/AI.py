@@ -136,7 +136,7 @@ class AI(BaseAI):
       #Iterate through all of these points to find which is the "best"
       for point in points:
         #Check to see if ship is within bounds of map
-        if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.mapRadius():
+        if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.mapRadius:
           goodMove = True
           #Check for mines
           for enemy in theirShips:
@@ -166,13 +166,13 @@ class AI(BaseAI):
     if (startDist - self.distance(finalX, x, finalY, y) < 0 and \
     self.distance(ship.getX(), finalX, ship.getY(), finalY) > ship.getMaxMovement()*.90 \
     and ship.getType() != "Mine Layer") or (ship.getMaxAttacks() == 0 and ship.getType() != "Warp Gate"):
-      #print "It happened", ship.getId(), self.turnNumber(), ship.getType()
+      #print "It happened", ship.getId(), self.turnNumber, ship.getType()
       points = self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()-5,32)
       points.extend(self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()/2,32))
       points.extend(self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()/3,24))
       for point in points:
         #Check to see if ship is within bounds of map
-        if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.mapRadius():
+        if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.mapRadius:
           if self.distance(point[0], x ,point[1], y) < distance:
             distance = self.distance(point[0], x , point[1], y)
             finalX = point[0]
@@ -191,7 +191,7 @@ class AI(BaseAI):
     points.extend(self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()/3,24))
     distance = 0
     for point in points:
-      if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.mapRadius():
+      if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.mapRadius:
         goodMove = True
         for enemy in theirShips:
           if enemy.getType() == "Mine":
@@ -337,7 +337,7 @@ class AI(BaseAI):
     points.extend(self.pointsAtEdge(ship.getX(),ship.getY(),ship.getMovementLeft()/3,24))
     distance = 10000
     for point in points:
-      if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.mapRadius():            
+      if self.distance(0, point[0], 0, point[1]) + ship.getRadius() < self.mapRadius:            
         if self.distance(point[0], dest[0] ,point[1], dest[1]) < distance:
           distance = self.distance(point[0], dest[0] , point[1], dest[1])
           finalX = point[0]
@@ -374,7 +374,7 @@ class AI(BaseAI):
     #Find out who I am
     player = 0    
     for i in self.players:
-      if i.getId() == self.playerID():
+      if i.getId() == self.playerID:
         player = i.getId()    
         
     #Creates a list my ships and enemy ships
@@ -397,21 +397,25 @@ class AI(BaseAI):
     modifier = -1
     if player == 1:
       modifier = 1
-           
+    
+    if player == 0:
+      agressiveWarp = [FriendlyWarpGate[0].getX() + FriendlyWarpGate[0].getRange(), FriendlyWarpGate[0].getY()]
+    else:
+      agressiveWarp = [FriendlyWarpGate[0].getX() - FriendlyWarpGate[0].getRange(), FriendlyWarpGate[0].getY()]
     #Setting general warp locations   
     #Closest to enemy warpgate 
-    agressiveWarp = self.moveTo(FriendlyWarpGate[0], EnemyWarpGate[0].getX(), EnemyWarpGate[0].getY())   
+    #agressiveWarp = self.moveTo(FriendlyWarpGate[0], EnemyWarpGate[0].getX(), EnemyWarpGate[0].getY())   
     #Closest to far edge
-    safeWarp =  [FriendlyWarpGate[0].getX(), FriendlyWarpGate[0].getY()]
-    if abs(safeWarp[0]+FriendlyWarpGate[0].getRange()*modifier) > 500:
-      safeWarp = [430,0]
-    else:
-      safeWarp = [safeWarp[0]+FriendlyWarpGate[0].getRange()*modifier, 0]
+   # safeWarp =  [FriendlyWarpGate[0].getX(), FriendlyWarpGate[0].getY()]
+    #if abs(safeWarp[0]+FriendlyWarpGate[0].getRange()*modifier) > 500:
+      #safeWarp = [430,0]
+    #else:
+      #safeWarp = [safeWarp[0]+FriendlyWarpGate[0].getRange()*modifier, 0]
     #Center of my warp gate   
-    defensiveWarp = [FriendlyWarpGate[0].getX(), FriendlyWarpGate[0].getY()]
+    agressiveWarp = safeWarp = defensiveWarp = [FriendlyWarpGate[0].getX(), FriendlyWarpGate[0].getY()]
          
     #Spawn my ships on the first turn
-    if (self.turnNumber() == 0 or self.turnNumber() == 1) and self.playerID() == player:
+    if (self.turnNumber == 0 or self.turnNumber == 1) and self.playerID == player:
       self.spawnShips(player, availShips, safeWarp, defensiveWarp, agressiveWarp)
       
     defensiveCount = 0
@@ -460,11 +464,11 @@ class AI(BaseAI):
         elif ship.getType() == "Weapons Platform": 
           if availShips["Mine Layer"] != 0:       
             if player == 0:
-              move = self.moveTo(ship,((self.mapRadius()-71)*-1), 0)          
+              move = self.moveTo(ship,((self.mapRadius-71)*-1), 0)          
               if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
                 ship.move(move[0], move[1])
             else:
-              move = self.moveTo(ship,self.mapRadius()-71, 0) 
+              move = self.moveTo(ship,self.mapRadius-71, 0) 
               if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) < ship.getMovementLeft():
                 ship.move(move[0],move[1])
           else:
@@ -494,7 +498,7 @@ class AI(BaseAI):
             move = self.moveTo(ship,FriendlyWarpGate[0].getX(), FriendlyWarpGate[0].getY())
             if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) <= ship.getMovementLeft():
               ship.move(move[0],move[1])
-            if self.turnNumber() >=4:                
+            if self.turnNumber >=4:                
               ship.attack(ship)
               myMines.append([ship.getX(), ship.getY()])                      
           else:
@@ -503,11 +507,11 @@ class AI(BaseAI):
         elif ship.getType() == "Warp Gate":  
           if availShips["Mine Layer"] != 0:      
             if player == 0:
-              move = self.moveTo(ship,((self.mapRadius()-71)*-1),0) 
+              move = self.moveTo(ship,((self.mapRadius-71)*-1),0) 
               if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) <= ship.getMovementLeft():
                 ship.move(move[0], move[1])
             else:
-              move = self.moveTo(ship,self.mapRadius()-71, 0) 
+              move = self.moveTo(ship,self.mapRadius-71, 0) 
               if self.distance(ship.getX(), move[0], ship.getY(), move[1]) > 0 and self.distance(ship.getX(), move[0], ship.getY(), move[1]) <= ship.getMovementLeft():
                 ship.move(move[0],move[1])
           else:
