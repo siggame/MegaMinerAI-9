@@ -19,6 +19,9 @@ except OSError:
 library.createConnection.restype = c_void_p
 library.createConnection.argtypes = []
 
+library.serverConnect.restype = c_int
+library.serverConnect.argtypes = [c_void_p, c_char_p, c_char_p]
+
 library.serverLogin.restype = c_int
 library.serverLogin.argtypes = [c_void_p, c_char_p, c_char_p]
 
@@ -55,7 +58,7 @@ library.shipAttack.argtypes = [c_void_p, c_void_p]
 
 # accessors
 
-#Globals 
+#Globals
 library.getTurnNumber.restype = c_int
 library.getTurnNumber.argtypes = [c_void_p]
 
@@ -71,11 +74,8 @@ library.getRound.argtypes = [c_void_p]
 library.getVictoriesNeeded.restype = c_int
 library.getVictoriesNeeded.argtypes = [c_void_p]
 
-library.getInnerMapRadius.restype = c_int
-library.getInnerMapRadius.argtypes = [c_void_p]
-
-library.getOuterMapRadius.restype = c_int
-library.getOuterMapRadius.argtypes = [c_void_p]
+library.getMapRadius.restype = c_int
+library.getMapRadius.argtypes = [c_void_p]
 
 library.getShipType.restype = c_void_p
 library.getShipType.argtypes = [c_void_p, c_int]

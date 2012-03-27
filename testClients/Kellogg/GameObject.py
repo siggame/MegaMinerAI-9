@@ -7,50 +7,60 @@ from ExistentialError import ExistentialError
 class GameObject(object):
   def __init__(self, ptr):
     from BaseAI import BaseAI
-    self.ptr = ptr
-    self.iteration = BaseAI.iteration
+    self._ptr = ptr
+    self._iteration = BaseAI.iteration
 
 
 ##An available ship type
 class ShipType(GameObject):
   def __init__(self, ptr):
     from BaseAI import BaseAI
-    self.ptr = ptr
-    self.iteration = BaseAI.iteration
-    
-    self.id = library.shipTypeGetId(ptr)
+    self._ptr = ptr
+    self._iteration = BaseAI.iteration
+    self._id = library.shipTypeGetId(ptr)
 
+  #\cond
   def validify(self):
     from BaseAI import BaseAI
     #if this class is pointing to an object from before the current turn it's probably
     #somewhere else in memory now
-    if self.iteration == BaseAI.iteration:
+    if self._iteration == BaseAI.iteration:
       return True
     for i in BaseAI.shipTypes:
-      if i.id == self.id:
-        self.ptr = i.ptr
-        self.iteration = BaseAI.iteration
+      if i._id == self._id:
+        self._ptr = i._ptr
+        self._iteration = BaseAI.iteration
         return True
     raise ExistentialError()
-  ##Sends in a new ship of this type
+  #\endcond
+  ##Sends in a new ship of this type. Ships must be warped in with the radius of the player's warp ship.
   def warpIn(self, x, y):
     self.validify()
-    return library.shipTypeWarpIn(self.ptr, x, y)
+    return library.shipTypeWarpIn(self._ptr, x, y)
 
-  ##Unique Identifier
+  #\cond
   def getId(self):
     self.validify()
-    return library.shipTypeGetId(self.ptr)
+    return library.shipTypeGetId(self._ptr)
+  #\endcond
+  ##Unique Identifier
+  id = property(getId)
 
-  ##The ship type
+  #\cond
   def getType(self):
     self.validify()
-    return library.shipTypeGetType(self.ptr)
+    return library.shipTypeGetType(self._ptr)
+  #\endcond
+  ##The ship type
+  type = property(getType)
 
-  ##The amount of money required to purchase this type of ship
+  #\cond
   def getCost(self):
     self.validify()
-    return library.shipTypeGetCost(self.ptr)
+    return library.shipTypeGetCost(self._ptr)
+  #\endcond
+  ##The amount of money required to purchase this type of ship
+  cost = property(getCost)
 
 
   def __str__(self):
@@ -65,52 +75,68 @@ class ShipType(GameObject):
 class Player(GameObject):
   def __init__(self, ptr):
     from BaseAI import BaseAI
-    self.ptr = ptr
-    self.iteration = BaseAI.iteration
-    
-    self.id = library.playerGetId(ptr)
+    self._ptr = ptr
+    self._iteration = BaseAI.iteration
+    self._id = library.playerGetId(ptr)
 
+  #\cond
   def validify(self):
     from BaseAI import BaseAI
     #if this class is pointing to an object from before the current turn it's probably
     #somewhere else in memory now
-    if self.iteration == BaseAI.iteration:
+    if self._iteration == BaseAI.iteration:
       return True
     for i in BaseAI.players:
-      if i.id == self.id:
-        self.ptr = i.ptr
-        self.iteration = BaseAI.iteration
+      if i._id == self._id:
+        self._ptr = i._ptr
+        self._iteration = BaseAI.iteration
         return True
     raise ExistentialError()
+  #\endcond
   ##Allows a player to display messages on the screen
   def talk(self, message):
     self.validify()
-    return library.playerTalk(self.ptr, message)
+    return library.playerTalk(self._ptr, message)
 
-  ##Unique Identifier
+  #\cond
   def getId(self):
     self.validify()
-    return library.playerGetId(self.ptr)
+    return library.playerGetId(self._ptr)
+  #\endcond
+  ##Unique Identifier
+  id = property(getId)
 
-  ##Player's Name
+  #\cond
   def getPlayerName(self):
     self.validify()
-    return library.playerGetPlayerName(self.ptr)
+    return library.playerGetPlayerName(self._ptr)
+  #\endcond
+  ##Player's Name
+  playerName = property(getPlayerName)
 
-  ##Time remaining, updated at start of turn
+  #\cond
   def getTime(self):
     self.validify()
-    return library.playerGetTime(self.ptr)
+    return library.playerGetTime(self._ptr)
+  #\endcond
+  ##Time remaining, updated at start of turn
+  time = property(getTime)
 
-  ##How many rounds you have won this match
+  #\cond
   def getVictories(self):
     self.validify()
-    return library.playerGetVictories(self.ptr)
+    return library.playerGetVictories(self._ptr)
+  #\endcond
+  ##How many rounds you have won this match
+  victories = property(getVictories)
 
-  ##How much energy the player has left to warp in ships
+  #\cond
   def getEnergy(self):
     self.validify()
-    return library.playerGetEnergy(self.ptr)
+    return library.playerGetEnergy(self._ptr)
+  #\endcond
+  ##How much energy the player has left to warp in ships
+  energy = property(getEnergy)
 
 
   def __str__(self):
@@ -127,115 +153,161 @@ class Player(GameObject):
 class Ship(GameObject):
   def __init__(self, ptr):
     from BaseAI import BaseAI
-    self.ptr = ptr
-    self.iteration = BaseAI.iteration
-    
-    self.id = library.shipGetId(ptr)
+    self._ptr = ptr
+    self._iteration = BaseAI.iteration
+    self._id = library.shipGetId(ptr)
 
+  #\cond
   def validify(self):
     from BaseAI import BaseAI
     #if this class is pointing to an object from before the current turn it's probably
     #somewhere else in memory now
-    if self.iteration == BaseAI.iteration:
+    if self._iteration == BaseAI.iteration:
       return True
     for i in BaseAI.ships:
-      if i.id == self.id:
-        self.ptr = i.ptr
-        self.iteration = BaseAI.iteration
+      if i._id == self._id:
+        self._ptr = i._ptr
+        self._iteration = BaseAI.iteration
         return True
     raise ExistentialError()
-  ##Command a ship to move to a specified position
+  #\endcond
+  ##Command a ship to move to a specified position. If the position specified by this function is not legal, the position of the ship will be updated, but the movement will be rejected by the server.
   def move(self, x, y):
     self.validify()
-    return library.shipMove(self.ptr, x, y)
+    return library.shipMove(self._ptr, x, y)
 
-  ##Blow yourself up, damage those around you
+  ##Blow yourself up, damage those around you, reduces the ship to 0 health.
   def selfDestruct(self):
     self.validify()
-    return library.shipSelfDestruct(self.ptr)
+    return library.shipSelfDestruct(self._ptr)
 
-  ##Commands your ship to attack a target
+  ##Commands your ship to attack a target. Making an attack will reduce the number of attacks available to the ship, even if the attack is rejected by the game server.
   def attack(self, target):
     self.validify()
     if not isinstance(target, Ship):
       raise TypeError('target should be of [Ship]')
     target.validify()
-    return library.shipAttack(self.ptr, target.ptr)
+    return library.shipAttack(self._ptr, target._ptr)
 
-  ##Unique Identifier
+  #\cond
   def getId(self):
     self.validify()
-    return library.shipGetId(self.ptr)
+    return library.shipGetId(self._ptr)
+  #\endcond
+  ##Unique Identifier
+  id = property(getId)
 
-  ##The owner of the ship
+  #\cond
   def getOwner(self):
     self.validify()
-    return library.shipGetOwner(self.ptr)
+    return library.shipGetOwner(self._ptr)
+  #\endcond
+  ##The owner of the ship
+  owner = property(getOwner)
 
-  ##X position of the ship
+  #\cond
   def getX(self):
     self.validify()
-    return library.shipGetX(self.ptr)
+    return library.shipGetX(self._ptr)
+  #\endcond
+  ##X position of the ship
+  x = property(getX)
 
-  ##Y position of the ship
+  #\cond
   def getY(self):
     self.validify()
-    return library.shipGetY(self.ptr)
+    return library.shipGetY(self._ptr)
+  #\endcond
+  ##Y position of the ship
+  y = property(getY)
 
-  ##The radius of the ship
+  #\cond
   def getRadius(self):
     self.validify()
-    return library.shipGetRadius(self.ptr)
+    return library.shipGetRadius(self._ptr)
+  #\endcond
+  ##The radius of the ship
+  radius = property(getRadius)
 
-  ##The ship type
+  #\cond
   def getType(self):
     self.validify()
-    return library.shipGetType(self.ptr)
+    return library.shipGetType(self._ptr)
+  #\endcond
+  ##The ship type
+  type = property(getType)
 
-  ##How many more attacks this ship has
+  #\cond
   def getAttacksLeft(self):
     self.validify()
-    return library.shipGetAttacksLeft(self.ptr)
+    return library.shipGetAttacksLeft(self._ptr)
+  #\endcond
+  ##How many more attacks this ship has
+  attacksLeft = property(getAttacksLeft)
 
-  ##How much more movement this ship has
+  #\cond
   def getMovementLeft(self):
     self.validify()
-    return library.shipGetMovementLeft(self.ptr)
+    return library.shipGetMovementLeft(self._ptr)
+  #\endcond
+  ##How much more movement this ship has
+  movementLeft = property(getMovementLeft)
 
-  ##The largest possible movement for this ship
+  #\cond
   def getMaxMovement(self):
     self.validify()
-    return library.shipGetMaxMovement(self.ptr)
+    return library.shipGetMaxMovement(self._ptr)
+  #\endcond
+  ##The largest possible movement for this ship
+  maxMovement = property(getMaxMovement)
 
-  ##The max number of attacks for this ship
+  #\cond
   def getMaxAttacks(self):
     self.validify()
-    return library.shipGetMaxAttacks(self.ptr)
+    return library.shipGetMaxAttacks(self._ptr)
+  #\endcond
+  ##The max number of attacks for this ship
+  maxAttacks = property(getMaxAttacks)
 
-  ##The strength of attacks for this ship
+  #\cond
   def getDamage(self):
     self.validify()
-    return library.shipGetDamage(self.ptr)
+    return library.shipGetDamage(self._ptr)
+  #\endcond
+  ##The strength of attacks for this ship
+  damage = property(getDamage)
 
-  ##The range of attacks for this ship
+  #\cond
   def getRange(self):
     self.validify()
-    return library.shipGetRange(self.ptr)
+    return library.shipGetRange(self._ptr)
+  #\endcond
+  ##The range of attacks for this ship
+  range = property(getRange)
 
-  ##The total health of the ship
+  #\cond
   def getHealth(self):
     self.validify()
-    return library.shipGetHealth(self.ptr)
+    return library.shipGetHealth(self._ptr)
+  #\endcond
+  ##The total health of the ship
+  health = property(getHealth)
 
-  ##The max health possible for the ship
+  #\cond
   def getMaxHealth(self):
     self.validify()
-    return library.shipGetMaxHealth(self.ptr)
+    return library.shipGetMaxHealth(self._ptr)
+  #\endcond
+  ##The max health possible for the ship
+  maxHealth = property(getMaxHealth)
 
-  ##The amount of damage done when this ship self destructs
+  #\cond
   def getSelfDestructDamage(self):
     self.validify()
-    return library.shipGetSelfDestructDamage(self.ptr)
+    return library.shipGetSelfDestructDamage(self._ptr)
+  #\endcond
+  ##The amount of damage done when this ship self destructs
+  selfDestructDamage = property(getSelfDestructDamage)
 
 
   def __str__(self):
