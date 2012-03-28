@@ -94,6 +94,7 @@ namespace visualizer
       int radius;
       int range;
       int maxHealth;
+      int maxMovement;
       string type;
       bool selected;
 
@@ -106,10 +107,14 @@ namespace visualizer
         range = ship.range;
         maxHealth = ship.maxHealth;
         type = (ship.type == NULL ? "default" : ship.type);
+        maxMovement = ship.maxMovement;
         m_X = ship.x;
         m_Y = ship.y;
         m_Round = round;
         selected = false;
+        
+        if( strcmp( "Mine", type.c_str() ) == 0 )
+          radius /= 2.0f;
 
         // have it stealth now (only Stealth ships care...)
         AddStealth( createdAt );
@@ -120,7 +125,7 @@ namespace visualizer
       vector< int > healths;
       vector< bool > emps;
 
-      void AddTurn( int turn, vector< SpacePoint > &moves )
+      void AddTurn( int turn, vector< SpacePoint > &moves, int movementLeft )
       {
         float span = 1.0f;// / moves.size();
         for(float i = 0; i < (float)moves.size(); i++)
@@ -135,6 +140,8 @@ namespace visualizer
 
           m_Moves.push_back( move );
         }
+        
+        m_MovementLeft.push_back( movementLeft );
       }
 
       bool HasMoves() { return m_Moves.size() > 0; }
@@ -229,7 +236,7 @@ namespace visualizer
 
       bool RenderRange()
       {
-        return (strcmp( "Mine", type.c_str() ) == 0) || (strcmp( "Support", type.c_str() ) == 0) || (strcmp( "Warp Ship", type.c_str() ) == 0);
+        return (strcmp( "Mine", type.c_str() ) == 0) || (strcmp( "Support", type.c_str() ) == 0) || (strcmp( "Warp Gate", type.c_str() ) == 0);
       }
 
       string PointsOn( int turn )
@@ -276,7 +283,21 @@ namespace visualizer
 
         return victims.str();
       }
-
+      
+      string MovementOn( int turn )
+      {
+        turn -= createdAtTurn;
+        stringstream ss;
+        if( turn >= m_MovementLeft.size() || turn < 0 )
+        {
+          ss << "-1/" << maxMovement;
+          return ss.str();
+        }
+        
+        ss << m_MovementLeft[ turn ] << "/" << maxMovement;
+        return ss.str();
+      }
+    
     private:
       int createdAtTurn;
       float m_X;
@@ -286,6 +307,7 @@ namespace visualizer
       vector< pair< int, char > > m_Stealths;  // int represents the turn, char 's' represents that it went into stealth, 'd' is destealth
       vector< SpaceMove > m_Moves;
       int m_Round;
+      vector<int> m_MovementLeft;
 
       int PreviousTurn(int turn)
       {
