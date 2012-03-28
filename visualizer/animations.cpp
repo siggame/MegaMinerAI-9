@@ -34,8 +34,8 @@ namespace visualizer
     game->renderer->setColor( Color( 1, 1, 1, 1 ) );
     game->renderer->drawTexturedQuad(0, 0, m_Background->radius * 2, m_Background->radius * 2, "background");
     //game->renderer->drawTexturedQuad(m_Background->outerRadius - m_Background->innerRadius, m_Background->outerRadius - m_Background->innerRadius, m_Background->innerRadius * 3, m_Background->innerRadius * 2, "planet");
-    game->renderer->setColor( Color( 1, 1, 1, 0.4f ) );
-    game->renderer->drawArc(500, 500, 500, 50 );
+    game->renderer->setColor( Color( 1, 1, 1, 0.1f ) );
+    game->renderer->drawArc(500, 500, 500, 80 );
   }
 
   void DrawRoundHUD::animate( const float& t, AnimData * /* d */, IGame* game )
@@ -72,7 +72,7 @@ namespace visualizer
     SpacePoint shipCenter = m_PersistentShip->LocationOn(m_Turn, t);
     shipCenter.x += *m_MapRadius;
     shipCenter.y += *m_MapRadius;
-    float shipHeading = m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270;//(m_PersistentShip->HeadingOn(m_Turn, t) == 0 ? (shipOwner ? 90 : 270) : m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270);
+    float shipHeading = m_PersistentShip->HeadingOn(m_Turn, t) + 270;//(m_PersistentShip->HeadingOn(m_Turn, t) == 0 ? (shipOwner ? 90 : 270) : m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270);
     float shipStealth = m_PersistentShip->StealthOn(m_Turn, t);
     bool shipIsEMPed = m_PersistentShip->EMPedOn(m_Turn);
     bool shipIsEMP = strcmp( "EMP", m_PersistentShip->type.c_str() ) == 0;

@@ -7,6 +7,7 @@
 #include <utility>
 #include <sstream>
 #include "glm/glm.hpp"
+#include "glm/gtx/vector_angle.hpp"
 
 namespace visualizer
 {
@@ -315,8 +316,12 @@ namespace visualizer
 
         glm::vec4 m = times * glm::transpose(A);
         glm::vec2 result = q * m;
-
-        return make_pair( SpacePoint( result.x, result.y ), 0 );
+      
+        double angle = glm::orientedAngle(glm::vec2(1,0), glm::normalize(p1-p0));
+        if( angle != angle )
+          angle = 0;
+        cout << angle << endl;
+        return make_pair(SpacePoint(result.x, result.y), angle);
       }
 
   };
