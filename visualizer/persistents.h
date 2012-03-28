@@ -8,6 +8,26 @@
 #include <sstream>
 #include "glm/glm.hpp"
 
+#define M11  0.0    
+#define M21 -0.5   
+#define M31  1.0   
+#define M41 -0.5   
+
+#define M12  1.0   
+#define M22  0.0   
+#define M32 -2.5   
+#define M42  1.5   
+
+#define M13  0.0   
+#define M23  0.5   
+#define M33  2.0   
+#define M43 -1.5   
+
+#define M14  0.0   
+#define M24  0.0   
+#define M34 -0.5   
+#define M44  0.5 
+
 namespace visualizer
 {
   ostream& operator <<( ostream& os, const glm::vec2& v );
@@ -102,9 +122,12 @@ namespace visualizer
 
       void AddTurn( int turn, vector< SpacePoint > &moves )
       {
-        float span = 1.0f / moves.size();
+        float span = 1.0f;// / moves.size();
         for(float i = 0; i < (float)moves.size(); i++)
         {
+          if( i != 0 )
+            continue;
+            
           SpaceMove move;
           move.point = moves[i];
           move.start = (float)turn + i * span;
@@ -197,12 +220,6 @@ namespace visualizer
       {
         healths.push_back(0);
         points.push_back( SpacePoint( points.back().x, points.back().y ) );
-
-        for(int i = 0; i < (signed)m_Moves.size(); i++)
-        {
-          //cout << id << ": #" << i << ":  (" << m_Moves[i].point.x << "," << m_Moves[i].point.y << ") @" << m_Moves[i].start << " to " << m_Moves[i].end << endl;
-        }
-
       }
 
       bool RenderShield()
@@ -212,7 +229,7 @@ namespace visualizer
 
       bool RenderRange()
       {
-        return (strcmp( "Mine", type.c_str() ) == 0) || (strcmp( "Support", type.c_str() ) == 0);
+        return (strcmp( "Mine", type.c_str() ) == 0) || (strcmp( "Support", type.c_str() ) == 0) || (strcmp( "Warp Ship", type.c_str() ) == 0);
       }
 
       string PointsOn( int turn )
@@ -275,7 +292,7 @@ namespace visualizer
         return (turn > 0 ? turn - 1 : 0);
       }
 
-      pair<SpacePoint, float> SplineOn(int turn, float t)
+      pair<SpacePoint, float> GardnersSplineOn(int turn, float t)
       {
         // Index setup from Jake F. 
         
@@ -318,7 +335,78 @@ namespace visualizer
 
         return make_pair( SpacePoint( result.x, result.y ), 0 );
       }
+      
+      pair<SpacePoint, float> SplineOn(int turn, float t)
+      {
+        int v2 = -1;
+        float time = float(turn) + t;
 
+        if(m_Moves.size() == 0)
+          return make_pair( SpacePoint( m_X, m_Y ), 0 );
+        
+        int i = -1;
+        for(i = 0; i < m_Moves.size(); i++)
+        {
+          if( m_Moves[i].InRange( time ) )
+          {
+            v2 = i;
+            i = m_Moves.size();
+          }
+          else if( m_Moves[i].start > time )
+          {
+            v2 = i-1;
+            t = 1.0f;
+            i = m_Moves.size();
+          }
+          else if( m_Moves[i].end < time )
+          {
+            continue;
+          }
+          else
+          {
+              // Shouldn't happen
+          }
+        }
+        
+        if(i == m_Moves.size()-1 && v2 == -1)
+        {
+          v2 = m_Moves.size()-1;
+        }
+        
+        int v1 = v2-1;
+        int v3 = v2+1;
+        int v4 = v2+2;
+
+        if( v1 < 0 )
+          v1=0;
+        if( v2 < 0 )
+          v2=0;
+        if( m_Moves.size() <= v3 )
+          v3=m_Moves.size()-1;
+        if( m_Moves.size() <= v4 )
+          v4=m_Moves.size()-1;		
+        
+        double c1,c2,c3,c4;   
+
+        c1 = M12*m_Moves[v2].point.x;   
+        c2 = M21*m_Moves[v1].point.x + M23*m_Moves[v3].point.x;   
+        c3 = M31*m_Moves[v1].point.x + M32*m_Moves[v2].point.x + M33*m_Moves[v3].point.x + M34*m_Moves[v4].point.x;   
+        c4 = M41*m_Moves[v1].point.x + M42*m_Moves[v2].point.x + M43*m_Moves[v3].point.x + M44*m_Moves[v4].point.x;   
+
+        float px = (((c4*t + c3)*t +c2)*t + c1);
+        float hx = (3*c4*t + 2*c3)*t +c2;
+
+        c1 = M12*m_Moves[v2].point.y;   
+        c2 = M21*m_Moves[v1].point.y + M23*m_Moves[v3].point.y;   
+        c3 = M31*m_Moves[v1].point.y + M32*m_Moves[v2].point.y + M33*m_Moves[v3].point.y + M34*m_Moves[v4].point.y;   
+        c4 = M41*m_Moves[v1].point.y + M42*m_Moves[v2].point.y + M43*m_Moves[v3].point.y + M44*m_Moves[v4].point.y;   
+
+        float py = (((c4*t + c3)*t +c2)*t + c1);
+        float hy = (3*c4*t + 2*c3)*t +c2;
+
+        return make_pair( SpacePoint( px, py ), atan2( hy, hx ) );
+      }
+      
   };
 }
 
