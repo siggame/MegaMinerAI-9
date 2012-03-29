@@ -75,8 +75,6 @@ namespace visualizer
           selectionB.y = y > sy ? y : sy;
 
           i.second->selected = intersects( selectionA, selectionB, shipA, shipB );
-          cout << "locX:" << loc.x << ", locY:" << loc.y << ", x:" << x << ", y:" << y << ", sx:" << sx << ", sy:" << sy << endl;
-          cout << "selectionA: (" << selectionA.x << "," << selectionA.y << ")  selectionB: (" << selectionB.x << "," << selectionB.y << ")\n"; 
         }
       }
     }
@@ -167,7 +165,7 @@ namespace visualizer
     
     // Build the Debug Table's Headers
     QStringList header;
-    header << "Owner" << "Type" << "Locations" << "Health" << "Attacks Who";
+    header << "Owner" << "Type" << "Locations" << "Movement Left" << "Health" << "Attacks Who";
     gui->setDebugHeader( header );
 
     int p = programs["test"] = renderer->createShaderProgram();
@@ -206,7 +204,6 @@ namespace visualizer
           }
         }
 
-
         // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
         m_PersistentShips[shipID]->points.push_back( SpacePoint( i.second.x, i.second.y ) );
         m_PersistentShips[shipID]->healths.push_back( i.second.health );
@@ -220,31 +217,31 @@ namespace visualizer
           {
             case parser::MOVE:
             {
-                parser::move &move = (parser::move&)*j;
-                if( !m_PersistentShips[shipID]->HasMoves() )
-                {
-                    moves.push_back( SpacePoint( move.fromX, move.fromY ) );
-                }
-                moves.push_back( SpacePoint( move.toX, move.toY ) );
+              parser::move &move = (parser::move&)*j;
+              if( !m_PersistentShips[shipID]->HasMoves() )
+              {
+                  moves.push_back( SpacePoint( move.fromX, move.fromY ) );
+              }
+              moves.push_back( SpacePoint( move.toX, move.toY ) );
             } break;
             case parser::ATTACK:
-              {
-                parser::attack &attack = (parser::attack&)*j;
-                m_PersistentShips[shipID]->AddAttack( m_PersistentShips[m_game->states[ state - 1 ].ships[ attack.targetID ].id], state );
+            {
+              parser::attack &attack = (parser::attack&)*j;
+              m_PersistentShips[shipID]->AddAttack( m_PersistentShips[m_game->states[ state - 1 ].ships[ attack.targetID ].id], state );
 
-              } break;
+            } break;
             case parser::STEALTH:
-              {
-                m_PersistentShips[shipID]->AddStealth( state );
-              }
+            {
+              m_PersistentShips[shipID]->AddStealth( state );
+            }
             case parser::DESTEALTH:
-              {
-                m_PersistentShips[shipID]->AddDeStealth( state );
-              }
+            {
+              m_PersistentShips[shipID]->AddDeStealth( state );
+            }
           }
         }
         
-        m_PersistentShips[shipID]->AddTurn( state, moves );
+        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.movementLeft );
       }
 
     }
@@ -293,6 +290,7 @@ namespace visualizer
           turn[i.first]["Owner"] = i.second->owner; 
           turn[i.first]["Type"] = i.second->type.c_str();
           turn[i.first]["Locations"] = i.second->PointsOn( state ).c_str();
+          turn[i.first]["Movement Left"] = i.second->MovementOn( state ).c_str();
           dto.str("");
           dto << i.second->HealthOn(state, 0) << "/" << i.second->maxHealth;
           turn[i.first]["Health"] = dto.str().c_str();
@@ -306,35 +304,36 @@ namespace visualizer
         }
       }
       
-        // Add the RoundHUD
-        int roundWinnerID = -1;
-        if( m_game->states.size() == state+1 )
+      // Add the RoundHUD
+      int roundWinnerID = -1;
+      if( m_game->states.size() == state+1 )
+      {
+        roundWinnerID = m_game->winner;
+      }
+      else
+      {
+        if( m_game->states[ state + 1 ].players[0].victories > m_game->states[ state ].players[0].victories )
         {
-            roundWinnerID = m_game->winner;
+          roundWinnerID = 0;
         }
-        else
+        if( m_game->states[ state + 1 ].players[1].victories > m_game->states[ state ].players[1].victories )
         {
-            if( m_game->states[ state + 1 ].players[0].victories > m_game->states[ state ].players[0].victories )
-            {
-                roundWinnerID = 0;
-            }
-            if( m_game->states[ state + 1 ].players[1].victories > m_game->states[ state ].players[1].victories )
-            {
-                if( roundWinnerID == 0 )
-                {
-                    roundWinnerID = -1;
-                }
-                else
-                {
-                    roundWinnerID = 1;
-                }
-            }
+          if( roundWinnerID == 0 )
+          {
+            roundWinnerID = -1;
+          }
+          else
+          {
+            roundWinnerID = 1;
+          }
         }
-        
-        // Thankyou for making your code so readable 
-        SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].round, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].round < m_game->states[ state + 1 ].round );
-        roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
-        turn.addAnimatable( roundHUD );
+      }
+      
+      // Thankyou for making your code so readable 
+      //  - You are welcome
+      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].round, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].round < m_game->states[ state + 1 ].round );
+      roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
+      turn.addAnimatable( roundHUD );
 
       addFrame( turn );
       if( state > 5 )

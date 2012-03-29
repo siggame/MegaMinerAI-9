@@ -77,6 +77,8 @@ namespace visualizer
     bool shipIsEMPed = m_PersistentShip->EMPedOn(m_Turn);
     bool shipIsEMP = strcmp( "EMP", m_PersistentShip->type.c_str() ) == 0;
     bool shipIsSelected = m_PersistentShip->selected;
+    
+    float shipSizeScale = game->options->getNumber( "Ship Render Size" ) / 100.0f;
 
     float shipRadius = m_PersistentShip->radius;
     bool shipIsExploding = m_PersistentShip->ExplodingOn(m_Turn);
@@ -134,7 +136,7 @@ namespace visualizer
     float healthEnd   = upAngle+healthSection*healthLeft;
 
     // Colors:
-    Color teamColor[] = { Color(1, 0, 0, (shipIsExploding? 1 - t : shipStealth) ), Color(0, 0.4f, 1, (shipIsExploding? 1 - t : shipStealth) ) };
+    Color teamColor = shipOwner ? Color(0, 0.4f, 1, (shipIsExploding? 1 - t : shipStealth)) : Color(1, 0, 0, (shipIsExploding? 1 - t : shipStealth));
     float attackTrans = t * 2;
     if(t >= 0.5f)
     {
@@ -165,8 +167,9 @@ namespace visualizer
       // Set the color to white for drawing the ship
       game->renderer->setColor( Color(1, 1, 1, shipStealth) );
       //game->renderer->drawTexturedQuad(shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipRadius * 1.6f, shipTexture.str());
-      drawRotatedTexturedQuad( game, shipCenter.x - shipRadius/1.25f, shipCenter.y - shipRadius/1.25f, shipRadius * 1.6f, shipHeading, shipTexture.str());
-      if(renderShield)
+      drawRotatedTexturedQuad( game, shipCenter.x - shipRadius/1.25f * shipSizeScale, shipCenter.y - shipRadius/1.25f * shipSizeScale, shipRadius * 1.6f * shipSizeScale, shipHeading, shipTexture.str());
+      
+      if(renderShield && game->options->getNumber( "Display Ships' Sheild" ) )
       {
         drawRotatedTexturedQuad( game, shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2, shipHeading, shipShieldTexture );
       }
@@ -175,7 +178,7 @@ namespace visualizer
     // Draw their health
     if(renderShield)
     {
-      game->renderer->setColor( teamColor[shipOwner] );
+      game->renderer->setColor( teamColor );
       game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRadius, 100, healthEnd, healthStart+360 );
       game->renderer->setColor( healthColor );
       game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRadius, 100, healthStart, healthEnd );
@@ -207,7 +210,7 @@ namespace visualizer
 
 
     // Draw Range
-    if(renderRange)
+    if(renderRange || game->options->getNumber( "Display Ships' Range" ))
     {
       game->renderer->setColor( rangeColor );
       game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRange, 100 );
