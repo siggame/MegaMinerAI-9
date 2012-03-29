@@ -113,6 +113,7 @@ namespace visualizer
   {
     gui->checkForUpdate( "Space", "./plugins/space/checkList.md5", VERSION_FILE );
     options->loadOptionFile( "./plugins/space/space.xml", "space" );
+    resourceManager->loadResourceFile( "./plugins/space/resources.r" );
 
   }
   
@@ -150,11 +151,10 @@ namespace visualizer
     }
     // END: Initial Setup
 
-    load();
-    return;
+    start();
   } // Space::loadGamelog()
 
-  void Space::load()
+  void Space::run()
   {
     map < int, vector< SmartPointer < Warp > > > Warps;
     Warps[ -1 ] = vector< SmartPointer< Warp > >();
@@ -164,7 +164,6 @@ namespace visualizer
     renderer->setCamera( 0, 0, m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2);
     renderer->setGridDimensions( m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2 );
     
-    resourceManager->loadResourceFile( "./plugins/space/resources.r" );
     
     // Build the Debug Table's Headers
     QStringList header;
@@ -183,7 +182,7 @@ namespace visualizer
 
     m_mapRadius = m_game->states[ 0 ].mapRadius;
 
-    timeManager->setNumTurns( m_game->states.size() );
+    timeManager->setNumTurns( 0 );
 
     // BEGIN: Look through the game logs and build the m_PersistentShips
     for(int state = 0; state < (int)m_game->states.size(); state++)
@@ -247,6 +246,7 @@ namespace visualizer
         
         m_PersistentShips[shipID]->AddTurn( state, moves );
       }
+
     }
 
     for ( auto& i : m_PersistentShips )
@@ -254,8 +254,6 @@ namespace visualizer
       i.second->Finalize();
     }
     // END: Look through the game logs and build the m_PersistentShips
-
-
 
     // BEGIN: Add every draw animation
     for(int state = 0; state < (int)m_game->states.size(); state++)
@@ -339,9 +337,14 @@ namespace visualizer
         turn.addAnimatable( roundHUD );
 
       addFrame( turn );
+      if( state > 5 )
+      {
+        timeManager->setNumTurns( state-5 );
+      }
     }
     // END: Add every draw animation
 
+    timeManager->setNumTurns( m_game->states.size() );
     timeManager->play();
   }
 

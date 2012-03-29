@@ -2,6 +2,7 @@
 #define CHESS_H
 
 #include <QObject>
+#include <QThread>
 #include "igame.h"
 #include "animsequence.h"
 #include <map>
@@ -16,7 +17,7 @@ using namespace std;
 
 namespace visualizer
 {
-    class Space: public QObject, public AnimSequence, public IGame
+    class Space: public QThread, public AnimSequence, public IGame
     {
         Q_OBJECT;
         Q_INTERFACES( visualizer::IGame );
@@ -27,7 +28,7 @@ namespace visualizer
             PluginInfo getPluginInfo();
             void loadGamelog( std::string gamelog );
 
-            void load();
+            void run();
             void setup();
             void destroy();
 
