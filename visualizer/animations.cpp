@@ -72,7 +72,7 @@ namespace visualizer
     SpacePoint shipCenter = m_PersistentShip->LocationOn(m_Turn, t);
     shipCenter.x += *m_MapRadius;
     shipCenter.y += *m_MapRadius;
-    float shipHeading = m_PersistentShip->HeadingOn(m_Turn, t) + 270;//(m_PersistentShip->HeadingOn(m_Turn, t) == 0 ? (shipOwner ? 90 : 270) : m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270);
+    float shipHeading = m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270;
     float shipStealth = m_PersistentShip->StealthOn(m_Turn, t);
     bool shipIsEMPed = m_PersistentShip->EMPedOn(m_Turn);
     bool shipIsEMP = strcmp( "EMP", m_PersistentShip->type.c_str() ) == 0;

@@ -250,6 +250,16 @@ namespace visualizer
         }
         
         m_PersistentShips[shipID]->AddTurn( state, moves, i.second.movementLeft );
+        
+        // Check to see if this ship dies next turn (doesn't exist next turn)
+        if( state + 1 != m_game->states.size() )
+        {
+          if( m_game->states[ state + 1 ].ships.find( shipID ) == m_game->states[ state + 1 ].ships.end() )
+          {
+            m_PersistentShips[shipID]->AddDeath( state + 1 );
+            cout << "adding death to " << shipID << " on turn " << state << endl;
+          }
+        }
       }
 
       // Start adding stuff to draw
@@ -349,7 +359,6 @@ namespace visualizer
     {
       if( m_suicide )
         break;
-      i.second->Finalize();
     }
     // END: Look through the game logs and build the m_PersistentShips
 

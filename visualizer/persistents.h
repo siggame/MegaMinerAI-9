@@ -109,10 +109,11 @@ namespace visualizer
         maxHealth = ship.maxHealth;
         type = (ship.type == NULL ? "default" : ship.type);
         maxMovement = ship.maxMovement;
-        m_X = ship.x;
-        m_Y = ship.y;
+        m_InitialX = ship.x;
+        m_InitialY = ship.y;
         m_Round = round;
         selected = false;
+        m_DeathTurn = 99999;
         
         if( strcmp( "Mine", type.c_str() ) == 0 )
           radius /= 2.0f;
@@ -149,7 +150,7 @@ namespace visualizer
 
       bool ExistsAtTurn(int turn, int round)
       {
-        return ( turn >= createdAtTurn && turn < createdAtTurn + (int)healths.size() && (m_Round == round || round == -1) );
+        return ( turn >= createdAtTurn && turn <= m_DeathTurn && (m_Round == round || round == -1) );
       }
 
       SpacePoint LocationOn(int turn, float t)
@@ -174,8 +175,9 @@ namespace visualizer
 
       bool EMPedOn(int turn)
       {
-        turn -= createdAtTurn;
-        return emps[turn];
+        //turn -= createdAtTurn;
+        //return emps[turn];
+        return false;
       }
 
       vector< SpacePoint > AttacksOn( int turn, float t )
@@ -221,13 +223,7 @@ namespace visualizer
 
       float ExplodingOn( int turn )
       {
-        return (healths[turn - createdAtTurn] == 0);
-      }
-
-      void Finalize()
-      {
-        healths.push_back(0);
-        points.push_back( SpacePoint( points.back().x, points.back().y ) );
+        return turn == m_DeathTurn;
       }
 
       bool RenderShield()
@@ -298,17 +294,36 @@ namespace visualizer
         ss << m_MovementLeft[ turn ] << "/" << maxMovement;
         return ss.str();
       }
+      
+      void AddDeath( int turn )
+      {
+        m_DeathTurn = turn;
+        healths.push_back( 0 );
+        points.push_back( SpacePoint( points.back().x, points.back().y ) );
+        
+        if(m_Moves.size() > 0)
+        {
+          SpaceMove move;
+          move.point.x = m_Moves.back().point.x;
+          move.point.y = m_Moves.back().point.y;
+          move.start = m_Moves.back().end;
+          move.end = m_Moves.back().end + 2;
+          
+          m_Moves.push_back( move );
+        }
+      }
     
     private:
       int createdAtTurn;
-      float m_X;
-      float m_Y;
+      float m_InitialX;
+      float m_InitialY;
       //map< int, vector< SpacePoint > > m_AttackLocations;
       map< int, vector < PersistentShip* > > m_AttackVictims;
       vector< pair< int, char > > m_Stealths;  // int represents the turn, char 's' represents that it went into stealth, 'd' is destealth
       vector< SpaceMove > m_Moves;
       int m_Round;
       vector<int> m_MovementLeft;
+      int m_DeathTurn;
 
       int PreviousTurn(int turn)
       {
@@ -369,7 +384,7 @@ namespace visualizer
         float time = float(turn) + t;
 
         if(m_Moves.size() == 0)
-          return make_pair( SpacePoint( m_X, m_Y ), 0 );
+          return make_pair( SpacePoint( m_InitialX, m_InitialY ), 0 );
         
         int i = -1;
         for(i = 0; i < m_Moves.size(); i++)
