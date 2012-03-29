@@ -21,6 +21,7 @@ namespace visualizer
   Space::Space()
   {
     m_game = 0;
+    m_suicide=false;
   } // Space::Space()
 
   Space::~Space()
@@ -30,6 +31,8 @@ namespace visualizer
 
   void Space::destroy()
   {
+    m_suicide=true;
+    wait();
     animationEngine->registerGame(0, 0);
 
     clear();
@@ -140,6 +143,13 @@ namespace visualizer
 
   void Space::loadGamelog( std::string gamelog )
   {
+    if(isRunning())
+    {
+      m_suicide = true;
+      wait();
+    }
+    m_suicide = false;
+
     // BEGIN: Initial Setup
     setup();
 
@@ -181,7 +191,7 @@ namespace visualizer
     timeManager->setNumTurns( 0 );
 
     // BEGIN: Look through the game logs and build the m_PersistentShips
-    for(int state = 0; state < (int)m_game->states.size(); state++)
+    for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
     {
       Warps[ state ] = vector< SmartPointer< Warp > >();
       // Loop though each PersistentShip in the current state
@@ -337,12 +347,18 @@ namespace visualizer
 
     for(auto& i : m_PersistentShips)
     {
+      if( m_suicide )
+        break;
       i.second->Finalize();
     }
     // END: Look through the game logs and build the m_PersistentShips
 
-    timeManager->setNumTurns( m_game->states.size() );
-    timeManager->play();
+    if(!m_suicide)
+    {
+      timeManager->setNumTurns( m_game->states.size() );
+      timeManager->play();
+    }
+
   }
 
 } // visualizer
