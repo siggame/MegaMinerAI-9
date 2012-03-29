@@ -257,7 +257,6 @@ namespace visualizer
           if( m_game->states[ state + 1 ].ships.find( shipID ) == m_game->states[ state + 1 ].ships.end() )
           {
             m_PersistentShips[shipID]->AddDeath( state + 1 );
-            cout << "adding death to " << shipID << " on turn " << state << endl;
           }
         }
       }
@@ -337,7 +336,14 @@ namespace visualizer
         }
       }
       
-      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].round, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].round < m_game->states[ state + 1 ].round );
+      // Get all the ship types for this round
+      vector< char* > shipTypes;
+      for( auto& shipType : m_game->states[ state ].shipTypes )
+      {
+        shipTypes.push_back( shipType.second.type );
+      }
+      
+      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].round, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].round < m_game->states[ state + 1 ].round, shipTypes );
       roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
       turn.addAnimatable( roundHUD );
 

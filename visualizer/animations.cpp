@@ -47,6 +47,35 @@ namespace visualizer
 
     // Draw the t "hand"
     //game->renderer->drawArc( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius, m_RoundHUD->mapRadius, 60, 0, 360.0f * t );
+    
+    // Draw the availible ship types
+    if( game->options->getNumber( "Show Round's Ship Types" ) )
+    {
+      game->renderer->drawText( m_RoundHUD->mapRadius * 2.05, m_RoundHUD->mapRadius - 350, "Roboto", "Availible Ship Types:", 100 );
+      int i = 0;
+      for( auto& shiptype: m_RoundHUD->shipTypes )
+      {
+        game->renderer->drawText( m_RoundHUD->mapRadius * 2.1, m_RoundHUD->mapRadius - 300 + (i * 75), "Roboto", shiptype, 70 );
+        
+        stringstream shipTexture;
+        shipTexture << "Ship-Red-";
+        for(auto& character: shiptype)
+        {
+          if(character == ' ')
+          {
+            shipTexture << "-";
+          }
+          else
+          {
+            shipTexture << character;
+          }
+        }
+        
+        game->renderer->drawTexturedQuad( m_RoundHUD->mapRadius * 2.125, m_RoundHUD->mapRadius - 280 + (i * 75), 50, 50, shipTexture.str() );
+        
+        i++;
+      }
+    }
 
     if( m_RoundHUD->drawWinScreen )
     {
