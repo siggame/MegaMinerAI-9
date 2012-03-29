@@ -113,6 +113,14 @@ namespace visualizer
     options->loadOptionFile( "./plugins/space/space.xml", "space" );
     resourceManager->loadResourceFile( "./plugins/space/resources.r" );
 
+    int p = programs["test"] = renderer->createShaderProgram();
+    renderer->attachShader( p, "testShader" );
+    renderer->buildShaderProgram( p );
+
+    p = programs["post"] = renderer->createShaderProgram();
+    renderer->attachShader( p, "post1" );
+    renderer->buildShaderProgram( p );
+
   }
   
 
@@ -148,7 +156,11 @@ namespace visualizer
           );
     }
     // END: Initial Setup
-
+    
+    // Setup the renderer as mapRadius*2 x mapRadius*2
+    renderer->setCamera( 0, 0, m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2);
+    renderer->setGridDimensions( m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2 );
+ 
     start();
   } // Space::loadGamelog()
 
@@ -156,25 +168,11 @@ namespace visualizer
   {
     map < int, vector< SmartPointer < Warp > > > Warps;
     Warps[ -1 ] = vector< SmartPointer< Warp > >();
-
-    // Setup the renderer as mapRadius*2 x mapRadius*2
-    cout << m_game->states[0].mapRadius << endl;
-    renderer->setCamera( 0, 0, m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2);
-    renderer->setGridDimensions( m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2 );
-    
     
     // Build the Debug Table's Headers
     QStringList header;
     header << "Owner" << "Type" << "Locations" << "Movement Left" << "Health" << "Attacks Who";
     gui->setDebugHeader( header );
-
-    int p = programs["test"] = renderer->createShaderProgram();
-    renderer->attachShader( p, "testShader" );
-    renderer->buildShaderProgram( p );
-
-    p = programs["post"] = renderer->createShaderProgram();
-    renderer->attachShader( p, "post1" );
-    renderer->buildShaderProgram( p );
 
     animationEngine->registerGame( this, this );
 
@@ -244,17 +242,7 @@ namespace visualizer
         m_PersistentShips[shipID]->AddTurn( state, moves, i.second.movementLeft );
       }
 
-    }
-
-    for ( auto& i : m_PersistentShips )
-    {
-      i.second->Finalize();
-    }
-    // END: Look through the game logs and build the m_PersistentShips
-
-    // BEGIN: Add every draw animation
-    for(int state = 0; state < (int)m_game->states.size(); state++)
-    {
+      // Start adding stuff to draw
       Frame turn;  // The frame that will be drawn
 
       // Add and draw the background
@@ -329,19 +317,29 @@ namespace visualizer
         }
       }
       
-      // Thankyou for making your code so readable 
-      //  - You are welcome
       SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].round, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].round < m_game->states[ state + 1 ].round );
       roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
       turn.addAnimatable( roundHUD );
 
-      addFrame( turn );
-      if( state > 5 )
+      animationEngine->buildAnimations(turn);
+      addFrame(turn);
+      if(state > 5)
       {
-        timeManager->setNumTurns( state-5 );
+        timeManager->setNumTurns(state - 5);
+        if(state == 6)
+        {
+          timeManager->setTurn(0);
+          timeManager->play();
+        }
       }
     }
     // END: Add every draw animation
+
+    for(auto& i : m_PersistentShips)
+    {
+      i.second->Finalize();
+    }
+    // END: Look through the game logs and build the m_PersistentShips
 
     timeManager->setNumTurns( m_game->states.size() );
     timeManager->play();

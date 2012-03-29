@@ -262,7 +262,7 @@ namespace visualizer
         if( nothing )
         {
           pts.str("");
-          pts << "(" << points[turn].x << "," << points[turn].y << ")";
+          pts << "(" << points[turn-createdAtTurn].x << "," << points[turn-createdAtTurn].y << ")";
         }
 
         return pts.str();
