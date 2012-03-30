@@ -215,7 +215,6 @@ namespace visualizer
         // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
         m_PersistentShips[shipID]->points.push_back( SpacePoint( i.second.x, i.second.y ) );
         m_PersistentShips[shipID]->healths.push_back( i.second.health );
-        m_PersistentShips[shipID]->emps.push_back( false );
         
         vector< SpacePoint > moves;
         // Check for this ship's animations in the gamelog
@@ -236,7 +235,13 @@ namespace visualizer
             {
               parser::attack &attack = (parser::attack&)*j;
               m_PersistentShips[shipID]->AddAttack( m_PersistentShips[m_game->states[ state - 1 ].ships[ attack.targetID ].id], state );
-
+              
+              // If this is an EMP attack we need to EMP the victim
+              if( strcmp( "EMP", m_PersistentShips[shipID]->type.c_str() ) == 0 )
+              {
+                m_PersistentShips[ attack.targetID ]->AddEMPed( state + 1 );
+              }
+              
             } break;
             case parser::STEALTH:
             {

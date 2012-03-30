@@ -125,7 +125,6 @@ namespace visualizer
       // Stats that change each turn
       vector< SpacePoint > points;
       vector< int > healths;
-      vector< bool > emps;
 
       void AddTurn( int turn, vector< SpacePoint > &moves, int movementLeft )
       {
@@ -175,8 +174,16 @@ namespace visualizer
 
       bool EMPedOn(int turn)
       {
-        //turn -= createdAtTurn;
-        //return emps[turn];
+        //for( auto& empedTurn : m_EMPeds )
+        for( int i = 0; i < m_EMPeds.size(); i++ )
+        {
+          int empedTurn = m_EMPeds[i];
+          if( empedTurn == turn )
+          {
+            return true;
+          }
+        }
+        
         return false;
       }
 
@@ -214,6 +221,11 @@ namespace visualizer
       void AddDeStealth( int turn )
       {
         m_Stealths.push_back( pair<int,char>(turn, 'd') );
+      }
+      
+      void AddEMPed( int turn )
+      {
+        m_EMPeds.push_back( turn );
       }
 
       float StealthOn( int /*turn*/, float /*t*/)
@@ -324,6 +336,7 @@ namespace visualizer
       int m_Round;
       vector<int> m_MovementLeft;
       int m_DeathTurn;
+      vector< int > m_EMPeds;
 
       int PreviousTurn(int turn)
       {
