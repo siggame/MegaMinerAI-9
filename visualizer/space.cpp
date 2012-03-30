@@ -368,6 +368,14 @@ namespace visualizer
 
     for(auto& i : m_PersistentShips)
     {
+      
+      cout << "ship " << i.second->id << " moves: \n";
+      for( auto& move : i.second->m_Moves )
+      {
+        cout << " (" << move.point.x << "," << move.point.y << ") ";
+      }
+      cout << endl << endl;
+      
       if( m_suicide )
         break;
     }

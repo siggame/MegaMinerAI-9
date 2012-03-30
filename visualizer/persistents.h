@@ -324,7 +324,7 @@ namespace visualizer
           m_Moves.push_back( move );
         }
       }
-    
+      vector< SpaceMove > m_Moves;
     private:
       int createdAtTurn;
       float m_InitialX;
@@ -332,7 +332,7 @@ namespace visualizer
       //map< int, vector< SpacePoint > > m_AttackLocations;
       map< int, vector < PersistentShip* > > m_AttackVictims;
       vector< pair< int, char > > m_Stealths;  // int represents the turn, char 's' represents that it went into stealth, 'd' is destealth
-      vector< SpaceMove > m_Moves;
+      //vector< SpaceMove > m_Moves;
       int m_Round;
       vector<int> m_MovementLeft;
       int m_DeathTurn;
@@ -394,24 +394,26 @@ namespace visualizer
       pair<SpacePoint, float> SplineOn(int turn, float t)
       {
         int v2 = -1;
+        bool foundV2 = false;
         float time = float(turn) + t;
 
         if(m_Moves.size() == 0)
           return make_pair( SpacePoint( m_InitialX, m_InitialY ), 0 );
         
-        int i = -1;
-        for(i = 0; i < m_Moves.size(); i++)
+        for(int i = 0; i < m_Moves.size(); i++)
         {
           if( m_Moves[i].InRange( time ) )
           {
             v2 = i;
             i = m_Moves.size();
+            foundV2 = true;
           }
           else if( m_Moves[i].start > time )
           {
             v2 = i-1;
             t = 1.0f;
             i = m_Moves.size();
+            foundV2 = true;
           }
           else if( m_Moves[i].end < time )
           {
@@ -423,9 +425,10 @@ namespace visualizer
           }
         }
         
-        if(i == m_Moves.size()-1 && v2 == -1)
+        if( !foundV2 )
         {
           v2 = m_Moves.size()-1;
+          t = 1.0f;
         }
         
         int v1 = v2-1;
