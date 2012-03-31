@@ -128,12 +128,10 @@ namespace visualizer
 
       void AddTurn( int turn, vector< SpacePoint > &moves, int movementLeft )
       {
-        float span = 1.0f;// / moves.size();
+        // Add the moves
+        float span = 1.0f / float(moves.size());
         for(float i = 0; i < (float)moves.size(); i++)
         {
-          if( i != 0 )
-            continue;
-            
           SpaceMove move;
           move.point = moves[i];
           move.start = (float)turn + i * span;
@@ -142,6 +140,7 @@ namespace visualizer
           m_Moves.push_back( move );
         }
         
+        // Add the movement left
         m_MovementLeft.push_back( movementLeft );
       }
 
@@ -324,15 +323,14 @@ namespace visualizer
           m_Moves.push_back( move );
         }
       }
-      vector< SpaceMove > m_Moves;
+      
     private:
       int createdAtTurn;
       float m_InitialX;
       float m_InitialY;
-      //map< int, vector< SpacePoint > > m_AttackLocations;
       map< int, vector < PersistentShip* > > m_AttackVictims;
       vector< pair< int, char > > m_Stealths;  // int represents the turn, char 's' represents that it went into stealth, 'd' is destealth
-      //vector< SpaceMove > m_Moves;
+      vector< SpaceMove > m_Moves;
       int m_Round;
       vector<int> m_MovementLeft;
       int m_DeathTurn;
@@ -424,7 +422,7 @@ namespace visualizer
               // Shouldn't happen
           }
         }
-        
+
         if( !foundV2 )
         {
           v2 = m_Moves.size()-1;
@@ -444,6 +442,10 @@ namespace visualizer
         if( m_Moves.size() <= v4 )
           v4=m_Moves.size()-1;		
         
+        if( t != 1.0f )  // if we need to calculate a new t, due to multiple moves per turn
+        {
+          t = (time - m_Moves[v2].start) / (m_Moves[v2].end - m_Moves[v2].start);
+        }
         double c1,c2,c3,c4;   
 
         c1 = M12*m_Moves[v2].point.x;   

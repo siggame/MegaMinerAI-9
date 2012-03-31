@@ -367,18 +367,9 @@ namespace visualizer
     // END: Add every draw animation
 
     for(auto& i : m_PersistentShips)
-    {
-      
-      cout << "ship " << i.second->id << " moves: \n";
-      for( auto& move : i.second->m_Moves )
-      {
-        cout << " (" << move.point.x << "," << move.point.y << ") ";
-      }
-      cout << endl << endl;
-      
       if( m_suicide )
         break;
-    }
+
     // END: Look through the game logs and build the m_PersistentShips
 
     if(!m_suicide)
