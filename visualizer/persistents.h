@@ -43,40 +43,10 @@ namespace visualizer
       2, 1, -2, 1
       );
 
-  class SpacePoint
-  {
-    public: 
-      float x;
-      float y;
-
-      SpacePoint()
-      {
-        x = y = 0;
-      }
-
-      SpacePoint(int posX, int posY)
-      {
-        x = posX;
-        y = posY;
-      }
-
-      SpacePoint(float posX, float posY)
-      {
-        x = posX;
-        y = posY;
-      }
-
-      void operator=( const SpacePoint & rhs )
-      {
-        x = rhs.x;
-        y = rhs.y;
-      }
-  };  
-
   class SpaceMove
   {
     public:
-      SpacePoint point;
+      glm::vec2 point;
       float start;
       float end;
 
@@ -123,11 +93,11 @@ namespace visualizer
       }
 
       // Stats that change each turn
-      vector< SpacePoint > points;
-      vector< int > healths;
-      vector< bool > emps;
+      vector<glm::vec2> points;
+      vector<int> healths;
+      vector<bool> emps;
 
-      void AddTurn( int turn, vector< SpacePoint > &moves, int movementLeft )
+      void AddTurn(int turn, vector<glm::vec2> &moves, int movementLeft)
       {
         float span = 1.0f;// / moves.size();
         for(float i = 0; i < (float)moves.size(); i++)
@@ -153,7 +123,7 @@ namespace visualizer
         return ( turn >= createdAtTurn && turn <= m_DeathTurn && (m_Round == round || round == -1) );
       }
 
-      SpacePoint LocationOn(int turn, float t)
+      glm::vec2 LocationOn(int turn, float t)
       {
         auto lah = SplineOn(turn, t);
         return lah.first;
@@ -180,17 +150,17 @@ namespace visualizer
         return false;
       }
 
-      vector< SpacePoint > AttacksOn( int turn, float t )
+      vector<glm::vec2> AttacksOn( int turn, float t )
       {
         if( m_AttackVictims.find( turn ) == m_AttackVictims.end() )
-          return vector< SpacePoint >();
+          return vector<glm::vec2>();
 
         // else, find every victim's location
-        vector< SpacePoint > victimLocations;
+        vector<glm::vec2> victimLocations;
 
         for(unsigned int i = 0; i < m_AttackVictims[turn].size(); i++)
         {
-          victimLocations.push_back( m_AttackVictims[turn][i]->LocationOn( turn, t ) );
+          victimLocations.push_back(m_AttackVictims[turn][i]->LocationOn(turn, t));
         }
 
         return victimLocations;
@@ -299,7 +269,7 @@ namespace visualizer
       {
         m_DeathTurn = turn;
         healths.push_back( 0 );
-        points.push_back( SpacePoint( points.back().x, points.back().y ) );
+        points.push_back(glm::vec2( points.back().x, points.back().y ));
         
         if(m_Moves.size() > 0)
         {
@@ -317,7 +287,7 @@ namespace visualizer
       int createdAtTurn;
       float m_InitialX;
       float m_InitialY;
-      //map< int, vector< SpacePoint > > m_AttackLocations;
+
       map< int, vector < PersistentShip* > > m_AttackVictims;
       vector< pair< int, char > > m_Stealths;  // int represents the turn, char 's' represents that it went into stealth, 'd' is destealth
       vector< SpaceMove > m_Moves;
@@ -330,7 +300,7 @@ namespace visualizer
         return (turn > 0 ? turn - 1 : 0);
       }
 
-      pair<SpacePoint, float> GardnersSplineOn(int turn, float t)
+      pair<glm::vec2, float> GardnersSplineOn(int turn, float t)
       {
         // Index setup from Jake F. 
         
@@ -375,16 +345,16 @@ namespace visualizer
         if( angle != angle )
           angle = 0;
         cout << angle << endl;
-        return make_pair(SpacePoint(result.x, result.y), angle);
+        return make_pair(glm::vec2(result.x, result.y), angle);
       }
       
-      pair<SpacePoint, float> SplineOn(int turn, float t)
+      pair<glm::vec2, float> SplineOn(int turn, float t)
       {
         int v2 = -1;
         float time = float(turn) + t;
 
         if(m_Moves.size() == 0)
-          return make_pair( SpacePoint( m_InitialX, m_InitialY ), 0 );
+          return make_pair(glm::vec2( m_InitialX, m_InitialY ), 0);
         
         int i = -1;
         for(i = 0; i < m_Moves.size(); i++)
@@ -406,6 +376,7 @@ namespace visualizer
           }
           else
           {
+            THROW(Exception, "Shouldn't Happen");
               // Shouldn't happen
           }
         }
@@ -446,7 +417,7 @@ namespace visualizer
         float py = (((c4*t + c3)*t +c2)*t + c1);
         float hy = (3*c4*t + 2*c3)*t +c2;
 
-        return make_pair( SpacePoint( px, py ), atan2( hy, hx ) );
+        return make_pair(glm::vec2(px, py), atan2(hy, hx));
       }
       
   };

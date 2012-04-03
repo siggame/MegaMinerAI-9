@@ -5,9 +5,11 @@
 #include "animations.h"
 #include "persistents.h"
 
+#include "intellids.h"
+
 namespace visualizer
 {
-  bool intersects( SpacePoint selectionA, SpacePoint selectionB, SpacePoint shipA, SpacePoint shipB )
+  bool intersects( glm::vec2 selectionA, glm::vec2 selectionB, glm::vec2 shipA, glm::vec2 shipB )
   {
     if (selectionB.y < shipA.y) return(false);
     if (selectionA.y > shipB.y) return(false);
@@ -61,16 +63,16 @@ namespace visualizer
           sx = input.sx - m_mapRadius, 
           y = input.y - m_mapRadius, 
           sy = input.sy - m_mapRadius;
-      //int x = input.x, sx = input.sx, y = input.y, sy = input.sy;
+
       for ( auto& i : m_PersistentShips )
       {
         if( i.second->ExistsAtTurn( turn, -1 ) )
         {
           // rough rectangle selection
           auto loc = i.second->LocationOn( turn, t );
-          SpacePoint selectionA, selectionB;
-          SpacePoint shipA = SpacePoint( float(loc.x - 0.75f*i.second->radius), float(loc.y - 0.75f*i.second->radius) );
-          SpacePoint shipB = SpacePoint( float(loc.x + 0.75f*i.second->radius), float(loc.y + 0.75f*i.second->radius) );
+          glm::vec2 selectionA, selectionB;
+          glm::vec2 shipA = glm::vec2( float(loc.x - 0.75f*i.second->radius), float(loc.y - 0.75f*i.second->radius) );
+          glm::vec2 shipB = glm::vec2( float(loc.x + 0.75f*i.second->radius), float(loc.y + 0.75f*i.second->radius) );
           
           selectionA.x = x < sx ? x : sx;
           selectionA.y = y < sy ? y : sy;
@@ -213,11 +215,11 @@ namespace visualizer
         }
 
         // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
-        m_PersistentShips[shipID]->points.push_back( SpacePoint( i.second.x, i.second.y ) );
+        m_PersistentShips[shipID]->points.push_back( glm::vec2( i.second.x, i.second.y ) );
         m_PersistentShips[shipID]->healths.push_back( i.second.health );
         m_PersistentShips[shipID]->emps.push_back( false );
         
-        vector< SpacePoint > moves;
+        vector< glm::vec2 > moves;
         // Check for this ship's animations in the gamelog
         for( auto& j : m_game->states[state].animations[shipID] )
         {
@@ -228,9 +230,9 @@ namespace visualizer
               parser::move &move = (parser::move&)*j;
               if( !m_PersistentShips[shipID]->HasMoves() )
               {
-                  moves.push_back( SpacePoint( move.fromX, move.fromY ) );
+                  moves.push_back( glm::vec2( move.fromX, move.fromY ) );
               }
-              moves.push_back( SpacePoint( move.toX, move.toY ) );
+              moves.push_back( glm::vec2( move.toX, move.toY ) );
             } break;
             case parser::ATTACK:
             {
@@ -374,7 +376,7 @@ namespace visualizer
       timeManager->play();
     }
 
-  }
+  } // Space::run()
 
 } // visualizer
 
