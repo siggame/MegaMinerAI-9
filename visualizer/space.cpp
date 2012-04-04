@@ -207,7 +207,7 @@ namespace visualizer
           // Add the warps for this ship (so long as it is not a mine)
           if( strcmp( i.second.type, "Mine" ) != 0)
           {
-            Warps[ state - 1 ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, false ) );
+            //Warps[ state - 1 ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, false ) );
             Warps[ state ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, true ) );
           }
         }
@@ -229,7 +229,8 @@ namespace visualizer
                   moves.push_back( SpacePoint( move.fromX, move.fromY ) );
               }
               moves.push_back( SpacePoint( move.toX, move.toY ) );
-              cout << "Move found on turn " << state << " with ship id " << shipID << " moving from (" << move.fromX << "," << move.fromY << ") to (" << move.toX << "," << move.toY << ")" << endl;
+              //if( shipID == 10 )
+                cout << "Move found on turn " << state << " with ship id " << shipID << " moving from (" << move.fromX << "," << move.fromY << ") to (" << move.toX << "," << move.toY << ")" << endl;
             } break;
             case parser::ATTACK:
             {
