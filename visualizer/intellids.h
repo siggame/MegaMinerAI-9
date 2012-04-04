@@ -77,7 +77,6 @@ namespace visualizer
           blobs.push_back(b);
         }
 
-
       }
     }
 

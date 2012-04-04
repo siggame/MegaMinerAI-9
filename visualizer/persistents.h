@@ -386,7 +386,7 @@ namespace visualizer
           }
           else
           {
-            THROW(Exception, "Shouldn't Happen");
+            //THROW(Exception, "Shouldn't Happen");
               // Shouldn't happen
           }
         }
