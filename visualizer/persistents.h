@@ -327,6 +327,8 @@ namespace visualizer
       
       void MoveInfo()
       {
+        return;
+        
         cout << "Ship " << id << " of type " << type << endl;
         for( auto& move : m_Moves )
         {
@@ -415,6 +417,11 @@ namespace visualizer
             v2 = i;
             i = m_Moves.size();
             foundV2 = true;
+            
+            if( selected )
+            {
+              cout << "for turn: " << turn << "decided on v2: " << v2 << " which is: (" << m_Moves[v2].point.x << "," << m_Moves[v2].point.y << ") from " << m_Moves[v2].start << " to " << m_Moves[v2].end << endl;
+            }
           }
           else if( m_Moves[i].start > time )
           {
