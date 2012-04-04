@@ -5,11 +5,15 @@
 #include "animations.h"
 #include "persistents.h"
 
+#include <list>
+using std::list;
+using glm::vec2;
+
 #include "intellids.h"
 
 namespace visualizer
 {
-  bool intersects( glm::vec2 selectionA, glm::vec2 selectionB, glm::vec2 shipA, glm::vec2 shipB )
+  bool intersects( vec2 selectionA, vec2 selectionB, vec2 shipA, vec2 shipB )
   {
     if (selectionB.y < shipA.y) return(false);
     if (selectionA.y > shipB.y) return(false);
@@ -70,9 +74,9 @@ namespace visualizer
         {
           // rough rectangle selection
           auto loc = i.second->LocationOn( turn, t );
-          glm::vec2 selectionA, selectionB;
-          glm::vec2 shipA = glm::vec2( float(loc.x - 0.75f*i.second->radius), float(loc.y - 0.75f*i.second->radius) );
-          glm::vec2 shipB = glm::vec2( float(loc.x + 0.75f*i.second->radius), float(loc.y + 0.75f*i.second->radius) );
+          vec2 selectionA, selectionB;
+          vec2 shipA = vec2( float(loc.x - 0.75f*i.second->radius), float(loc.y - 0.75f*i.second->radius) );
+          vec2 shipB = vec2( float(loc.x + 0.75f*i.second->radius), float(loc.y + 0.75f*i.second->radius) );
           
           selectionA.x = x < sx ? x : sx;
           selectionA.y = y < sy ? y : sy;
@@ -197,9 +201,19 @@ namespace visualizer
     {
       Warps[ state ] = vector< SmartPointer< Warp > >();
       // Loop though each PersistentShip in the current state
+
+      // The list of ships this turn to do some blob calculations on
+      list<SmartPointer<TempShip>> shipsThisTurn;
+      
       for(auto& i : m_game->states[ state ].ships)
       {
         int shipID = i.second.id;
+
+        SmartPointer<TempShip> tShip = new TempShip;
+        tShip->position.x = i.second.x;
+        tShip->position.y = i.second.y;
+        tShip->radius = i.second.radius;
+        tShip->id = i.second.id;
 
         // If the current ship's ID does not map to a PersistentShip in the map, create it and the warp for it
         if( m_PersistentShips.find(shipID) == m_PersistentShips.end() )
@@ -214,12 +228,14 @@ namespace visualizer
           }
         }
 
+        shipsThisTurn.push_back(tShip);
+
         // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
-        m_PersistentShips[shipID]->points.push_back( glm::vec2( i.second.x, i.second.y ) );
+        m_PersistentShips[shipID]->points.push_back( vec2( i.second.x, i.second.y ) );
         m_PersistentShips[shipID]->healths.push_back( i.second.health );
         m_PersistentShips[shipID]->emps.push_back( false );
         
-        vector< glm::vec2 > moves;
+        vector< vec2 > moves;
         // Check for this ship's animations in the gamelog
         for( auto& j : m_game->states[state].animations[shipID] )
         {
@@ -230,9 +246,9 @@ namespace visualizer
               parser::move &move = (parser::move&)*j;
               if( !m_PersistentShips[shipID]->HasMoves() )
               {
-                  moves.push_back( glm::vec2( move.fromX, move.fromY ) );
+                  moves.push_back( vec2( move.fromX, move.fromY ) );
               }
-              moves.push_back( glm::vec2( move.toX, move.toY ) );
+              moves.push_back( vec2( move.toX, move.toY ) );
             } break;
             case parser::ATTACK:
             {
@@ -262,6 +278,8 @@ namespace visualizer
           }
         }
       }
+
+      createBlobs<TempShip>(shipsThisTurn, 12.0f);
 
       // Start adding stuff to draw
       Frame turn;  // The frame that will be drawn
@@ -361,6 +379,7 @@ namespace visualizer
         }
       }
     }
+
     // END: Add every draw animation
 
     for(auto& i : m_PersistentShips)

@@ -3,13 +3,18 @@
 
 #include "glm/glm.hpp"
 #include <vector>
+#include <list>
+#include <stack>
+#include <algorithm>
 
 using glm::vec2;
 using std::vector;
+using std::list;
+using std::stack;
+using std::find_if;
 
 namespace visualizer
 {
-
   template <class T>
   struct Blob
   {
@@ -22,8 +27,51 @@ namespace visualizer
 
 
   template <class T>
-  void createBlobs()
+  list<SmartPointer<Blob<T>>> createBlobs(const list<SmartPointer<T>>& units, const float& defaultRadius)
   {
+
+    // replace with faster data structure for searching
+    list<int> usedUnits;
+    stack<Blob<T>> possiblobs;
+    list<SmartPointer<Blob<T>>> blobs;
+
+    for(auto& i: units)
+    {
+      Blob<T> t;
+      t.units.push_back(i);
+      t.radius = defaultRadius;
+      t.center = i->position;
+      possiblobs.push(t);
+    }
+
+    while(possiblobs.size())
+    {
+      auto b = possiblobs.top();
+      possiblobs.pop();
+
+      bool shipAdded = false;
+
+      for(auto& s: units)
+      {
+        // is the id in the usedUnits. 
+        if(b.units[0]->id == s->id || (find_if(
+              usedUnits.begin(), 
+              usedUnits.end(), 
+              [&](const int& c) { return c == s->id; }) == usedUnits.end()))
+        {
+          if(glm::distance(b.center, s->position) < b.radius)
+          {
+            // Within radius.
+          }
+        }
+          
+      }
+
+    }
+
+    return blobs;
+
+   
   } // createBlobs()
 
 } // visualizer

@@ -9,6 +9,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtx/vector_angle.hpp"
 
+using glm::vec2;
+
 #define M11  0.0    
 #define M21 -0.5   
 #define M31  1.0   
@@ -31,7 +33,7 @@
 
 namespace visualizer
 {
-  ostream& operator <<( ostream& os, const glm::vec2& v );
+  ostream& operator <<( ostream& os, const vec2& v );
   ostream& operator <<( ostream& os, const glm::vec4& v );
   ostream& operator <<( ostream& os, const glm::mat4x2& m );
   ostream& operator <<( ostream& os, const glm::mat4& m );
@@ -46,13 +48,21 @@ namespace visualizer
   class SpaceMove
   {
     public:
-      glm::vec2 point;
+      vec2 point;
       float start;
       float end;
 
       bool InRange(float time) { return start < time && end >= time; }
       bool IsAfter(float time) { return start > time; }
       bool IsBefore(float time) { return end < time; }
+  };
+
+
+  struct TempShip
+  {
+    vec2 position;
+    float radius;
+    int id;
   };
 
 
@@ -93,11 +103,11 @@ namespace visualizer
       }
 
       // Stats that change each turn
-      vector<glm::vec2> points;
+      vector<vec2> points;
       vector<int> healths;
       vector<bool> emps;
 
-      void AddTurn(int turn, vector<glm::vec2> &moves, int movementLeft)
+      void AddTurn(int turn, vector<vec2> &moves, int movementLeft)
       {
         float span = 1.0f;// / moves.size();
         for(float i = 0; i < (float)moves.size(); i++)
@@ -123,7 +133,7 @@ namespace visualizer
         return ( turn >= createdAtTurn && turn <= m_DeathTurn && (m_Round == round || round == -1) );
       }
 
-      glm::vec2 LocationOn(int turn, float t)
+      vec2 LocationOn(int turn, float t)
       {
         auto lah = SplineOn(turn, t);
         return lah.first;
@@ -150,13 +160,13 @@ namespace visualizer
         return false;
       }
 
-      vector<glm::vec2> AttacksOn( int turn, float t )
+      vector<vec2> AttacksOn( int turn, float t )
       {
         if( m_AttackVictims.find( turn ) == m_AttackVictims.end() )
-          return vector<glm::vec2>();
+          return vector<vec2>();
 
         // else, find every victim's location
-        vector<glm::vec2> victimLocations;
+        vector<vec2> victimLocations;
 
         for(unsigned int i = 0; i < m_AttackVictims[turn].size(); i++)
         {
@@ -269,7 +279,7 @@ namespace visualizer
       {
         m_DeathTurn = turn;
         healths.push_back( 0 );
-        points.push_back(glm::vec2( points.back().x, points.back().y ));
+        points.push_back(vec2( points.back().x, points.back().y ));
         
         if(m_Moves.size() > 0)
         {
@@ -300,7 +310,7 @@ namespace visualizer
         return (turn > 0 ? turn - 1 : 0);
       }
 
-      pair<glm::vec2, float> GardnersSplineOn(int turn, float t)
+      pair<vec2, float> GardnersSplineOn(int turn, float t)
       {
         // Index setup from Jake F. 
         
@@ -322,16 +332,16 @@ namespace visualizer
         // Setting up the verticies
 
         auto times = glm::vec4(1, t, t*t, t*t*t);
-        auto p0 = glm::vec2(points[v1].x, points[v1].y);
-        auto p1 = glm::vec2(points[v2].x, points[v2].y);
-        auto m0 = glm::normalize(p0 - glm::vec2(points[v0].x, points[v0].y));
-        auto m1 = glm::normalize(glm::vec2(points[v3].x, points[v3].y) - p1);
+        auto p0 = vec2(points[v1].x, points[v1].y);
+        auto p1 = vec2(points[v2].x, points[v2].y);
+        auto m0 = glm::normalize(p0 - vec2(points[v0].x, points[v0].y));
+        auto m1 = glm::normalize(vec2(points[v3].x, points[v3].y) - p1);
 
         if( m0.x != m0.x )
-          m0 = glm::vec2(0, 0);
+          m0 = vec2(0, 0);
 
         if( m1.x != m1.x )
-          m1 = glm::vec2(0, 0);
+          m1 = vec2(0, 0);
 
         m0 *= 0;
         m1 *= 0;
@@ -339,22 +349,22 @@ namespace visualizer
         auto q = glm::mat4x2(p0, m0, p1, m1);
 
         glm::vec4 m = times * glm::transpose(A);
-        glm::vec2 result = q * m;
+        vec2 result = q * m;
       
-        double angle = glm::orientedAngle(glm::vec2(1,0), glm::normalize(p1-p0));
+        double angle = glm::orientedAngle(vec2(1,0), glm::normalize(p1-p0));
         if( angle != angle )
           angle = 0;
         cout << angle << endl;
-        return make_pair(glm::vec2(result.x, result.y), angle);
+        return make_pair(vec2(result.x, result.y), angle);
       }
       
-      pair<glm::vec2, float> SplineOn(int turn, float t)
+      pair<vec2, float> SplineOn(int turn, float t)
       {
         int v2 = -1;
         float time = float(turn) + t;
 
         if(m_Moves.size() == 0)
-          return make_pair(glm::vec2( m_InitialX, m_InitialY ), 0);
+          return make_pair(vec2( m_InitialX, m_InitialY ), 0);
         
         int i = -1;
         for(i = 0; i < m_Moves.size(); i++)
@@ -417,7 +427,7 @@ namespace visualizer
         float py = (((c4*t + c3)*t +c2)*t + c1);
         float hy = (3*c4*t + 2*c3)*t +c2;
 
-        return make_pair(glm::vec2(px, py), atan2(hy, hx));
+        return make_pair(vec2(px, py), atan2(hy, hx));
       }
       
   };
