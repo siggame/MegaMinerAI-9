@@ -279,7 +279,7 @@ namespace visualizer
         }
       }
 
-      createBlobs<TempShip>(shipsThisTurn, 12.0f);
+      createBlobs<TempShip>(shipsThisTurn, 12.0f, 10.0f);
 
       // Start adding stuff to draw
       Frame turn;  // The frame that will be drawn
