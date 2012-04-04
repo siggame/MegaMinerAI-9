@@ -77,11 +77,27 @@ namespace visualizer
           blobs.push_back(b);
         }
 
+        b->center = vec2(0, 0);
+        for(auto& i: b->units)
+        {
+          b->center += i->position;
+        }
+        b->center /= b->units.size();
+
+
+        float distToCenter = 0;
+        for(auto& i: b->units)
+        {
+          distToCenter += glm::distance(i->position, b->center);
+        }
+        distToCenter /= b->units.size();
+
+        b->radius = distToCenter + defaultRadius;
+
       }
     }
 
     return blobs;
-
    
   } // createBlobs()
 
