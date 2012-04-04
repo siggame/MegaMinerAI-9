@@ -386,6 +386,8 @@ namespace visualizer
           }
           else
           {
+            // TODO: Put this back when we find out 
+            // what's wrong.
             //THROW(Exception, "Shouldn't Happen");
               // Shouldn't happen
           }
