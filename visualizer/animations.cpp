@@ -36,6 +36,12 @@ namespace visualizer
     //game->renderer->drawTexturedQuad(m_Background->outerRadius - m_Background->innerRadius, m_Background->outerRadius - m_Background->innerRadius, m_Background->innerRadius * 3, m_Background->innerRadius * 2, "planet");
     game->renderer->setColor( Color( 1, 1, 1, 0.1f ) );
     game->renderer->drawArc(500, 500, 500, 80 );
+    
+    if( game->options->getNumber( "Show Grid" ) )
+    {
+      game->renderer->drawLine( m_Background->radius, 0, m_Background->radius, m_Background->radius * 2, 1 );
+      game->renderer->drawLine( 0, m_Background->radius, m_Background->radius * 2, m_Background->radius, 1 );
+    }
   }
 
   void DrawRoundHUD::animate( const float& t, AnimData * /* d */, IGame* game )

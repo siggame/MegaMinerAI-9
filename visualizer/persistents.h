@@ -123,7 +123,6 @@ namespace visualizer
       }
 
       // Stats that change each turn
-      vector< SpacePoint > points;
       vector< int > healths;
 
       void AddTurn( int turn, vector< SpacePoint > &moves, int movementLeft )
@@ -269,7 +268,8 @@ namespace visualizer
         if( nothing )
         {
           pts.str("");
-          pts << "(" << points[turn-createdAtTurn].x << "," << points[turn-createdAtTurn].y << ")";
+          auto location = SplineOn( turn, 1.0f ).first;
+          pts << "(" << location.x << "," << location.y << ")";
         }
 
         return pts.str();
@@ -310,7 +310,6 @@ namespace visualizer
       {
         m_DeathTurn = turn;
         healths.push_back( 0 );
-        points.push_back( SpacePoint( points.back().x, points.back().y ) );
         
         if(m_Moves.size() > 0)
         {
@@ -321,6 +320,17 @@ namespace visualizer
           move.end = m_Moves.back().end + 2;
           
           m_Moves.push_back( move );
+        }
+      }
+      
+      int FirstTurn() { return createdAtTurn; }
+      
+      void MoveInfo()
+      {
+        cout << "Ship " << id << " of type " << type << endl;
+        for( auto& move : m_Moves )
+        {
+          cout << "  (" << move.point.x << "," << move.point.y << ") from " << move.start << " to " << move.end << endl;
         }
       }
       
@@ -341,7 +351,7 @@ namespace visualizer
         return (turn > 0 ? turn - 1 : 0);
       }
 
-      pair<SpacePoint, float> GardnersSplineOn(int turn, float t)
+      /*pair<SpacePoint, float> GardnersSplineOn(int turn, float t)
       {
         // Index setup from Jake F. 
         
@@ -387,7 +397,7 @@ namespace visualizer
           angle = 0;
         cout << angle << endl;
         return make_pair(SpacePoint(result.x, result.y), angle);
-      }
+      }*/
       
       pair<SpacePoint, float> SplineOn(int turn, float t)
       {
