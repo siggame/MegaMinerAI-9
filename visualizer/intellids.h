@@ -32,15 +32,15 @@ namespace visualizer
 
     // replace with faster data structure for searching
     list<int> usedUnits;
-    stack<Blob<T>> possiblobs;
+    stack<SmartPointer<Blob<T>>> possiblobs;
     list<SmartPointer<Blob<T>>> blobs;
 
     for(auto& i: units)
     {
-      Blob<T> t;
-      t.units.push_back(i);
-      t.radius = defaultRadius;
-      t.center = i->position;
+      SmartPointer<Blob<T>> t = new Blob<T>;
+      t->units.push_back(i);
+      t->radius = defaultRadius;
+      t->center = i->position;
       possiblobs.push(t);
     }
 
@@ -54,19 +54,31 @@ namespace visualizer
       for(auto& s: units)
       {
         // is the id in the usedUnits. 
-        if(b.units[0]->id == s->id || (find_if(
+        if(b->units[0]->id == s->id || (find_if(
               usedUnits.begin(), 
               usedUnits.end(), 
               [&](const int& c) { return c == s->id; }) == usedUnits.end()))
         {
-          if(glm::distance(b.center, s->position) < b.radius)
+          if(glm::distance(b->center, s->position) < b->radius)
           {
+            shipAdded = true;
+            b->units.push_back(s);
+            usedUnits.push_back(s->id);
             // Within radius.
           }
         }
-          
       }
 
+      if(shipAdded)
+      {
+        possiblobs.push(b);
+        if(find_if(blobs.begin(), blobs.end(), [&](const SmartPointer<Blob<T>>& blob) { return blob == b; }) == blobs.end())
+        {
+          blobs.push_back(b);
+        }
+
+
+      }
     }
 
     return blobs;
