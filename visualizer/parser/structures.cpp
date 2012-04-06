@@ -8,11 +8,34 @@ namespace parser
 {
 
 
+std::ostream& operator<<(std::ostream& stream, ShipDescription ob)
+{
+  stream << "id: " << ob.id  <<'\n';
+  stream << "type: " << ob.type  <<'\n';
+  stream << "cost: " << ob.cost  <<'\n';
+  stream << "radius: " << ob.radius  <<'\n';
+  stream << "range: " << ob.range  <<'\n';
+  stream << "damage: " << ob.damage  <<'\n';
+  stream << "selfDestructDamage: " << ob.selfDestructDamage  <<'\n';
+  stream << "maxMovement: " << ob.maxMovement  <<'\n';
+  stream << "maxAttacks: " << ob.maxAttacks  <<'\n';
+  stream << "maxHealth: " << ob.maxHealth  <<'\n';
+  return stream;
+}
+
+
 std::ostream& operator<<(std::ostream& stream, ShipType ob)
 {
   stream << "id: " << ob.id  <<'\n';
   stream << "type: " << ob.type  <<'\n';
   stream << "cost: " << ob.cost  <<'\n';
+  stream << "radius: " << ob.radius  <<'\n';
+  stream << "range: " << ob.range  <<'\n';
+  stream << "damage: " << ob.damage  <<'\n';
+  stream << "selfDestructDamage: " << ob.selfDestructDamage  <<'\n';
+  stream << "maxMovement: " << ob.maxMovement  <<'\n';
+  stream << "maxAttacks: " << ob.maxAttacks  <<'\n';
+  stream << "maxHealth: " << ob.maxHealth  <<'\n';
   return stream;
 }
 
@@ -31,20 +54,21 @@ std::ostream& operator<<(std::ostream& stream, Player ob)
 std::ostream& operator<<(std::ostream& stream, Ship ob)
 {
   stream << "id: " << ob.id  <<'\n';
+  stream << "type: " << ob.type  <<'\n';
+  stream << "cost: " << ob.cost  <<'\n';
+  stream << "radius: " << ob.radius  <<'\n';
+  stream << "range: " << ob.range  <<'\n';
+  stream << "damage: " << ob.damage  <<'\n';
+  stream << "selfDestructDamage: " << ob.selfDestructDamage  <<'\n';
+  stream << "maxMovement: " << ob.maxMovement  <<'\n';
+  stream << "maxAttacks: " << ob.maxAttacks  <<'\n';
+  stream << "maxHealth: " << ob.maxHealth  <<'\n';
   stream << "owner: " << ob.owner  <<'\n';
   stream << "x: " << ob.x  <<'\n';
   stream << "y: " << ob.y  <<'\n';
-  stream << "radius: " << ob.radius  <<'\n';
-  stream << "type: " << ob.type  <<'\n';
   stream << "attacksLeft: " << ob.attacksLeft  <<'\n';
   stream << "movementLeft: " << ob.movementLeft  <<'\n';
-  stream << "maxMovement: " << ob.maxMovement  <<'\n';
-  stream << "maxAttacks: " << ob.maxAttacks  <<'\n';
-  stream << "damage: " << ob.damage  <<'\n';
-  stream << "range: " << ob.range  <<'\n';
   stream << "health: " << ob.health  <<'\n';
-  stream << "maxHealth: " << ob.maxHealth  <<'\n';
-  stream << "selfDestructDamage: " << ob.selfDestructDamage  <<'\n';
   return stream;
 }
 
@@ -66,6 +90,14 @@ std::ostream& operator<<(std::ostream& stream, selfDestruct ob)
 {
   stream << "selfDestruct" << "\n";
   stream << "actingID: " << ob.actingID  <<'\n';
+  return stream;
+}
+
+
+std::ostream& operator<<(std::ostream& stream, roundVictory ob)
+{
+  stream << "roundVictory" << "\n";
+  stream << "message: " << ob.message  <<'\n';
   return stream;
 }
 
@@ -113,6 +145,9 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
   stream << "victoriesNeeded: " << ob.victoriesNeeded  <<'\n';
   stream << "mapRadius: " << ob.mapRadius  <<'\n';
 
+  stream << "\n\nShipDescriptions:\n";
+  for(std::map<int,ShipDescription>::iterator i = ob.shipDescriptions.begin(); i != ob.shipDescriptions.end(); i++)
+    stream << i->second << '\n';
   stream << "\n\nShipTypes:\n";
   for(std::map<int,ShipType>::iterator i = ob.shipTypes.begin(); i != ob.shipTypes.end(); i++)
     stream << i->second << '\n';
@@ -136,6 +171,8 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
 //      stream << *((move*)*i) << "\n";
 //    if((*(*i)).type == SELFDESTRUCT)
 //      stream << *((selfDestruct*)*i) << "\n";
+//    if((*(*i)).type == ROUNDVICTORY)
+//      stream << *((roundVictory*)*i) << "\n";
 //    if((*(*i)).type == ATTACK)
 //      stream << *((attack*)*i) << "\n";
 //    if((*(*i)).type == STEALTH)

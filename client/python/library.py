@@ -98,6 +98,36 @@ library.getShipCount.argtypes = [c_void_p]
 # getters
 
 #Data
+library.shipDescriptionGetId.restype = c_int
+library.shipDescriptionGetId.argtypes = [c_void_p]
+
+library.shipDescriptionGetType.restype = c_char_p
+library.shipDescriptionGetType.argtypes = [c_void_p]
+
+library.shipDescriptionGetCost.restype = c_int
+library.shipDescriptionGetCost.argtypes = [c_void_p]
+
+library.shipDescriptionGetRadius.restype = c_int
+library.shipDescriptionGetRadius.argtypes = [c_void_p]
+
+library.shipDescriptionGetRange.restype = c_int
+library.shipDescriptionGetRange.argtypes = [c_void_p]
+
+library.shipDescriptionGetDamage.restype = c_int
+library.shipDescriptionGetDamage.argtypes = [c_void_p]
+
+library.shipDescriptionGetSelfDestructDamage.restype = c_int
+library.shipDescriptionGetSelfDestructDamage.argtypes = [c_void_p]
+
+library.shipDescriptionGetMaxMovement.restype = c_int
+library.shipDescriptionGetMaxMovement.argtypes = [c_void_p]
+
+library.shipDescriptionGetMaxAttacks.restype = c_int
+library.shipDescriptionGetMaxAttacks.argtypes = [c_void_p]
+
+library.shipDescriptionGetMaxHealth.restype = c_int
+library.shipDescriptionGetMaxHealth.argtypes = [c_void_p]
+
 library.shipTypeGetId.restype = c_int
 library.shipTypeGetId.argtypes = [c_void_p]
 
@@ -106,6 +136,27 @@ library.shipTypeGetType.argtypes = [c_void_p]
 
 library.shipTypeGetCost.restype = c_int
 library.shipTypeGetCost.argtypes = [c_void_p]
+
+library.shipTypeGetRadius.restype = c_int
+library.shipTypeGetRadius.argtypes = [c_void_p]
+
+library.shipTypeGetRange.restype = c_int
+library.shipTypeGetRange.argtypes = [c_void_p]
+
+library.shipTypeGetDamage.restype = c_int
+library.shipTypeGetDamage.argtypes = [c_void_p]
+
+library.shipTypeGetSelfDestructDamage.restype = c_int
+library.shipTypeGetSelfDestructDamage.argtypes = [c_void_p]
+
+library.shipTypeGetMaxMovement.restype = c_int
+library.shipTypeGetMaxMovement.argtypes = [c_void_p]
+
+library.shipTypeGetMaxAttacks.restype = c_int
+library.shipTypeGetMaxAttacks.argtypes = [c_void_p]
+
+library.shipTypeGetMaxHealth.restype = c_int
+library.shipTypeGetMaxHealth.argtypes = [c_void_p]
 
 library.playerGetId.restype = c_int
 library.playerGetId.argtypes = [c_void_p]
@@ -125,6 +176,33 @@ library.playerGetEnergy.argtypes = [c_void_p]
 library.shipGetId.restype = c_int
 library.shipGetId.argtypes = [c_void_p]
 
+library.shipGetType.restype = c_char_p
+library.shipGetType.argtypes = [c_void_p]
+
+library.shipGetCost.restype = c_int
+library.shipGetCost.argtypes = [c_void_p]
+
+library.shipGetRadius.restype = c_int
+library.shipGetRadius.argtypes = [c_void_p]
+
+library.shipGetRange.restype = c_int
+library.shipGetRange.argtypes = [c_void_p]
+
+library.shipGetDamage.restype = c_int
+library.shipGetDamage.argtypes = [c_void_p]
+
+library.shipGetSelfDestructDamage.restype = c_int
+library.shipGetSelfDestructDamage.argtypes = [c_void_p]
+
+library.shipGetMaxMovement.restype = c_int
+library.shipGetMaxMovement.argtypes = [c_void_p]
+
+library.shipGetMaxAttacks.restype = c_int
+library.shipGetMaxAttacks.argtypes = [c_void_p]
+
+library.shipGetMaxHealth.restype = c_int
+library.shipGetMaxHealth.argtypes = [c_void_p]
+
 library.shipGetOwner.restype = c_int
 library.shipGetOwner.argtypes = [c_void_p]
 
@@ -134,38 +212,14 @@ library.shipGetX.argtypes = [c_void_p]
 library.shipGetY.restype = c_int
 library.shipGetY.argtypes = [c_void_p]
 
-library.shipGetRadius.restype = c_int
-library.shipGetRadius.argtypes = [c_void_p]
-
-library.shipGetType.restype = c_char_p
-library.shipGetType.argtypes = [c_void_p]
-
 library.shipGetAttacksLeft.restype = c_int
 library.shipGetAttacksLeft.argtypes = [c_void_p]
 
 library.shipGetMovementLeft.restype = c_int
 library.shipGetMovementLeft.argtypes = [c_void_p]
 
-library.shipGetMaxMovement.restype = c_int
-library.shipGetMaxMovement.argtypes = [c_void_p]
-
-library.shipGetMaxAttacks.restype = c_int
-library.shipGetMaxAttacks.argtypes = [c_void_p]
-
-library.shipGetDamage.restype = c_int
-library.shipGetDamage.argtypes = [c_void_p]
-
-library.shipGetRange.restype = c_int
-library.shipGetRange.argtypes = [c_void_p]
-
 library.shipGetHealth.restype = c_int
 library.shipGetHealth.argtypes = [c_void_p]
-
-library.shipGetMaxHealth.restype = c_int
-library.shipGetMaxHealth.argtypes = [c_void_p]
-
-library.shipGetSelfDestructDamage.restype = c_int
-library.shipGetSelfDestructDamage.argtypes = [c_void_p]
 
 
 #Properties

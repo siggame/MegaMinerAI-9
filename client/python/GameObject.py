@@ -11,8 +11,112 @@ class GameObject(object):
     self._iteration = BaseAI.iteration
 
 
+##Base class for all variables needed to define a ship
+class ShipDescription(GameObject):
+  def __init__(self, ptr):
+    from BaseAI import BaseAI
+    self._ptr = ptr
+    self._iteration = BaseAI.iteration
+    self._id = library.shipDescriptionGetId(ptr)
+
+  #\cond
+  def getId(self):
+    self.validify()
+    return library.shipDescriptionGetId(self._ptr)
+  #\endcond
+  ##Unique Identifier
+  id = property(getId)
+
+  #\cond
+  def getType(self):
+    self.validify()
+    return library.shipDescriptionGetType(self._ptr)
+  #\endcond
+  ##The ship type
+  type = property(getType)
+
+  #\cond
+  def getCost(self):
+    self.validify()
+    return library.shipDescriptionGetCost(self._ptr)
+  #\endcond
+  ##The amount of money required to purchase this type of ship
+  cost = property(getCost)
+
+  #\cond
+  def getRadius(self):
+    self.validify()
+    return library.shipDescriptionGetRadius(self._ptr)
+  #\endcond
+  ##The radius of the ship
+  radius = property(getRadius)
+
+  #\cond
+  def getRange(self):
+    self.validify()
+    return library.shipDescriptionGetRange(self._ptr)
+  #\endcond
+  ##The range of attacks for this ship
+  range = property(getRange)
+
+  #\cond
+  def getDamage(self):
+    self.validify()
+    return library.shipDescriptionGetDamage(self._ptr)
+  #\endcond
+  ##The strength of attacks for this ship
+  damage = property(getDamage)
+
+  #\cond
+  def getSelfDestructDamage(self):
+    self.validify()
+    return library.shipDescriptionGetSelfDestructDamage(self._ptr)
+  #\endcond
+  ##The amount of damage done when this ship self destructs
+  selfDestructDamage = property(getSelfDestructDamage)
+
+  #\cond
+  def getMaxMovement(self):
+    self.validify()
+    return library.shipDescriptionGetMaxMovement(self._ptr)
+  #\endcond
+  ##The largest possible movement for this ship
+  maxMovement = property(getMaxMovement)
+
+  #\cond
+  def getMaxAttacks(self):
+    self.validify()
+    return library.shipDescriptionGetMaxAttacks(self._ptr)
+  #\endcond
+  ##The max number of attacks for this ship
+  maxAttacks = property(getMaxAttacks)
+
+  #\cond
+  def getMaxHealth(self):
+    self.validify()
+    return library.shipDescriptionGetMaxHealth(self._ptr)
+  #\endcond
+  ##The max health possible for the ship
+  maxHealth = property(getMaxHealth)
+
+
+  def __str__(self):
+    self.validify()
+    ret = ""
+    ret += "id: %s\n" % self.getId()
+    ret += "type: %s\n" % self.getType()
+    ret += "cost: %s\n" % self.getCost()
+    ret += "radius: %s\n" % self.getRadius()
+    ret += "range: %s\n" % self.getRange()
+    ret += "damage: %s\n" % self.getDamage()
+    ret += "selfDestructDamage: %s\n" % self.getSelfDestructDamage()
+    ret += "maxMovement: %s\n" % self.getMaxMovement()
+    ret += "maxAttacks: %s\n" % self.getMaxAttacks()
+    ret += "maxHealth: %s\n" % self.getMaxHealth()
+    return ret
+
 ##An available ship type
-class ShipType(GameObject):
+class ShipType(ShipDescription):
   def __init__(self, ptr):
     from BaseAI import BaseAI
     self._ptr = ptr
@@ -62,6 +166,62 @@ class ShipType(GameObject):
   ##The amount of money required to purchase this type of ship
   cost = property(getCost)
 
+  #\cond
+  def getRadius(self):
+    self.validify()
+    return library.shipTypeGetRadius(self._ptr)
+  #\endcond
+  ##The radius of the ship
+  radius = property(getRadius)
+
+  #\cond
+  def getRange(self):
+    self.validify()
+    return library.shipTypeGetRange(self._ptr)
+  #\endcond
+  ##The range of attacks for this ship
+  range = property(getRange)
+
+  #\cond
+  def getDamage(self):
+    self.validify()
+    return library.shipTypeGetDamage(self._ptr)
+  #\endcond
+  ##The strength of attacks for this ship
+  damage = property(getDamage)
+
+  #\cond
+  def getSelfDestructDamage(self):
+    self.validify()
+    return library.shipTypeGetSelfDestructDamage(self._ptr)
+  #\endcond
+  ##The amount of damage done when this ship self destructs
+  selfDestructDamage = property(getSelfDestructDamage)
+
+  #\cond
+  def getMaxMovement(self):
+    self.validify()
+    return library.shipTypeGetMaxMovement(self._ptr)
+  #\endcond
+  ##The largest possible movement for this ship
+  maxMovement = property(getMaxMovement)
+
+  #\cond
+  def getMaxAttacks(self):
+    self.validify()
+    return library.shipTypeGetMaxAttacks(self._ptr)
+  #\endcond
+  ##The max number of attacks for this ship
+  maxAttacks = property(getMaxAttacks)
+
+  #\cond
+  def getMaxHealth(self):
+    self.validify()
+    return library.shipTypeGetMaxHealth(self._ptr)
+  #\endcond
+  ##The max health possible for the ship
+  maxHealth = property(getMaxHealth)
+
 
   def __str__(self):
     self.validify()
@@ -69,6 +229,13 @@ class ShipType(GameObject):
     ret += "id: %s\n" % self.getId()
     ret += "type: %s\n" % self.getType()
     ret += "cost: %s\n" % self.getCost()
+    ret += "radius: %s\n" % self.getRadius()
+    ret += "range: %s\n" % self.getRange()
+    ret += "damage: %s\n" % self.getDamage()
+    ret += "selfDestructDamage: %s\n" % self.getSelfDestructDamage()
+    ret += "maxMovement: %s\n" % self.getMaxMovement()
+    ret += "maxAttacks: %s\n" % self.getMaxAttacks()
+    ret += "maxHealth: %s\n" % self.getMaxHealth()
     return ret
 
 ##
@@ -150,7 +317,7 @@ class Player(GameObject):
     return ret
 
 ##A space ship!
-class Ship(GameObject):
+class Ship(ShipDescription):
   def __init__(self, ptr):
     from BaseAI import BaseAI
     self._ptr = ptr
@@ -198,6 +365,78 @@ class Ship(GameObject):
   id = property(getId)
 
   #\cond
+  def getType(self):
+    self.validify()
+    return library.shipGetType(self._ptr)
+  #\endcond
+  ##The ship type
+  type = property(getType)
+
+  #\cond
+  def getCost(self):
+    self.validify()
+    return library.shipGetCost(self._ptr)
+  #\endcond
+  ##The amount of money required to purchase this type of ship
+  cost = property(getCost)
+
+  #\cond
+  def getRadius(self):
+    self.validify()
+    return library.shipGetRadius(self._ptr)
+  #\endcond
+  ##The radius of the ship
+  radius = property(getRadius)
+
+  #\cond
+  def getRange(self):
+    self.validify()
+    return library.shipGetRange(self._ptr)
+  #\endcond
+  ##The range of attacks for this ship
+  range = property(getRange)
+
+  #\cond
+  def getDamage(self):
+    self.validify()
+    return library.shipGetDamage(self._ptr)
+  #\endcond
+  ##The strength of attacks for this ship
+  damage = property(getDamage)
+
+  #\cond
+  def getSelfDestructDamage(self):
+    self.validify()
+    return library.shipGetSelfDestructDamage(self._ptr)
+  #\endcond
+  ##The amount of damage done when this ship self destructs
+  selfDestructDamage = property(getSelfDestructDamage)
+
+  #\cond
+  def getMaxMovement(self):
+    self.validify()
+    return library.shipGetMaxMovement(self._ptr)
+  #\endcond
+  ##The largest possible movement for this ship
+  maxMovement = property(getMaxMovement)
+
+  #\cond
+  def getMaxAttacks(self):
+    self.validify()
+    return library.shipGetMaxAttacks(self._ptr)
+  #\endcond
+  ##The max number of attacks for this ship
+  maxAttacks = property(getMaxAttacks)
+
+  #\cond
+  def getMaxHealth(self):
+    self.validify()
+    return library.shipGetMaxHealth(self._ptr)
+  #\endcond
+  ##The max health possible for the ship
+  maxHealth = property(getMaxHealth)
+
+  #\cond
   def getOwner(self):
     self.validify()
     return library.shipGetOwner(self._ptr)
@@ -222,22 +461,6 @@ class Ship(GameObject):
   y = property(getY)
 
   #\cond
-  def getRadius(self):
-    self.validify()
-    return library.shipGetRadius(self._ptr)
-  #\endcond
-  ##The radius of the ship
-  radius = property(getRadius)
-
-  #\cond
-  def getType(self):
-    self.validify()
-    return library.shipGetType(self._ptr)
-  #\endcond
-  ##The ship type
-  type = property(getType)
-
-  #\cond
   def getAttacksLeft(self):
     self.validify()
     return library.shipGetAttacksLeft(self._ptr)
@@ -254,38 +477,6 @@ class Ship(GameObject):
   movementLeft = property(getMovementLeft)
 
   #\cond
-  def getMaxMovement(self):
-    self.validify()
-    return library.shipGetMaxMovement(self._ptr)
-  #\endcond
-  ##The largest possible movement for this ship
-  maxMovement = property(getMaxMovement)
-
-  #\cond
-  def getMaxAttacks(self):
-    self.validify()
-    return library.shipGetMaxAttacks(self._ptr)
-  #\endcond
-  ##The max number of attacks for this ship
-  maxAttacks = property(getMaxAttacks)
-
-  #\cond
-  def getDamage(self):
-    self.validify()
-    return library.shipGetDamage(self._ptr)
-  #\endcond
-  ##The strength of attacks for this ship
-  damage = property(getDamage)
-
-  #\cond
-  def getRange(self):
-    self.validify()
-    return library.shipGetRange(self._ptr)
-  #\endcond
-  ##The range of attacks for this ship
-  range = property(getRange)
-
-  #\cond
   def getHealth(self):
     self.validify()
     return library.shipGetHealth(self._ptr)
@@ -293,39 +484,24 @@ class Ship(GameObject):
   ##The total health of the ship
   health = property(getHealth)
 
-  #\cond
-  def getMaxHealth(self):
-    self.validify()
-    return library.shipGetMaxHealth(self._ptr)
-  #\endcond
-  ##The max health possible for the ship
-  maxHealth = property(getMaxHealth)
-
-  #\cond
-  def getSelfDestructDamage(self):
-    self.validify()
-    return library.shipGetSelfDestructDamage(self._ptr)
-  #\endcond
-  ##The amount of damage done when this ship self destructs
-  selfDestructDamage = property(getSelfDestructDamage)
-
 
   def __str__(self):
     self.validify()
     ret = ""
     ret += "id: %s\n" % self.getId()
+    ret += "type: %s\n" % self.getType()
+    ret += "cost: %s\n" % self.getCost()
+    ret += "radius: %s\n" % self.getRadius()
+    ret += "range: %s\n" % self.getRange()
+    ret += "damage: %s\n" % self.getDamage()
+    ret += "selfDestructDamage: %s\n" % self.getSelfDestructDamage()
+    ret += "maxMovement: %s\n" % self.getMaxMovement()
+    ret += "maxAttacks: %s\n" % self.getMaxAttacks()
+    ret += "maxHealth: %s\n" % self.getMaxHealth()
     ret += "owner: %s\n" % self.getOwner()
     ret += "x: %s\n" % self.getX()
     ret += "y: %s\n" % self.getY()
-    ret += "radius: %s\n" % self.getRadius()
-    ret += "type: %s\n" % self.getType()
     ret += "attacksLeft: %s\n" % self.getAttacksLeft()
     ret += "movementLeft: %s\n" % self.getMovementLeft()
-    ret += "maxMovement: %s\n" % self.getMaxMovement()
-    ret += "maxAttacks: %s\n" % self.getMaxAttacks()
-    ret += "damage: %s\n" % self.getDamage()
-    ret += "range: %s\n" % self.getRange()
     ret += "health: %s\n" % self.getHealth()
-    ret += "maxHealth: %s\n" % self.getMaxHealth()
-    ret += "selfDestructDamage: %s\n" % self.getSelfDestructDamage()
     return ret

@@ -207,6 +207,7 @@ DLLEXPORT void getStatus(Connection* c)
 }
 
 
+
 DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y)
 {
   stringstream expr;
@@ -290,27 +291,47 @@ DLLEXPORT int shipAttack(_Ship* object, _Ship* target)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
- 
+
   //Game state update
-  Connection * c = object->_c;
-  object->attacksLeft -= 1;
-  int modifier = 1;
-  for(int i = 0; i < c->ShipCount; i++)
-  {
-    if(c->Ships[i].owner == object->owner and c->Ships[i].type == "Support")
-    {
-      if(sqrt(pow(c->Ships[i].x - target->x,2)+pow(c->Ships[i].y - target->y,2)) <= c->Ships[i].range + target->radius)
-      {
-        modifier += (c->Ships[i].damage)/100;
-      }
-    }
-  }
-  target->health -= object->damage*modifier;
+  //TODO Support
+  object->attacksLeft--;
+  target->health -= object->damage;
   return 1;
 }
 
 
 //Utility functions for parsing data
+void parseShipDescription(Connection* c, _ShipDescription* object, sexp_t* expression)
+{
+  sexp_t* sub;
+  sub = expression->list;
+
+  object->_c = c;
+
+  object->id = atoi(sub->val);
+  sub = sub->next;
+  object->type = new char[strlen(sub->val)+1];
+  strncpy(object->type, sub->val, strlen(sub->val));
+  object->type[strlen(sub->val)] = 0;
+  sub = sub->next;
+  object->cost = atoi(sub->val);
+  sub = sub->next;
+  object->radius = atoi(sub->val);
+  sub = sub->next;
+  object->range = atoi(sub->val);
+  sub = sub->next;
+  object->damage = atoi(sub->val);
+  sub = sub->next;
+  object->selfDestructDamage = atoi(sub->val);
+  sub = sub->next;
+  object->maxMovement = atoi(sub->val);
+  sub = sub->next;
+  object->maxAttacks = atoi(sub->val);
+  sub = sub->next;
+  object->maxHealth = atoi(sub->val);
+  sub = sub->next;
+
+}
 void parseShipType(Connection* c, _ShipType* object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -325,6 +346,20 @@ void parseShipType(Connection* c, _ShipType* object, sexp_t* expression)
   object->type[strlen(sub->val)] = 0;
   sub = sub->next;
   object->cost = atoi(sub->val);
+  sub = sub->next;
+  object->radius = atoi(sub->val);
+  sub = sub->next;
+  object->range = atoi(sub->val);
+  sub = sub->next;
+  object->damage = atoi(sub->val);
+  sub = sub->next;
+  object->selfDestructDamage = atoi(sub->val);
+  sub = sub->next;
+  object->maxMovement = atoi(sub->val);
+  sub = sub->next;
+  object->maxAttacks = atoi(sub->val);
+  sub = sub->next;
+  object->maxHealth = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -358,35 +393,37 @@ void parseShip(Connection* c, _Ship* object, sexp_t* expression)
 
   object->id = atoi(sub->val);
   sub = sub->next;
+  object->type = new char[strlen(sub->val)+1];
+  strncpy(object->type, sub->val, strlen(sub->val));
+  object->type[strlen(sub->val)] = 0;
+  sub = sub->next;
+  object->cost = atoi(sub->val);
+  sub = sub->next;
+  object->radius = atoi(sub->val);
+  sub = sub->next;
+  object->range = atoi(sub->val);
+  sub = sub->next;
+  object->damage = atoi(sub->val);
+  sub = sub->next;
+  object->selfDestructDamage = atoi(sub->val);
+  sub = sub->next;
+  object->maxMovement = atoi(sub->val);
+  sub = sub->next;
+  object->maxAttacks = atoi(sub->val);
+  sub = sub->next;
+  object->maxHealth = atoi(sub->val);
+  sub = sub->next;
   object->owner = atoi(sub->val);
   sub = sub->next;
   object->x = atoi(sub->val);
   sub = sub->next;
   object->y = atoi(sub->val);
   sub = sub->next;
-  object->radius = atoi(sub->val);
-  sub = sub->next;
-  object->type = new char[strlen(sub->val)+1];
-  strncpy(object->type, sub->val, strlen(sub->val));
-  object->type[strlen(sub->val)] = 0;
-  sub = sub->next;
   object->attacksLeft = atoi(sub->val);
   sub = sub->next;
   object->movementLeft = atoi(sub->val);
   sub = sub->next;
-  object->maxMovement = atoi(sub->val);
-  sub = sub->next;
-  object->maxAttacks = atoi(sub->val);
-  sub = sub->next;
-  object->damage = atoi(sub->val);
-  sub = sub->next;
-  object->range = atoi(sub->val);
-  sub = sub->next;
   object->health = atoi(sub->val);
-  sub = sub->next;
-  object->maxHealth = atoi(sub->val);
-  sub = sub->next;
-  object->selfDestructDamage = atoi(sub->val);
   sub = sub->next;
 
 }

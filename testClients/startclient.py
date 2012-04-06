@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
   for f in listdir('../../client/{0}/'.format(args.language)):
     operation = symlink
-    if splitext(basename(f))[0].lower() in ['ai', 'makefile', 'run']:
+    if splitext(basename(f))[0].lower() in ['ai', 'makefile', 'run', 'main']:
       operation = copy
     operation('../../client/{0}/{1}'.format(args.language, f), './{0}'.format(f))
 

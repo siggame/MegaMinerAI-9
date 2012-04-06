@@ -3,11 +3,8 @@ using System.Runtime.InteropServices;
 
 
 ///A space ship!
-public class Ship
+public class Ship: ShipDescription
 {
-  public IntPtr ptr;
-  protected int ID;
-  protected int iteration;
 
   public Ship()
   {
@@ -20,7 +17,7 @@ public class Ship
     iteration = BaseAI.iteration;
   }
 
-  public bool validify()
+  public override bool validify()
   {
     if(iteration == BaseAI.iteration) return true;
     for(int i = 0; i < BaseAI.ships.Length; i++)
@@ -60,10 +57,73 @@ public class Ship
     //getters
 
   ///Unique Identifier
-  public int getId()
+  public new int getId()
   {
     validify();
     int value = Client.shipGetId(ptr);
+    return value;
+  }
+  ///The ship type
+  public new string getType()
+  {
+    validify();
+    IntPtr value = Client.shipGetType(ptr);
+    return Marshal.PtrToStringAuto(value);
+  }
+  ///The amount of money required to purchase this type of ship
+  public new int getCost()
+  {
+    validify();
+    int value = Client.shipGetCost(ptr);
+    return value;
+  }
+  ///The radius of the ship
+  public new int getRadius()
+  {
+    validify();
+    int value = Client.shipGetRadius(ptr);
+    return value;
+  }
+  ///The range of attacks for this ship
+  public new int getRange()
+  {
+    validify();
+    int value = Client.shipGetRange(ptr);
+    return value;
+  }
+  ///The strength of attacks for this ship
+  public new int getDamage()
+  {
+    validify();
+    int value = Client.shipGetDamage(ptr);
+    return value;
+  }
+  ///The amount of damage done when this ship self destructs
+  public new int getSelfDestructDamage()
+  {
+    validify();
+    int value = Client.shipGetSelfDestructDamage(ptr);
+    return value;
+  }
+  ///The largest possible movement for this ship
+  public new int getMaxMovement()
+  {
+    validify();
+    int value = Client.shipGetMaxMovement(ptr);
+    return value;
+  }
+  ///The max number of attacks for this ship
+  public new int getMaxAttacks()
+  {
+    validify();
+    int value = Client.shipGetMaxAttacks(ptr);
+    return value;
+  }
+  ///The max health possible for the ship
+  public new int getMaxHealth()
+  {
+    validify();
+    int value = Client.shipGetMaxHealth(ptr);
     return value;
   }
   ///The owner of the ship
@@ -87,20 +147,6 @@ public class Ship
     int value = Client.shipGetY(ptr);
     return value;
   }
-  ///The radius of the ship
-  public int getRadius()
-  {
-    validify();
-    int value = Client.shipGetRadius(ptr);
-    return value;
-  }
-  ///The ship type
-  public string getType()
-  {
-    validify();
-    IntPtr value = Client.shipGetType(ptr);
-    return Marshal.PtrToStringAuto(value);
-  }
   ///How many more attacks this ship has
   public int getAttacksLeft()
   {
@@ -115,53 +161,11 @@ public class Ship
     int value = Client.shipGetMovementLeft(ptr);
     return value;
   }
-  ///The largest possible movement for this ship
-  public int getMaxMovement()
-  {
-    validify();
-    int value = Client.shipGetMaxMovement(ptr);
-    return value;
-  }
-  ///The max number of attacks for this ship
-  public int getMaxAttacks()
-  {
-    validify();
-    int value = Client.shipGetMaxAttacks(ptr);
-    return value;
-  }
-  ///The strength of attacks for this ship
-  public int getDamage()
-  {
-    validify();
-    int value = Client.shipGetDamage(ptr);
-    return value;
-  }
-  ///The range of attacks for this ship
-  public int getRange()
-  {
-    validify();
-    int value = Client.shipGetRange(ptr);
-    return value;
-  }
   ///The total health of the ship
   public int getHealth()
   {
     validify();
     int value = Client.shipGetHealth(ptr);
-    return value;
-  }
-  ///The max health possible for the ship
-  public int getMaxHealth()
-  {
-    validify();
-    int value = Client.shipGetMaxHealth(ptr);
-    return value;
-  }
-  ///The amount of damage done when this ship self destructs
-  public int getSelfDestructDamage()
-  {
-    validify();
-    int value = Client.shipGetSelfDestructDamage(ptr);
     return value;
   }
 

@@ -16,16 +16,30 @@ namespace parser
 
 const int MOVE = 0;
 const int SELFDESTRUCT = 1;
-const int ATTACK = 2;
-const int STEALTH = 3;
-const int PLAYERTALK = 4;
-const int DESTEALTH = 5;
+const int ROUNDVICTORY = 2;
+const int ATTACK = 3;
+const int STEALTH = 4;
+const int PLAYERTALK = 5;
+const int DESTEALTH = 6;
 
-struct ShipType
+struct ShipDescription
 {
   int id;
   char* type;
   int cost;
+  int radius;
+  int range;
+  int damage;
+  int selfDestructDamage;
+  int maxMovement;
+  int maxAttacks;
+  int maxHealth;
+
+  friend std::ostream& operator<<(std::ostream& stream, ShipDescription obj);
+};
+
+struct ShipType: public ShipDescription 
+{
 
   friend std::ostream& operator<<(std::ostream& stream, ShipType obj);
 };
@@ -41,23 +55,14 @@ struct Player
   friend std::ostream& operator<<(std::ostream& stream, Player obj);
 };
 
-struct Ship
+struct Ship: public ShipDescription 
 {
-  int id;
   int owner;
   int x;
   int y;
-  int radius;
-  char* type;
   int attacksLeft;
   int movementLeft;
-  int maxMovement;
-  int maxAttacks;
-  int damage;
-  int range;
   int health;
-  int maxHealth;
-  int selfDestructDamage;
 
   friend std::ostream& operator<<(std::ostream& stream, Ship obj);
 };
@@ -84,6 +89,13 @@ struct selfDestruct : public Animation
   int actingID;
 
   friend std::ostream& operator<<(std::ostream& stream, selfDestruct obj);
+};
+
+struct roundVictory : public Animation
+{
+  char* message;
+
+  friend std::ostream& operator<<(std::ostream& stream, roundVictory obj);
 };
 
 struct attack : public Animation
@@ -124,6 +136,7 @@ struct AnimOwner: public Animation
 
 struct GameState
 {
+  std::map<int,ShipDescription> shipDescriptions;
   std::map<int,ShipType> shipTypes;
   std::map<int,Player> players;
   std::map<int,Ship> ships;
