@@ -223,7 +223,7 @@ namespace visualizer
           // Add the warps for this ship (so long as it is not a mine)
           if( strcmp( i.second.type, "Mine" ) != 0)
           {
-            Warps[ state - 1 ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, false ) );
+            //Warps[ state - 1 ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, false ) );
             Warps[ state ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, true ) );
           }
         }
@@ -231,9 +231,7 @@ namespace visualizer
         shipsThisTurn.push_back(tShip);
 
         // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
-        m_PersistentShips[shipID]->points.push_back( vec2( i.second.x, i.second.y ) );
         m_PersistentShips[shipID]->healths.push_back( i.second.health );
-        m_PersistentShips[shipID]->emps.push_back( false );
         
         vector< vec2 > moves;
         // Check for this ship's animations in the gamelog
@@ -249,12 +247,21 @@ namespace visualizer
                   moves.push_back( vec2( move.fromX, move.fromY ) );
               }
               moves.push_back( vec2( move.toX, move.toY ) );
+              //if( shipID == 10 )
+                cout << "Move found on turn " << state << " with ship id " << shipID << " moving from (" << move.fromX << "," << move.fromY << ") to (" << move.toX << "," << move.toY << ")" << endl;
             } break;
             case parser::ATTACK:
             {
               parser::attack &attack = (parser::attack&)*j;
-              m_PersistentShips[shipID]->AddAttack( m_PersistentShips[m_game->states[ state - 1 ].ships[ attack.targetID ].id], state );
-
+              m_PersistentShips[shipID]->AddAttack( m_PersistentShips[ attack.targetID ], state );
+              
+              // If this is an EMP attack we need to EMP the victim
+              if( strcmp( "EMP", m_PersistentShips[shipID]->type.c_str() ) == 0 )
+              {
+                m_PersistentShips[ attack.targetID ]->AddEMPed( state + 1 );
+              }
+              cout << "Attack found on turn " << state << " of attacker " << shipID << " attacking " << attack.targetID << endl;
+              
             } break;
             case parser::STEALTH:
             {
@@ -279,7 +286,7 @@ namespace visualizer
         }
       }
 
-      createBlobs<TempShip>(shipsThisTurn, 12.0f, 10.0f);
+      auto blobs = createBlobs<TempShip>(shipsThisTurn, 12.0f, 10.0f);
 
       // Start adding stuff to draw
       Frame turn;  // The frame that will be drawn
@@ -384,9 +391,12 @@ namespace visualizer
 
     for(auto& i : m_PersistentShips)
     {
+      i.second->MoveInfo();
+      
       if( m_suicide )
         break;
     }
+
     // END: Look through the game logs and build the m_PersistentShips
 
     if(!m_suicide)

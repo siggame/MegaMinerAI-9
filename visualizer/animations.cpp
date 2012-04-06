@@ -36,6 +36,12 @@ namespace visualizer
     //game->renderer->drawTexturedQuad(m_Background->outerRadius - m_Background->innerRadius, m_Background->outerRadius - m_Background->innerRadius, m_Background->innerRadius * 3, m_Background->innerRadius * 2, "planet");
     game->renderer->setColor( Color( 1, 1, 1, 0.1f ) );
     game->renderer->drawArc(500, 500, 500, 80 );
+    
+    if( game->options->getNumber( "Show Grid" ) )
+    {
+      game->renderer->drawLine( m_Background->radius, 0, m_Background->radius, m_Background->radius * 2, 1 );
+      game->renderer->drawLine( 0, m_Background->radius, m_Background->radius * 2, m_Background->radius, 1 );
+    }
   }
 
   void DrawRoundHUD::animate( const float& t, AnimData * /* d */, IGame* game )
@@ -165,7 +171,11 @@ namespace visualizer
     float healthLeft = m_PersistentShip->HealthOn(m_Turn, t) / m_PersistentShip->maxHealth;
     float healthStart = upAngle-healthSection*healthLeft;
     float healthEnd   = upAngle+healthSection*healthLeft;
-
+    
+    // EMP Animation
+    float animEmp[] = { 0.0f, 36.6f, 91.8f, 10.1f, 338.4f, 198.2f, 251.9f, 279.7f, 53.3f, 360.0f };
+    float currentEmpAnim = animEmp[ int(t * 10.f) ];
+    
     // Colors:
     Color teamColor = shipOwner ? Color(0, 0.4f, 1, (shipIsExploding? 1 - t : shipStealth)) : Color(1, 0, 0, (shipIsExploding? 1 - t : shipStealth));
     float attackTrans = t * 2;
@@ -217,18 +227,17 @@ namespace visualizer
 
 
 
-    if(shipIsEMPed)
+    if( shipIsEMPed )
     {
-      // Commented out until the isEMPd works
       game->renderer->setColor( normalColor );
-      drawRotatedTexturedQuad( game, shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2, shipHeading, empedTexture.str() );
+      drawRotatedTexturedQuad( game, shipCenter.x - shipRadius, shipCenter.y - shipRadius, shipRadius * 2, shipHeading + currentEmpAnim, empedTexture.str() );
     }
 
     // Draw Attacks
     if(shipIsEMP && shipAttacks.size() > 0)
     {
       game->renderer->setColor( normalColor );
-      drawRotatedTexturedQuad( game, shipCenter.x - shipRange, shipCenter.y - shipRange, shipRange * 2, shipHeading, empTexture.str() );
+      drawRotatedTexturedQuad( game, shipCenter.x - shipRange, shipCenter.y - shipRange, shipRange * 2, shipHeading + currentEmpAnim, empTexture.str() );
     }
     else if (shipAttacks.size() > 0)
     {
