@@ -78,6 +78,8 @@ namespace visualizer
       int maxMovement;
       string type;
       bool selected;
+      // Stats that change each turn
+      vector< int > healths;
 
       PersistentShip(int createdAt, int round, parser::Ship ship)
       {
@@ -101,9 +103,6 @@ namespace visualizer
         // have it stealth now (only Stealth ships care...)
         AddStealth( createdAt );
       }
-
-      // Stats that change each turn
-      vector< int > healths;
 
       void AddTurn(int turn, vector<vec2> &moves, int movementLeft)
       {
