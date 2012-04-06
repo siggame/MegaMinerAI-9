@@ -12,6 +12,38 @@ def distance(fromX, toX, fromY, toY):
 def inRange(x1, y1, rad1, x2, y2, rad2):
   return distance(x1, x2, y1, y2) <= rad1 + rad2
 
+class ShipDescription:
+  def __init__(self, game, id, type, cost, radius, range, damage, selfDestructDamage, maxMovement, maxAttacks, maxHealth):
+    self.game = game
+    self.id = id
+    self.type = type
+    self.cost = cost
+    self.radius = radius
+    self.range = range
+    self.damage = damage
+    self.selfDestructDamage = selfDestructDamage
+    self.maxMovement = maxMovement
+    self.maxAttacks = maxAttacks
+    self.maxHealth = maxHealth
+
+  def toList(self):
+    value = [
+      self.id,
+      self.type,
+      self.cost,
+      self.radius,
+      self.range,
+      self.damage,
+      self.selfDestructDamage,
+      self.maxMovement,
+      self.maxAttacks,
+      self.maxHealth,
+      ]
+    return value
+
+  def nextTurn(self):
+    pass
+
 class Player:
   def __init__(self, game, id, playerName, time, victories, energy):
     self.game = game
@@ -41,44 +73,46 @@ class Player:
     return True
 
 
-class Ship:
-  def __init__(self, game, id, owner, x, y, radius, type, attacksLeft, movementLeft, maxMovement, maxAttacks, damage, range, health, maxHealth, selfDestructDamage):
+class Ship(ShipDescription):
+  def __init__(self, game, id, owner, x, y, attacksLeft, movementLeft, health, type, cost, radius, range, damage, selfDestructDamage, maxMovement, maxAttacks, maxHealth):
     self.game = game
     self.id = id
+    self.type = type
+    self.cost = cost
+    self.radius = radius
+    self.range = range
+    self.damage = damage
+    self.selfDestructDamage = selfDestructDamage
+    self.maxMovement = maxMovement
+    self.maxAttacks = maxAttacks
+    self.maxHealth = maxHealth
     self.owner = owner
     self.x = x
     self.y = y
-    self.radius = radius
-    self.type = type
     self.attacksLeft = attacksLeft
     self.movementLeft = movementLeft
-    self.maxMovement = maxMovement
-    self.maxAttacks = maxAttacks
-    self.damage = damage
-    self.range = range
     self.health = health
-    self.maxHealth = maxHealth
-    self.selfDestructDamage = selfDestructDamage
     self.isStealthed = False
     self.targeted = set()
 
   def toList(self):
     value = [
       self.id,
+      self.type,
+      self.cost,
+      self.radius,
+      self.range,
+      self.damage,
+      self.selfDestructDamage,
+      self.maxMovement,
+      self.maxAttacks,
+      self.maxHealth,
       self.owner,
       self.x,
       self.y,
-      self.radius,
-      self.type,
       self.attacksLeft,
       self.movementLeft,
-      self.maxMovement,
-      self.maxAttacks,
-      self.damage,
-      self.range,
       self.health,
-      self.maxHealth,
-      self.selfDestructDamage,
       ]
     return value
     
@@ -95,7 +129,7 @@ class Ship:
     #Ships warp in at the beginning of that player's turn
     for warp in self.game.objects.players[self.game.playerID].warping:
       #Uses a list of ship values in the config to get all of the ships stats
-      shipStats = [cfgUnits[warp[0]][value] for value in self.game.ordering] 
+      shipStats = [cfgUnits[warp[0]][value] for value in self.game.shipordering]
       #Adds the ship with the retreived stats to the game
       self.game.addObject(Ship, [self.game.playerID, warp[1], warp[2]] + shipStats)
       #Remove the created ship from the queue
@@ -191,7 +225,7 @@ class Ship:
       return "You have already commanded %s %i to attack %s %i"%(self.type,self.id,target.type,target.id)
     if self.type == "Mine Layer":
       #Adding a new mine to the game
-      shipStats = [cfgUnits["Mine"][value] for value in self.game.ordering]   
+      shipStats = [cfgUnits["Mine"][value] for value in self.game.shipordering]
       self.game.addObject(Ship, [self.game.playerID, self.x, self.y] + shipStats)
       self.maxAttacks-=1
       self.attacksLeft -= 1
@@ -233,18 +267,32 @@ class Ship:
     return inRange(self.x, self.y, self.range, target.x, target.y, target.range)
 
 
-class ShipType:
-  def __init__(self, game, id, type, cost):
+class ShipType(ShipDescription):
+  def __init__(self, game, id, type, cost, radius, range, damage, selfDestructDamage, maxMovement, maxAttacks, maxHealth):
     self.game = game
     self.id = id
     self.type = type
     self.cost = cost
+    self.radius = radius
+    self.range = range
+    self.damage = damage
+    self.selfDestructDamage = selfDestructDamage
+    self.maxMovement = maxMovement
+    self.maxAttacks = maxAttacks
+    self.maxHealth = maxHealth
 
   def toList(self):
     value = [
       self.id,
       self.type,
       self.cost,
+      self.radius,
+      self.range,
+      self.damage,
+      self.selfDestructDamage,
+      self.maxMovement,
+      self.maxAttacks,
+      self.maxHealth,
       ]
     return value
 

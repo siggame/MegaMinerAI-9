@@ -68,9 +68,12 @@ class Match(DefaultGameWorld):
     self.turn = self.players[-1]
     self.turnNumber = -1
 
-    self.ordering = ["radius", "type", "maxAttacks", "maxMovement", "maxMovement", "maxAttacks", "damage", 
-                     "range", "maxHealth", "maxHealth", "selfDestructDamage"]
-    self.warpGate = [cfgUnits["Warp Gate"][value] for value in self.ordering]
+    self.shipordering = ["maxAttacks", "maxMovement", "maxHealth", "type", "cost", "radius", "range",
+                     "damage", "selfDestructDamage", "maxMovement", "maxAttacks", "maxHealth"]
+
+    self.typeordering = ["type", "cost", "radius", "range", "damage", "selfDestructDamage",
+                         "maxMovement", "maxAttacks", "maxHealth"]
+    self.warpGate = [cfgUnits["Warp Gate"][value] for value in self.shipordering]
     self.spawnableTypes = cfgUnits.keys()
     self.spawnableTypes.remove("Warp Gate")
     self.spawnableTypes.remove("Mine")
@@ -109,7 +112,7 @@ class Match(DefaultGameWorld):
       self.shipChain.remove(choice)
     print sorted(using)
     for shipType in using:
-      self.addObject(ShipType, [shipType, cfgUnits[shipType]["cost"]])
+      self.addObject(ShipType, [cfgUnits[shipType][value] for value in self.typeordering])
     self.nextTurn()
     return True
 
@@ -221,13 +224,17 @@ class Match(DefaultGameWorld):
   def logPath(self):
     return "logs/" + str(self.id) + ".glog"
 
+  @derefArgs(ShipType, None, None)
+  def warpIn(self, object, x, y):
+    return object.warpIn(x, y, )
+
   @derefArgs(Player, None)
   def talk(self, object, message):
     return object.talk(message, )
 
   @derefArgs(Ship, None, None)
   def move(self, object, x, y):
-    return object.move(x, y,)
+    return object.move(x, y, )
 
   @derefArgs(Ship)
   def selfDestruct(self, object):
@@ -236,10 +243,6 @@ class Match(DefaultGameWorld):
   @derefArgs(Ship, Ship)
   def attack(self, object, target):
     return object.attack(target, )
-
-  @derefArgs(ShipType, None, None)
-  def warpIn(self, object, x, y):
-    return object.warpIn(x, y, )
 
 
   def sendIdent(self, players):
