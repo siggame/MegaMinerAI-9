@@ -94,6 +94,14 @@ std::ostream& operator<<(std::ostream& stream, selfDestruct ob)
 }
 
 
+std::ostream& operator<<(std::ostream& stream, roundVictory ob)
+{
+  stream << "roundVictory" << "\n";
+  stream << "message: " << ob.message  <<'\n';
+  return stream;
+}
+
+
 std::ostream& operator<<(std::ostream& stream, attack ob)
 {
   stream << "attack" << "\n";
@@ -163,6 +171,8 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
 //      stream << *((move*)*i) << "\n";
 //    if((*(*i)).type == SELFDESTRUCT)
 //      stream << *((selfDestruct*)*i) << "\n";
+//    if((*(*i)).type == ROUNDVICTORY)
+//      stream << *((roundVictory*)*i) << "\n";
 //    if((*(*i)).type == ATTACK)
 //      stream << *((attack*)*i) << "\n";
 //    if((*(*i)).type == STEALTH)

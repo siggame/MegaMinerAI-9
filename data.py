@@ -109,3 +109,9 @@ deStealth = Animation('deStealth',
     Variable('actingID', int),
     ],
   )
+  
+roundVictory = Animation('roundVictory',
+  data=[
+    Variable('message', str),
+  ],
+)

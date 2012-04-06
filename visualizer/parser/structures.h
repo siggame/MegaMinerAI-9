@@ -16,10 +16,11 @@ namespace parser
 
 const int MOVE = 0;
 const int SELFDESTRUCT = 1;
-const int ATTACK = 2;
-const int STEALTH = 3;
-const int PLAYERTALK = 4;
-const int DESTEALTH = 5;
+const int ROUNDVICTORY = 2;
+const int ATTACK = 3;
+const int STEALTH = 4;
+const int PLAYERTALK = 5;
+const int DESTEALTH = 6;
 
 struct ShipDescription
 {
@@ -88,6 +89,13 @@ struct selfDestruct : public Animation
   int actingID;
 
   friend std::ostream& operator<<(std::ostream& stream, selfDestruct obj);
+};
+
+struct roundVictory : public Animation
+{
+  char* message;
+
+  friend std::ostream& operator<<(std::ostream& stream, roundVictory obj);
 };
 
 struct attack : public Animation
