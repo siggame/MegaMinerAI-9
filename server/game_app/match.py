@@ -157,19 +157,24 @@ class Match(DefaultGameWorld):
     #SWAPPED WHICH PLAYER WINS
       if len(gates) == 1:
         if player1.warpGate in self.objects:
+          self.animations.append(['roundVictory', "Player 1 wins by warp gate destruction"])
           player1.victories += 1
         else:
+          self.animations.append(['roundVictory', "Player 2 wins by warp gate destruction"])
           player2.victories += 1
           #CHANGE END HERE
       else: # Both win if they both die in one turn
+        self.animations.append(['roundVictory', "Draw due to mutual warp gate destruction"])
         player1.victories += 1
         player2.victories += 1
       self.nextRound()
     elif self.turnNumber >= self.turnLimit or (player1.energy < cost and player2.energy < cost and len(self.objects.ships)==2):
       # Warp gate health
       if self.objects[player1.warpGate].health > self.objects[player2.warpGate].health:
+        self.animations.append(['roundVictory', "Player 1 wins by warp gate shield integrity"])
         player1.victories += 1
       elif self.objects[player1.warpGate].health < self.objects[player2.warpGate].health:
+        self.animations.append(['roundVictory', "Player 2 wins by warp gate shield integrity"])
         player2.victories += 1
       else:
         # score
@@ -180,10 +185,13 @@ class Match(DefaultGameWorld):
           for ship in player.warping:
             scores[ship.owner] += cfgUnits[ship.type]["cost"]
         if scores[0] > scores[1]:
+          self.animations.append(['roundVictory', "Player 1 wins by total living army value"])
           player1.victories += 1
         elif scores[0] < scores[1]:
+          self.animations.append(['roundVictory', "Player 2 wins by total living army value"])
           player2.victories += 1
         else:
+          self.animations.append(['roundVictory', "Draw by because you are twins"])
           player1.victories += 1
           player2.victories += 1
       if player1.victories < self.victories and player2.victories < self.victories:
