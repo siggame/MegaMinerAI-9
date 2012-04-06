@@ -333,7 +333,7 @@ namespace visualizer
       }
 
 #if 0
-      /*pair<SpacePoint, float> GardnersSplineOn(int turn, float t)
+      pair<SpacePoint, float> GardnersSplineOn(int turn, float t)
       {
         // Index setup from Jake F. 
         
