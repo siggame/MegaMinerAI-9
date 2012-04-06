@@ -6,11 +6,11 @@ cfgUnits = networking.config.config.readConfig("config/units.cfg")
 for key in cfgUnits.keys():
   cfgUnits[key]['type'] = key
 
-def distance(fromX, toX, fromY, toY):
+def distance(fromX, fromY, toX, toY):
   return int(math.ceil(math.sqrt((fromX-toX)**2 + (fromY-toY)**2)))
 
 def inRange(x1, y1, rad1, x2, y2, rad2):
-  return distance(x1, x2, y1, y2) <= rad1 + rad2
+  return distance(x1, y1, x2, y2) <= rad1 + rad2
 
 class ShipDescription:
   def __init__(self, game, id, type, cost, radius, range, damage, selfDestructDamage, maxMovement, maxAttacks, maxHealth):
@@ -66,7 +66,14 @@ class Player:
     return value
 
   def nextTurn(self):
-    pass
+    #Ships warp in at the beginning of that player's turn
+    if self.game.playerID == self.id:
+      for warp in self.warping:
+        #Uses a list of ship values in the config to get all of the ships stats
+        shipStats = [cfgUnits[warp[0]][value] for value in self.game.shipordering]
+        #Adds the ship with the retreived stats to the game
+        self.game.addObject(Ship, [self.id, warp[1], warp[2]] + shipStats)
+      self.warping = []
 
   def talk(self, message):
     self.game.animations.append(['playerTalk', self.id, message])
@@ -126,16 +133,6 @@ class Ship(ShipDescription):
     return result
 
   def nextTurn(self):
-    #Ships warp in at the beginning of that player's turn
-    for warp in self.game.objects.players[self.game.playerID].warping:
-      #Uses a list of ship values in the config to get all of the ships stats
-      shipStats = [cfgUnits[warp[0]][value] for value in self.game.shipordering]
-      #Adds the ship with the retreived stats to the game
-      self.game.addObject(Ship, [self.game.playerID, warp[1], warp[2]] + shipStats)
-      #Remove the created ship from the queue
-      self.game.objects.players[self.game.playerID].warping.remove(warp)
-                                                                                            
-    
     #Healing other ships in range of support ship      
     self.targeted = set()
     #Healing other ships in range of engineering ship      
@@ -160,9 +157,9 @@ class Ship(ShipDescription):
     if self.owner != self.game.playerID:
       return "you cannot move your oppenent's %s %i "%(self.type,self.id)
     #moved is the distance they've moved, where they were to where they're going
-    moved = distance(self.x, x, self.y, y)       
+    moved = distance(self.x, self.y, x, y)
     #if they're trying to move outside the map
-    if distance(0,x,0,y) + self.radius > self.game.mapRadius:
+    if distance(0, 0, x, y) + self.radius > self.game.mapRadius:
       return "We're deep in Space, corner of No and Where. You take extra care to not move your %s %i out of the map."%(self.type,self.id)
     #check if they can't move that far
     elif self.movementLeft - moved < 0:
@@ -300,12 +297,7 @@ class ShipType(ShipDescription):
     pass
 
   def warpIn(self, x, y):
-    #TODO make units warp in at start of next turn
-    #check to see whose turn it is, hint: it's player's turn
-    if self.game.turnNumber == 0:
-      player = self.game.objects.players[0]
-    else:
-      player = self.game.objects.players[self.game.turnNumber%2]
+    player = self.game.objects.players[self.game.playerID]
     #TODO (Maybe) Try to build library of ships each turn to speed up calculations (last priority)
     warpX = 0; warpY = 0
     for ship in self.game.objects.values():
@@ -316,7 +308,7 @@ class ShipType(ShipDescription):
     if self.game.playerID != player.id:
       #print self.game.playerID, player.id
       return "You cannot warp in ships on your opponent's turn",
-    if distance(0,x,0,y) + cfgUnits[self.type]["radius"] > self.game.mapRadius:
+    if distance(0, 0, x, y) + cfgUnits[self.type]["radius"] > self.game.mapRadius:
       return "That ship would be lost in space...forever"
     elif player.energy < self.cost:
       return "You need to not be poor to buy that %s"%(self.type)

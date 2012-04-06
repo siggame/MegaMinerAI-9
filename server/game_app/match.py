@@ -9,10 +9,8 @@ import itertools
 import scribe
 import random
 import copy
-#from sets import Set
 
 Scribe = scribe.Scribe
-
 
 def loadClassDefaults(cfgFile = "config/defaults.cfg"):
   cfg = networking.config.config.readConfig(cfgFile)
@@ -80,17 +78,16 @@ class Match(DefaultGameWorld):
     self.shipChain = []
 
     self.nextRound()
-    #self.nextTurn()
+    self.nextTurn()
     return True
 
   def nextRound(self):
+    #Handles logic for starting a new round
     self.round += 1
-    self.turnNumber = -1
-    self.turn = self.players[-1]
-    #Handles logic for starting a new round:
-      #first get rid of all shiptypes and ships available that round, then put into a new subset of available ship types
+
     print "YOU ARE ENTERING A NEW ROUND", self.round, 'Score:', [player.victories for player in self.objects.players]
 
+    #first get rid of all shiptypes and ships available that round, then put into a new subset of available ship types
     for obj in self.objects.values():
       if isinstance(obj, ShipType) or isinstance(obj, Ship):
         self.removeObject(obj)
@@ -98,7 +95,9 @@ class Match(DefaultGameWorld):
     for player in self.objects.players:
       #Give players energy initially each round
       player.energy = self.startEnergy
-      player.warpGate = self.addObject(Ship, [player.id, (player.id * 2 - 1) * (self.mapRadius)/2, 0] + self.warpGate).id
+      player.time = self.startTime
+      player.warping = []
+      player.warpGate = self.addObject(Ship, [player.id, (player.id * 2 - 1) * (self.mapRadius)/2, 0] + self.warpGate)
     # Get the set of ships to be used this round
     using = set()
     while len(using) < self.shipsPerRound:
@@ -113,7 +112,6 @@ class Match(DefaultGameWorld):
     print sorted(using)
     for shipType in using:
       self.addObject(ShipType, [cfgUnits[shipType][value] for value in self.typeordering])
-    self.nextTurn()
     return True
 
   def nextTurn(self):
@@ -126,7 +124,7 @@ class Match(DefaultGameWorld):
       self.playerID = 0
     else:
       return "Game is over." 
-      
+
     for obj in self.objects.values():
       obj.nextTurn()
     self.checkWinner()
@@ -138,80 +136,71 @@ class Match(DefaultGameWorld):
     self.animations = ["animations"]
     return True
 
+  def declareRoundWinner(self, winners, message):
+    #self.animations.append(['roundVictory', message])
+    for winner in winners:
+      winner.victories += 1
+    self.turnNumber = 0
+    self.nextRound()
+
   def checkRoundWinner(self):
     player1 = self.objects.players[0]
     player2 = self.objects.players[1]   
     gates = []
-    for obj in self.objects:
-      if obj == player1.warpGate:
-        gates.append(player1.warpGate)
-      elif obj == player2.warpGate:  
-        gates.append( player2.warpGate)     
     
-    #TODO compare energy to lowest type cost of that rouond
-    cost = 100
-    for type in self.objects.shipTypes:
-      if type.cost <= cost:
-        cost = type.cost
-    if len(gates) < 2:
-    #SWAPPED WHICH PLAYER WINS
-      if len(gates) == 1:
-        if player1.warpGate in self.objects:
-          self.animations.append(['roundVictory', "Player 1 wins by warp gate destruction"])
-          player1.victories += 1
-        else:
-          self.animations.append(['roundVictory', "Player 2 wins by warp gate destruction"])
-          player2.victories += 1
-          #CHANGE END HERE
-      else: # Both win if they both die in one turn
-        self.animations.append(['roundVictory', "Draw due to mutual warp gate destruction"])
-        player1.victories += 1
-        player2.victories += 1
-      self.nextRound()
+    for obj in self.objects.ships:
+      if obj is player1.warpGate:
+        gates.append(player1.warpGate)
+      elif obj is player2.warpGate:  
+        gates.append(player2.warpGate)     
+    
+    #Find the energy of the lowest type cost of that rouond
+    cost = min([shipType.cost for shipType in self.objects.shipTypes])
+    # Descruction round end
+    if player1.warpGate.health <= 0 and player2.warpGate.health <= 0:
+      self.declareRoundWinner([player1, player2], "Draw due to mutual warp gate destruction")
+    elif player2.warpGate.health <= 0:
+      self.declareRoundWinner([player1], "Player 1 wins by warp gate destruction")
+    elif player1.warpGate.health <= 0:
+      self.declareRoundWinner([player2], "Player 2 wins by warp gate destruction")
+    # End by turn limit
     elif self.turnNumber >= self.turnLimit or (player1.energy < cost and player2.energy < cost and len(self.objects.ships)==2):
-      # Warp gate health
-      if self.objects[player1.warpGate].health > self.objects[player2.warpGate].health:
-        self.animations.append(['roundVictory', "Player 1 wins by warp gate shield integrity"])
-        player1.victories += 1
-      elif self.objects[player1.warpGate].health < self.objects[player2.warpGate].health:
-        self.animations.append(['roundVictory', "Player 2 wins by warp gate shield integrity"])
-        player2.victories += 1
+      if player1.warpGate.health > player2.warpGate.health:
+        self.declareRoundWinner([player1], "Player 1 wins by warp gate shield integrity")
+      elif player1.warpGate.health < player2.warpGate.health:
+        self.declareRoundWinner([player2], "Player 2 wins by warp gate shield integrity")
       else:
         # score
         scores = [player1.energy, player2.energy]
         for ship in self.objects.ships:
-          scores[ship.owner] += cfgUnits[ship.type]["cost"]
+          scores[ship.owner] += ship.cost
+        # includes warping in ships
         for player in self.objects.players:
           for ship in player.warping:
             scores[ship.owner] += cfgUnits[ship.type]["cost"]
         if scores[0] > scores[1]:
-          self.animations.append(['roundVictory', "Player 1 wins by total living army value"])
-          player1.victories += 1
+          self.declareRoundWinner([player1], "Player 1 wins by total living army value")
         elif scores[0] < scores[1]:
-          self.animations.append(['roundVictory', "Player 2 wins by total living army value"])
-          player2.victories += 1
+          self.declareRoundWinner([player2], "Player 2 wins by total living army value")
         else:
-          self.animations.append(['roundVictory', "Draw by because you are twins"])
-          player1.victories += 1
-          player2.victories += 1
-      if player1.victories < self.victories and player2.victories < self.victories:
-        self.nextRound()
-    
+          self.declareRoundWinner([player1, player2], "Draw by because you are twins")
+
   def checkWinner(self):
+    # First, the round
     self.checkRoundWinner()
     player1 = self.objects.players[0]
     player2 = self.objects.players[1]
+    # Strictly player 1 victory
     if player1.victories >= self.victories and player1.victories > player2.victories:
-      self.declareWinner(self.players[0], "Player " + str(self.objects.players[0].id+1) + " has won the game " \
-      + str(self.objects.players[0].victories) + "-" + str(self.objects.players[1].victories))
+      self.declareWinner(self.players[0], "Player 1 has won the game %i-%i"%(player1.victories, player2.victories))
+    # Strictly player 2 victory
     elif player2.victories >= self.victories and player2.victories > player1.victories:
-      self.declareWinner(self.players[1], "Player " + str(self.objects.players[1].id+1) + " has won the game " \
-      + str(self.objects.players[1].victories) + "-" + str(self.objects.players[0].victories))
+      self.declareWinner(self.players[0], "Player 2 has won the game %i-%i"%(player2.victories, player1.victories))
+    # Tied last round
     elif player1.victories >= self.victories and player2.victories >= self.victories:
       self.declareWinner(random.choice(self.players), "The game is a tie")
 
   def declareWinner(self, winner, reason=''):
-    #TODO give reasons for winning, who has more round victories, etc..
     print "Game", self.id, "over"
     self.winner = winner
 
@@ -272,7 +261,8 @@ class Match(DefaultGameWorld):
   def sendStatus(self, players):
     for i in players:
       i.writeSExpr(self.status(i))
-      i.writeSExpr(self.animations)
+      if i.type != "player":
+        i.writeSExpr(self.animations)
     return True
 
 
