@@ -242,13 +242,13 @@ namespace visualizer
             case parser::MOVE:
             {
               parser::move &move = (parser::move&)*j;
-              if( !m_PersistentShips[shipID]->HasMoves() )
+              if( !m_PersistentShips[shipID]->HasMoves() && state != m_PersistentShips[shipID]->FirstTurn() )
               {
                   moves.push_back( vec2( move.fromX, move.fromY ) );
               }
               moves.push_back( vec2( move.toX, move.toY ) );
               //if( shipID == 10 )
-                cout << "Move found on turn " << state << " with ship id " << shipID << " moving from (" << move.fromX << "," << move.fromY << ") to (" << move.toX << "," << move.toY << ")" << endl;
+                //cout << "Move found on turn " << state << " with ship id " << shipID << " moving from (" << move.fromX << "," << move.fromY << ") to (" << move.toX << "," << move.toY << ")" << endl;
             } break;
             case parser::ATTACK:
             {
@@ -260,7 +260,9 @@ namespace visualizer
               {
                 m_PersistentShips[ attack.targetID ]->AddEMPed( state + 1 );
               }
-              cout << "Attack found on turn " << state << " of attacker " << shipID << " attacking " << attack.targetID << endl;
+              
+              //if( shipID == 10 )
+                //cout << "Attack found on turn " << state << " of attacker " << shipID << " attacking " << attack.targetID << endl;
               
             } break;
             case parser::STEALTH:
@@ -272,6 +274,11 @@ namespace visualizer
               m_PersistentShips[shipID]->AddDeStealth( state );
             }
           }
+        }
+        
+        if( !m_PersistentShips[shipID]->HasMoves() && state == m_PersistentShips[shipID]->FirstTurn() )
+        {
+          moves.push_back( SpacePoint( i.second.x, i.second.y ) );
         }
         
         m_PersistentShips[shipID]->AddTurn( state, moves, i.second.movementLeft );

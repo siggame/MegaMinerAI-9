@@ -25,7 +25,7 @@ class AI(BaseAI):
 
   def init(self):
     for pl in self.players:
-      if self.playerID() == pl.getId():
+      if self.playerID == pl.getId():
         myPlayer.append(pl)
       else:
         foePlayer.append(pl)
@@ -46,7 +46,9 @@ class AI(BaseAI):
   def batShipControl(self,myListDict,enemyListDict):
     #Move towards enemy warp gate. if not in range of warp gate, attack enemy with most health that you can kill
     #once in range of warp gate, attack. if health is below x%, fire and self destruct
-    warp = enemyListDict['Warp Gate'][0]
+#    print "bat",enemyListDict['Warp Gate']
+    if len(enemyListDict['Warp Gate'])>0:
+      warp = enemyListDict['Warp Gate'][0]
     for ship in myListDict['Battleship']:
       self.smartMoveTo(ship,warp,enemyListDict)
       if self.inRange(ship.getX(),ship.getY(),ship.getRange(),warp.getX(),warp.getY(),warp.getRadius()):
@@ -91,7 +93,9 @@ class AI(BaseAI):
            
   def empControl(self,myListDict,enemyListDict):
     #move towards largest cluster of enemy units, stun them. Works well with multi attackers
-    target = enemyListDict['Warp Gate'][0]
+#    print "emp",enemyListDict['Warp Gate']
+    if len(enemyListDict['Warp Gate'])>0:
+      target = enemyListDict['Warp Gate'][0]
     for ship in myListDict['EMP']:
       target2 = self.findCluster(ship,ship.getOwner()^1)
       if isinstance(target2,Ship):
@@ -346,9 +350,7 @@ class AI(BaseAI):
     return Xval,Yval
                                   
   def checkMove(self,x,y,radius,myShip,mines):
-    if self.distance(0,x,0,y)-radius < self.innerMapRadius():
-      return False
-    elif self.distance(0,x,0,y)+radius > self.outerMapRadius():
+    if self.distance(0,x,0,y)+radius > self.mapRadius:
       return False
     else:
       for mine in mines:
@@ -453,8 +455,8 @@ class AI(BaseAI):
     for ty in types:
       try:
         #myListDict[ty] = funDict[ty](myPlayer[0].getId(),self.ships)  
-        myListDict[ty] = self.typeList(self.playerID(),self.ships,ty)
-        enemyListDict[ty] = self.typeList(self.playerID()^1,self.ships,ty)
+        myListDict[ty] = self.typeList(self.playerID,self.ships,ty)
+        enemyListDict[ty] = self.typeList(self.playerID^1,self.ships,ty)
         #enemyListDict[ty] = funDict[ty](foePlayer[0].getId(),self.ships)
       except KeyError:
         pass #print ty
