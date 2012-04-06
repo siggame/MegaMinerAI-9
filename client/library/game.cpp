@@ -291,6 +291,11 @@ DLLEXPORT int shipAttack(_Ship* object, _Ship* target)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+
+  //Game state update
+  //TODO Support
+  object->attacksLeft--;
+  target->health -= object->damage;
   return 1;
 }
 
