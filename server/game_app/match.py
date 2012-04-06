@@ -143,19 +143,23 @@ class Match(DefaultGameWorld):
     self.turnNumber = 0
     self.nextRound()
 
-  def checkRoundWinner(self):
+  def smartEnd(self):
     player1 = self.objects.players[0]
-    player2 = self.objects.players[1]   
-    gates = []
-    
-    for obj in self.objects.ships:
-      if obj is player1.warpGate:
-        gates.append(player1.warpGate)
-      elif obj is player2.warpGate:  
-        gates.append(player2.warpGate)     
-    
+    player2 = self.objects.players[1]
     #Find the energy of the lowest type cost of that rouond
     cost = min([shipType.cost for shipType in self.objects.shipTypes])
+    if self.turnNumber >= self.turnLimit:
+      return True
+    if player1.energy < cost and len([ship for ship in self.objects.ships if ship.owner == 0]) < 2 and player1.warpGate.health < player2.warpGate.health:
+      return True
+    if player2.energy < cost and len([ship for ship in self.objects.ships if ship.owner == 1]) < 2 and player2.warpGate.health < player1.warpGate.health:
+      return True
+    return False
+  
+  def checkRoundWinner(self):
+    player1 = self.objects.players[0]
+    player2 = self.objects.players[1]
+    
     # Descruction round end
     if player1.warpGate.health <= 0 and player2.warpGate.health <= 0:
       self.declareRoundWinner([player1, player2], "Draw due to mutual warp gate destruction")
@@ -164,7 +168,7 @@ class Match(DefaultGameWorld):
     elif player1.warpGate.health <= 0:
       self.declareRoundWinner([player2], "Player 2 wins by warp gate destruction")
     # End by turn limit
-    elif self.turnNumber >= self.turnLimit or (player1.energy < cost and player2.energy < cost and len(self.objects.ships)==2):
+    elif self.smartEnd():
       if player1.warpGate.health > player2.warpGate.health:
         self.declareRoundWinner([player1], "Player 1 wins by warp gate shield integrity")
       elif player1.warpGate.health < player2.warpGate.health:
