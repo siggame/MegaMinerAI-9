@@ -24,6 +24,107 @@ char *ToLower( char *str )
 }
 
 
+static bool parseShipDescription(ShipDescription& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  sub = expression->list;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipDescription.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.id = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipDescription.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.type = new char[strlen(sub->val)+1];
+  strncpy(object.type, sub->val, strlen(sub->val));
+  object.type[strlen(sub->val)] = 0;
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipDescription.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.cost = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipDescription.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.radius = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipDescription.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.range = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipDescription.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.damage = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipDescription.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.selfDestructDamage = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipDescription.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.maxMovement = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipDescription.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.maxAttacks = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipDescription.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.maxHealth = atoi(sub->val);
+  sub = sub->next;
+
+  return true;
+
+}
 static bool parseShipType(ShipType& object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -57,6 +158,69 @@ static bool parseShipType(ShipType& object, sexp_t* expression)
   }
 
   object.cost = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.radius = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.range = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.damage = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.selfDestructDamage = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.maxMovement = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.maxAttacks = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShipType.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.maxHealth = atoi(sub->val);
   sub = sub->next;
 
   return true;
@@ -139,6 +303,89 @@ static bool parseShip(Ship& object, sexp_t* expression)
     return false;
   }
 
+  object.type = new char[strlen(sub->val)+1];
+  strncpy(object.type, sub->val, strlen(sub->val));
+  object.type[strlen(sub->val)] = 0;
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.cost = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.radius = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.range = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.damage = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.selfDestructDamage = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.maxMovement = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.maxAttacks = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.maxHealth = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
   object.owner = atoi(sub->val);
   sub = sub->next;
 
@@ -166,26 +413,6 @@ static bool parseShip(Ship& object, sexp_t* expression)
     return false;
   }
 
-  object.radius = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.type = new char[strlen(sub->val)+1];
-  strncpy(object.type, sub->val, strlen(sub->val));
-  object.type[strlen(sub->val)] = 0;
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
   object.attacksLeft = atoi(sub->val);
   sub = sub->next;
 
@@ -204,61 +431,7 @@ static bool parseShip(Ship& object, sexp_t* expression)
     return false;
   }
 
-  object.maxMovement = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.maxAttacks = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.damage = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.range = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
   object.health = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.maxHealth = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseShip.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.selfDestructDamage = atoi(sub->val);
   sub = sub->next;
 
   return true;
@@ -441,6 +614,19 @@ static bool parseSexp(Game& game, sexp_t* expression)
           if ( !sub ) return false;
           gs.mapRadius = atoi(sub->val);
           sub = sub->next;
+      }
+      else if(string(sub->val) == "ShipDescription")
+      {
+        sub = sub->next;
+        bool flag = true;
+        while(sub && flag)
+        {
+          ShipDescription object;
+          flag = parseShipDescription(object, sub);
+          gs.shipDescriptions[object.id] = object;
+          sub = sub->next;
+        }
+        if ( !flag ) return false;
       }
       else if(string(sub->val) == "ShipType")
       {
