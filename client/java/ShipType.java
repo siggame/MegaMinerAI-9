@@ -1,16 +1,11 @@
 import com.sun.jna.Pointer;
 
 ///An available ship type
-class ShipType
+class ShipType extends ShipDescription
 {
-  Pointer ptr;
-  int ID;
-  int iteration;
   public ShipType(Pointer p)
   {
-    ptr = p;
-    ID = Client.INSTANCE.shipTypeGetId(ptr);
-    iteration = BaseAI.iteration;
+    super(p);
   }
   boolean validify()
   {
@@ -55,6 +50,48 @@ class ShipType
   {
     validify();
     return Client.INSTANCE.shipTypeGetCost(ptr);
+  }
+  ///The radius of the ship
+  public int getRadius()
+  {
+    validify();
+    return Client.INSTANCE.shipTypeGetRadius(ptr);
+  }
+  ///The range of attacks for this ship
+  public int getRange()
+  {
+    validify();
+    return Client.INSTANCE.shipTypeGetRange(ptr);
+  }
+  ///The strength of attacks for this ship
+  public int getDamage()
+  {
+    validify();
+    return Client.INSTANCE.shipTypeGetDamage(ptr);
+  }
+  ///The amount of damage done when this ship self destructs
+  public int getSelfDestructDamage()
+  {
+    validify();
+    return Client.INSTANCE.shipTypeGetSelfDestructDamage(ptr);
+  }
+  ///The largest possible movement for this ship
+  public int getMaxMovement()
+  {
+    validify();
+    return Client.INSTANCE.shipTypeGetMaxMovement(ptr);
+  }
+  ///The max number of attacks for this ship
+  public int getMaxAttacks()
+  {
+    validify();
+    return Client.INSTANCE.shipTypeGetMaxAttacks(ptr);
+  }
+  ///The max health possible for the ship
+  public int getMaxHealth()
+  {
+    validify();
+    return Client.INSTANCE.shipTypeGetMaxHealth(ptr);
   }
 
 }

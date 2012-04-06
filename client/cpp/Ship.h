@@ -6,45 +6,47 @@
 #include <iostream>
 #include "structures.h"
 
+#include "ShipDescription.h"
 class Ship;
 
 ///A space ship!
-class Ship {
+class Ship : public ShipDescription {
   public:
-  void* ptr;
   Ship(_Ship* ptr = NULL);
 
   // Accessors
   ///Unique Identifier
   int id();
+  ///The ship type
+  char* type();
+  ///The amount of money required to purchase this type of ship
+  int cost();
+  ///The radius of the ship
+  int radius();
+  ///The range of attacks for this ship
+  int range();
+  ///The strength of attacks for this ship
+  int damage();
+  ///The amount of damage done when this ship self destructs
+  int selfDestructDamage();
+  ///The largest possible movement for this ship
+  int maxMovement();
+  ///The max number of attacks for this ship
+  int maxAttacks();
+  ///The max health possible for the ship
+  int maxHealth();
   ///The owner of the ship
   int owner();
   ///X position of the ship
   int x();
   ///Y position of the ship
   int y();
-  ///The radius of the ship
-  int radius();
-  ///The ship type
-  char* type();
   ///How many more attacks this ship has
   int attacksLeft();
   ///How much more movement this ship has
   int movementLeft();
-  ///The largest possible movement for this ship
-  int maxMovement();
-  ///The max number of attacks for this ship
-  int maxAttacks();
-  ///The strength of attacks for this ship
-  int damage();
-  ///The range of attacks for this ship
-  int range();
   ///The total health of the ship
   int health();
-  ///The max health possible for the ship
-  int maxHealth();
-  ///The amount of damage done when this ship self destructs
-  int selfDestructDamage();
 
   // Actions
   ///Command a ship to move to a specified position. If the position specified by this function is not legal, the position of the ship will be updated, but the movement will be rejected by the server.

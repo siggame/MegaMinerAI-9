@@ -65,11 +65,46 @@ public class Client {
 
     //getters
   [DllImport("client")]
+  public static extern int shipDescriptionGetId(IntPtr ptr);
+  [DllImport("client")]
+  public static extern IntPtr shipDescriptionGetType(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipDescriptionGetCost(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipDescriptionGetRadius(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipDescriptionGetRange(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipDescriptionGetDamage(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipDescriptionGetSelfDestructDamage(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipDescriptionGetMaxMovement(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipDescriptionGetMaxAttacks(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipDescriptionGetMaxHealth(IntPtr ptr);
+
+  [DllImport("client")]
   public static extern int shipTypeGetId(IntPtr ptr);
   [DllImport("client")]
   public static extern IntPtr shipTypeGetType(IntPtr ptr);
   [DllImport("client")]
   public static extern int shipTypeGetCost(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipTypeGetRadius(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipTypeGetRange(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipTypeGetDamage(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipTypeGetSelfDestructDamage(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipTypeGetMaxMovement(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipTypeGetMaxAttacks(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipTypeGetMaxHealth(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int playerGetId(IntPtr ptr);
@@ -85,33 +120,35 @@ public class Client {
   [DllImport("client")]
   public static extern int shipGetId(IntPtr ptr);
   [DllImport("client")]
+  public static extern IntPtr shipGetType(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipGetCost(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipGetRadius(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipGetRange(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipGetDamage(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipGetSelfDestructDamage(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipGetMaxMovement(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipGetMaxAttacks(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int shipGetMaxHealth(IntPtr ptr);
+  [DllImport("client")]
   public static extern int shipGetOwner(IntPtr ptr);
   [DllImport("client")]
   public static extern int shipGetX(IntPtr ptr);
   [DllImport("client")]
   public static extern int shipGetY(IntPtr ptr);
   [DllImport("client")]
-  public static extern int shipGetRadius(IntPtr ptr);
-  [DllImport("client")]
-  public static extern IntPtr shipGetType(IntPtr ptr);
-  [DllImport("client")]
   public static extern int shipGetAttacksLeft(IntPtr ptr);
   [DllImport("client")]
   public static extern int shipGetMovementLeft(IntPtr ptr);
   [DllImport("client")]
-  public static extern int shipGetMaxMovement(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int shipGetMaxAttacks(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int shipGetDamage(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int shipGetRange(IntPtr ptr);
-  [DllImport("client")]
   public static extern int shipGetHealth(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int shipGetMaxHealth(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int shipGetSelfDestructDamage(IntPtr ptr);
 
 
     //properties

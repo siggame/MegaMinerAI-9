@@ -1,17 +1,17 @@
 // -*-c++-*-
 
-#ifndef SHIPTYPE_H
-#define SHIPTYPE_H
+#ifndef SHIPDESCRIPTION_H
+#define SHIPDESCRIPTION_H
 
 #include <iostream>
 #include "structures.h"
 
-#include "ShipDescription.h"
 
-///An available ship type
-class ShipType : public ShipDescription {
+///Base class for all variables needed to define a ship
+class ShipDescription {
   public:
-  ShipType(_ShipType* ptr = NULL);
+  void* ptr;
+  ShipDescription(_ShipDescription* ptr = NULL);
 
   // Accessors
   ///Unique Identifier
@@ -36,13 +36,11 @@ class ShipType : public ShipDescription {
   int maxHealth();
 
   // Actions
-  ///Sends in a new ship of this type. Ships must be warped in with the radius of the player's warp ship.
-  int warpIn(int x, int y);
 
   // Properties
 
 
-  friend std::ostream& operator<<(std::ostream& stream, ShipType ob);
+  friend std::ostream& operator<<(std::ostream& stream, ShipDescription ob);
 };
 
 #endif

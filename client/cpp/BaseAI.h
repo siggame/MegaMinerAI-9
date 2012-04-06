@@ -8,6 +8,7 @@
 #include <ctime>
 #include "game.h"
 
+#include "ShipDescription.h"
 #include "ShipType.h"
 #include "Player.h"
 #include "Ship.h"
