@@ -46,7 +46,7 @@ class AI(BaseAI):
   def batShipControl(self,myListDict,enemyListDict):
     #Move towards enemy warp gate. if not in range of warp gate, attack enemy with most health that you can kill
     #once in range of warp gate, attack. if health is below x%, fire and self destruct
-    print "bat",enemyListDict['Warp Gate']
+#    print "bat",enemyListDict['Warp Gate']
     if len(enemyListDict['Warp Gate'])>0:
       warp = enemyListDict['Warp Gate'][0]
     for ship in myListDict['Battleship']:
@@ -93,7 +93,7 @@ class AI(BaseAI):
            
   def empControl(self,myListDict,enemyListDict):
     #move towards largest cluster of enemy units, stun them. Works well with multi attackers
-    print "emp",enemyListDict['Warp Gate']
+#    print "emp",enemyListDict['Warp Gate']
     if len(enemyListDict['Warp Gate'])>0:
       target = enemyListDict['Warp Gate'][0]
     for ship in myListDict['EMP']:
