@@ -184,7 +184,7 @@ namespace visualizer
     header << "Owner" << "Type" << "Locations" << "Movement Left" << "Health" << "Attacks Who";
     gui->setDebugHeader( header );
 
-    animationEngine->registerGame( this, this );
+    animationEngine->registerGame(0, 0);
 
     m_mapRadius = m_game->states[ 0 ].mapRadius;
 
@@ -368,12 +368,19 @@ namespace visualizer
         timeManager->setNumTurns(state - 5);
         if(state == 6)
         {
+          animationEngine->registerGame(this, this);
           timeManager->setTurn(0);
           timeManager->play();
         }
       }
     }
     // END: Add every draw animation
+
+    if(!m_suicide)
+    {
+      // Just make sure the game is registered correctly
+      animationEngine->registerGame(this, this);
+    }
 
     for(auto& i : m_PersistentShips)
     {
