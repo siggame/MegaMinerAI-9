@@ -278,7 +278,7 @@ namespace visualizer
         
         if( !m_PersistentShips[shipID]->HasMoves() && state == m_PersistentShips[shipID]->FirstTurn() )
         {
-          moves.push_back( SpacePoint( i.second.x, i.second.y ) );
+          moves.push_back(vec2(i.second.x, i.second.y));
         }
         
         m_PersistentShips[shipID]->AddTurn( state, moves, i.second.movementLeft );
