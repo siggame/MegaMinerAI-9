@@ -42,6 +42,7 @@ namespace visualizer
     stack<SmartPointer<Blob<T>>> possiblobs;
     list<SmartPointer<Blob<T>>> blobs;
 
+    cout << "Unit" << endl;
     for(auto& i: units)
     {
       SmartPointer<Blob<T>> t = new Blob<T>;
@@ -53,6 +54,8 @@ namespace visualizer
 
     while(possiblobs.size())
     {
+      cout << "Possiblobs: " <<  possiblobs.size() << endl;;
+
       auto b = possiblobs.top();
       possiblobs.pop();
 
@@ -61,7 +64,8 @@ namespace visualizer
       for(auto& s: units)
       {
         // is the id in the usedUnits. 
-        if(b->units[0]->id == s->id || (find_if(
+        if(b->units[0]->id != s->id  // We don't want to test against our own unit
+            && (find_if(
               usedUnits.begin(), 
               usedUnits.end(), 
               [&](const int& c) { return c == s->id; }) == usedUnits.end()))
@@ -106,6 +110,7 @@ namespace visualizer
 
     for(auto& b: blobs)
     {
+      cout << "Blobs: " << endl;
       sort(
           b->units.begin(), 
           b->units.end(), 
