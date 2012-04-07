@@ -399,11 +399,6 @@ namespace visualizer
             v2 = i;
             i = m_Moves.size();
             foundV2 = true;
-            
-            if( selected )
-            {
-              cout << "for turn: " << turn << "decided on v2: " << v2 << " which is: (" << m_Moves[v2].point.x << "," << m_Moves[v2].point.y << ") from " << m_Moves[v2].start << " to " << m_Moves[v2].end << endl;
-            }
           }
           else if( m_Moves[i].start > time )
           {
@@ -448,6 +443,8 @@ namespace visualizer
         {
           t = (time - m_Moves[v2].start) / (m_Moves[v2].end - m_Moves[v2].start);
         }
+        
+        t = pow(t, (2.0f/3.0f)); // to ease into thier final positions make t = t^(2/3)
         double c1,c2,c3,c4;   
 
         c1 = M12*m_Moves[v2].point.x;   

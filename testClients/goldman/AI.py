@@ -79,7 +79,7 @@ class AI(BaseAI):
     pass
 
   def validPos(self, ship, pos):
-    if not (self.innerMapRadius + ship.radius <= pos.magnitude <= self.outerMapRadius - ship.radius):
+    if not (pos.magnitude <= self.mapRadius - ship.radius):
       #print pos, self.innerMapRadius(), pos.magnitude, self.outerMapRadius()
       return False
     for block in self.ships:

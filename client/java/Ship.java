@@ -1,16 +1,11 @@
 import com.sun.jna.Pointer;
 
 ///A space ship!
-class Ship
+class Ship extends ShipDescription
 {
-  Pointer ptr;
-  int ID;
-  int iteration;
   public Ship(Pointer p)
   {
-    ptr = p;
-    ID = Client.INSTANCE.shipGetId(ptr);
-    iteration = BaseAI.iteration;
+    super(p);
   }
   boolean validify()
   {
@@ -57,6 +52,60 @@ class Ship
     validify();
     return Client.INSTANCE.shipGetId(ptr);
   }
+  ///The ship type
+  public String getType()
+  {
+    validify();
+    return Client.INSTANCE.shipGetType(ptr);
+  }
+  ///The amount of money required to purchase this type of ship
+  public int getCost()
+  {
+    validify();
+    return Client.INSTANCE.shipGetCost(ptr);
+  }
+  ///The radius of the ship
+  public int getRadius()
+  {
+    validify();
+    return Client.INSTANCE.shipGetRadius(ptr);
+  }
+  ///The range of attacks for this ship
+  public int getRange()
+  {
+    validify();
+    return Client.INSTANCE.shipGetRange(ptr);
+  }
+  ///The strength of attacks for this ship
+  public int getDamage()
+  {
+    validify();
+    return Client.INSTANCE.shipGetDamage(ptr);
+  }
+  ///The amount of damage done when this ship self destructs
+  public int getSelfDestructDamage()
+  {
+    validify();
+    return Client.INSTANCE.shipGetSelfDestructDamage(ptr);
+  }
+  ///The largest possible movement for this ship
+  public int getMaxMovement()
+  {
+    validify();
+    return Client.INSTANCE.shipGetMaxMovement(ptr);
+  }
+  ///The max number of attacks for this ship
+  public int getMaxAttacks()
+  {
+    validify();
+    return Client.INSTANCE.shipGetMaxAttacks(ptr);
+  }
+  ///The max health possible for the ship
+  public int getMaxHealth()
+  {
+    validify();
+    return Client.INSTANCE.shipGetMaxHealth(ptr);
+  }
   ///The owner of the ship
   public int getOwner()
   {
@@ -75,18 +124,6 @@ class Ship
     validify();
     return Client.INSTANCE.shipGetY(ptr);
   }
-  ///The radius of the ship
-  public int getRadius()
-  {
-    validify();
-    return Client.INSTANCE.shipGetRadius(ptr);
-  }
-  ///The ship type
-  public String getType()
-  {
-    validify();
-    return Client.INSTANCE.shipGetType(ptr);
-  }
   ///How many more attacks this ship has
   public int getAttacksLeft()
   {
@@ -99,47 +136,11 @@ class Ship
     validify();
     return Client.INSTANCE.shipGetMovementLeft(ptr);
   }
-  ///The largest possible movement for this ship
-  public int getMaxMovement()
-  {
-    validify();
-    return Client.INSTANCE.shipGetMaxMovement(ptr);
-  }
-  ///The max number of attacks for this ship
-  public int getMaxAttacks()
-  {
-    validify();
-    return Client.INSTANCE.shipGetMaxAttacks(ptr);
-  }
-  ///The strength of attacks for this ship
-  public int getDamage()
-  {
-    validify();
-    return Client.INSTANCE.shipGetDamage(ptr);
-  }
-  ///The range of attacks for this ship
-  public int getRange()
-  {
-    validify();
-    return Client.INSTANCE.shipGetRange(ptr);
-  }
   ///The total health of the ship
   public int getHealth()
   {
     validify();
     return Client.INSTANCE.shipGetHealth(ptr);
-  }
-  ///The max health possible for the ship
-  public int getMaxHealth()
-  {
-    validify();
-    return Client.INSTANCE.shipGetMaxHealth(ptr);
-  }
-  ///The amount of damage done when this ship self destructs
-  public int getSelfDestructDamage()
-  {
-    validify();
-    return Client.INSTANCE.shipGetSelfDestructDamage(ptr);
   }
 
 }

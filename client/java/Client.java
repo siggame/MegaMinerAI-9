@@ -41,9 +41,27 @@ public interface Client extends Library {
 
 
     //getters
+  int shipDescriptionGetId(Pointer ptr);
+  String shipDescriptionGetType(Pointer ptr);
+  int shipDescriptionGetCost(Pointer ptr);
+  int shipDescriptionGetRadius(Pointer ptr);
+  int shipDescriptionGetRange(Pointer ptr);
+  int shipDescriptionGetDamage(Pointer ptr);
+  int shipDescriptionGetSelfDestructDamage(Pointer ptr);
+  int shipDescriptionGetMaxMovement(Pointer ptr);
+  int shipDescriptionGetMaxAttacks(Pointer ptr);
+  int shipDescriptionGetMaxHealth(Pointer ptr);
+
   int shipTypeGetId(Pointer ptr);
   String shipTypeGetType(Pointer ptr);
   int shipTypeGetCost(Pointer ptr);
+  int shipTypeGetRadius(Pointer ptr);
+  int shipTypeGetRange(Pointer ptr);
+  int shipTypeGetDamage(Pointer ptr);
+  int shipTypeGetSelfDestructDamage(Pointer ptr);
+  int shipTypeGetMaxMovement(Pointer ptr);
+  int shipTypeGetMaxAttacks(Pointer ptr);
+  int shipTypeGetMaxHealth(Pointer ptr);
 
   int playerGetId(Pointer ptr);
   String playerGetPlayerName(Pointer ptr);
@@ -52,20 +70,21 @@ public interface Client extends Library {
   int playerGetEnergy(Pointer ptr);
 
   int shipGetId(Pointer ptr);
+  String shipGetType(Pointer ptr);
+  int shipGetCost(Pointer ptr);
+  int shipGetRadius(Pointer ptr);
+  int shipGetRange(Pointer ptr);
+  int shipGetDamage(Pointer ptr);
+  int shipGetSelfDestructDamage(Pointer ptr);
+  int shipGetMaxMovement(Pointer ptr);
+  int shipGetMaxAttacks(Pointer ptr);
+  int shipGetMaxHealth(Pointer ptr);
   int shipGetOwner(Pointer ptr);
   int shipGetX(Pointer ptr);
   int shipGetY(Pointer ptr);
-  int shipGetRadius(Pointer ptr);
-  String shipGetType(Pointer ptr);
   int shipGetAttacksLeft(Pointer ptr);
   int shipGetMovementLeft(Pointer ptr);
-  int shipGetMaxMovement(Pointer ptr);
-  int shipGetMaxAttacks(Pointer ptr);
-  int shipGetDamage(Pointer ptr);
-  int shipGetRange(Pointer ptr);
   int shipGetHealth(Pointer ptr);
-  int shipGetMaxHealth(Pointer ptr);
-  int shipGetSelfDestructDamage(Pointer ptr);
 
 
     //properties

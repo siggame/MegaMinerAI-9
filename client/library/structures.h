@@ -5,17 +5,39 @@
 #define STRUCTURES_H
 
 struct Connection;
+struct _ShipDescription;
 struct _ShipType;
 struct _Player;
 struct _Ship;
 
 
+struct _ShipDescription
+{
+  Connection* _c;
+  int id;
+  char* type;
+  int cost;
+  int radius;
+  int range;
+  int damage;
+  int selfDestructDamage;
+  int maxMovement;
+  int maxAttacks;
+  int maxHealth;
+};
 struct _ShipType
 {
   Connection* _c;
   int id;
   char* type;
   int cost;
+  int radius;
+  int range;
+  int damage;
+  int selfDestructDamage;
+  int maxMovement;
+  int maxAttacks;
+  int maxHealth;
 };
 struct _Player
 {
@@ -30,20 +52,21 @@ struct _Ship
 {
   Connection* _c;
   int id;
+  char* type;
+  int cost;
+  int radius;
+  int range;
+  int damage;
+  int selfDestructDamage;
+  int maxMovement;
+  int maxAttacks;
+  int maxHealth;
   int owner;
   int x;
   int y;
-  int radius;
-  char* type;
   int attacksLeft;
   int movementLeft;
-  int maxMovement;
-  int maxAttacks;
-  int damage;
-  int range;
   int health;
-  int maxHealth;
-  int selfDestructDamage;
 };
 
 #endif
