@@ -296,6 +296,12 @@ namespace visualizer
       }
 
       auto blobs = createBlobs<TempShip>(shipsThisTurn, 14.0f, 10.0f);
+      for(auto& subBlob: blobs)
+      {
+        for(auto& unit: subBlob->units)
+        {
+        }
+      }
 
       // Start adding stuff to draw
       Frame turn;  // The frame that will be drawn
