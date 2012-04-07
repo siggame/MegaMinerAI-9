@@ -42,7 +42,6 @@ namespace visualizer
     stack<SmartPointer<Blob<T>>> possiblobs;
     list<SmartPointer<Blob<T>>> blobs;
 
-    cout << "Unit" << endl;
     for(auto& i: units)
     {
       SmartPointer<Blob<T>> t = new Blob<T>;
@@ -54,8 +53,6 @@ namespace visualizer
 
     while(possiblobs.size())
     {
-      cout << "Possiblobs: " <<  possiblobs.size() << endl;;
-
       auto b = possiblobs.top();
       possiblobs.pop();
 
@@ -110,7 +107,6 @@ namespace visualizer
 
     for(auto& b: blobs)
     {
-      cout << "Blobs: " << endl;
       sort(
           b->units.begin(), 
           b->units.end(), 
@@ -130,7 +126,6 @@ namespace visualizer
         availableAngles.push_back(i * interval);
       }
 
-      cout << "-------" << endl;
       for(size_t i = 0; i < b->units.size(); i++)
       {
         auto &u = b->units[i];
@@ -152,6 +147,20 @@ namespace visualizer
         
       }
       
+    }
+
+    for(auto& i: units)
+    {
+      if(find_if(
+              usedUnits.begin(), 
+              usedUnits.end(), 
+              [&i](const int& c) { return c == i->id; }) == usedUnits.end())
+      {
+        SmartPointer<Blob<T>> t = new Blob<T>;
+        t->units.push_back(i);
+        t->idPositions.push_back(i->position);
+        blobs.push_back(t);
+      }
     }
 
     return blobs;

@@ -114,6 +114,7 @@ namespace visualizer
     bool shipIsEMPed = m_PersistentShip->EMPedOn(m_Turn);
     bool shipIsEMP = strcmp( "EMP", m_PersistentShip->type.c_str() ) == 0;
     bool shipIsSelected = m_PersistentShip->selected;
+    vec2 idPosition = m_PersistentShip->m_idPositions[m_Turn];
     
     float shipSizeScale = game->options->getNumber( "Ship Render Size" ) / 100.0f;
 
@@ -248,13 +249,16 @@ namespace visualizer
       }
     }
 
-
     // Draw Range
     if(renderRange || game->options->getNumber( "Display Ships' Range" ))
     {
       game->renderer->setColor( rangeColor );
       game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRange, 100 );
     }
+
+    game->renderer->setColor(Color(1, 1, 1));
+    game->renderer->drawQuad(idPosition.x + *m_MapRadius, idPosition.y + *m_MapRadius, 20, 20);
+    
 
   } // DrawPersistentShip::animation()
 

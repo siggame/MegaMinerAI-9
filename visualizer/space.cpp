@@ -182,7 +182,6 @@ namespace visualizer
 
   void Space::run()
   {
-    cout << "LOADING..." << endl;
     map < int, vector< SmartPointer < Warp > > > Warps;
     Warps[ -1 ] = vector< SmartPointer< Warp > >();
     
@@ -196,11 +195,9 @@ namespace visualizer
 
     m_mapRadius = m_game->states[ 0 ].mapRadius;
 
-    cout << "LOADING..." << __LINE__ << endl;
     // BEGIN: Look through the game logs and build the m_PersistentShips
     for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
     {
-      cout << "LOADING..." << __LINE__ << endl;
       Warps[ state ] = vector< SmartPointer< Warp > >();
       // Loop though each PersistentShip in the current state
 
@@ -298,8 +295,11 @@ namespace visualizer
       auto blobs = createBlobs<TempShip>(shipsThisTurn, 14.0f, 10.0f);
       for(auto& subBlob: blobs)
       {
-        for(auto& unit: subBlob->units)
+        for(size_t i = 0; i < subBlob->units.size(); i++)
         {
+          m_PersistentShips[subBlob->units[i]->id]->m_idPositions[state]  
+           = subBlob->idPositions[i];
+          cout << "P: " << m_PersistentShips[subBlob->units[i]->id]->m_idPositions[state]  << endl;
         }
       }
 
@@ -390,11 +390,9 @@ namespace visualizer
       turn.addAnimatable( roundHUD );
 
       animationEngine->buildAnimations(turn);
-      cout << "LOADING..." << __LINE__ << endl;
       addFrame(turn);
       if(state > 5)
       {
-        cout << "LOADING..." << __LINE__ << endl;
         timeManager->setNumTurns(state - 5);
         animationEngine->registerGame( this, this );
         if(state == 6)
@@ -406,7 +404,6 @@ namespace visualizer
       }
     }
 
-    cout << "LOADING..." << __LINE__ << endl;
 
     // END: Add every draw animation
 

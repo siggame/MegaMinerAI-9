@@ -105,6 +105,7 @@ namespace visualizer
       void AddDeath( int turn );
       int FirstTurn() { return createdAtTurn; }
       void MoveInfo();
+      map<int, vec2> m_idPositions;
      
     private:
       int createdAtTurn;
