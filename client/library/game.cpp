@@ -207,6 +207,13 @@ DLLEXPORT void getStatus(Connection* c)
 }
 
 
+#include <cmath>
+DLLEXPORT int distance(int fromX, int fromY, int toX, int toY)
+{
+  int dx = (fromX - toX);
+  int dy = (fromY - toY);
+  return int(ceil(sqrt(dx * dx + dy * dy)));
+}
 
 DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y)
 {
@@ -221,8 +228,35 @@ DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y)
   
   //Game state update
   Connection * c = object->_c;
-  c->Players[c->playerID].energy -= object->cost;
-  return 1;
+  if(distance(0, 0, x, y) + object->radius > c->mapRadius)
+  {
+    return 0;
+  }
+  else if (c->Players[c->playerID].energy < object->cost)
+  {
+    return 0;
+  }
+  else
+  {
+    // Find the player's warp gate
+    int gateIndex = -1;
+    for(int i=0; i < c->ShipCount && gateIndex == -1; i++)
+    {
+      if(c->Ships[i].owner == c->playerID && strcmp("Warp Gate", c->Ships[i].type) == 0)
+      {
+        gateIndex = i;
+      }
+    }
+    if(distance(c->Ships[gateIndex].x, c->Ships[gateIndex].y, x, y) + object->radius > c->Ships[gateIndex].radius)
+    {
+      return 0;
+    }
+    else
+    {
+      c->Players[c->playerID].energy -= object->cost;
+      return 1;
+    }
+  }
 }
 
 
@@ -235,7 +269,17 @@ DLLEXPORT int playerTalk(_Player* object, char* message)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
-  return 1;
+
+  //Game State Update
+  Connection * c = object->_c;
+  if(object->id == c->playerID)
+  {
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 
@@ -250,10 +294,28 @@ DLLEXPORT int shipMove(_Ship* object, int x, int y)
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
   
-  //Game state update
-  object->movementLeft = object->movementLeft - sqrt(pow(x - object->x,2)+pow(y-object->y,2));
+  //Game State Update
+  Connection * c = object->_c;
+  int moved = distance(object->x, object->y, x, y);
+  if(object->owner != c->playerID)
+  {
+    return 0;
+  }
+  else if(distance(0, 0, x, y) + object->radius > c->mapRadius)
+  {
+    return 0;
+  }
+  else if(object->movementLeft < moved)
+  {
+    return 0;
+  }
+  else if (moved == 0)
+  {
+    return 0;
+  }
   object->x = x;
   object->y = y;
+  object->movementLeft -= moved;
   return 1;
 }
 
@@ -267,18 +329,26 @@ DLLEXPORT int shipSelfDestruct(_Ship* object)
   UNLOCK( &object->_c->mutex);
   
   //Game state update
-  object->health = 0;
   Connection * c = object->_c;
+  if(strcmp(object->type,"Warp Gate") == 0)
+  {
+    return 0;
+  }
+  else if(object->owner != c->playerID)
+  {
+    return 0;
+  }
   for(int i = 0; i < c->ShipCount; i++)
   {
     if(c->Ships[i].owner != object->owner)
     {
-      if(sqrt(pow(c->Ships[i].x - object->x,2)+pow(c->Ships[i].y - object->y,2)) <= c->Ships[i].radius + object->radius)
+      if(distance(object->x, object->y, c->Ships[i].x, c->Ships[i].y) < c->Ships[i].radius + object->radius)
       {
         c->Ships[i].health -= object->selfDestructDamage;
       }
     }
   }
+  object->health = 0;
   return 1;
 }
 
@@ -293,7 +363,7 @@ DLLEXPORT int shipAttack(_Ship* object, _Ship* target)
   UNLOCK( &object->_c->mutex);
 
   //Game state update
-  //TODO Support
+  //TODO Complete client side attack logic
   object->attacksLeft--;
   target->health -= object->damage;
   return 1;

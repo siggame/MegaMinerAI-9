@@ -280,11 +280,11 @@ class ShipType(ShipDescription):
 
   def warpIn(self, x, y):
     player = self.game.objects.players[self.game.playerID]
-    if distance(0, 0, x, y) + cfgUnits[self.type]["radius"] > self.game.mapRadius:
+    if distance(0, 0, x, y) + self.radius > self.game.mapRadius:
       return "Warping in that ship to %i, %i would be lost in space...forever"%(x, y)
     elif player.energy < self.cost:
       return "You need to not be poor to buy that %s"%(self.type)
-    elif distance(player.warpGate.x, player.warpGate.y, x, y) + cfgUnits[self.type]["radius"] > player.warpGate.radius:
+    elif distance(player.warpGate.x, player.warpGate.y, x, y) + self.radius > player.warpGate.radius:
       return "You must spawn that %s closer to your Warp Gate"%(self.type)
     else:
       #spawn the unit with its stats, from units.cfg in config directory
