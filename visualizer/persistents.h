@@ -124,59 +124,10 @@ namespace visualizer
         return (turn > 0 ? turn - 1 : 0);
       }
 
-#if 0
-      pair<SpacePoint, float> GardnersSplineOn(int turn, float t)
-      {
-        // Index setup from Jake F. 
-        
-        turn -= createdAtTurn;
-        int i = turn;
-        const int step = 1;
-        int v0 = i-step;
-        int v1 = i;
-        int v2 = i+step;
-        int v3 = i+2*step;
-
-        if( i-step < 0 )
-          v0=0;
-        if( (signed)points.size() <= i+step )
-          v2=points.size()-1;
-        if( (signed)points.size() <= i+step*2 )
-          v3=points.size()-1;		
-
-        // Setting up the verticies
-
-        auto times = glm::vec4(1, t, t*t, t*t*t);
-        auto p0 = vec2(points[v1].x, points[v1].y);
-        auto p1 = vec2(points[v2].x, points[v2].y);
-        auto m0 = glm::normalize(p0 - vec2(points[v0].x, points[v0].y));
-        auto m1 = glm::normalize(vec2(points[v3].x, points[v3].y) - p1);
-
-        if( m0.x != m0.x )
-          m0 = vec2(0, 0);
-
-        if( m1.x != m1.x )
-          m1 = vec2(0, 0);
-
-        m0 *= 0;
-        m1 *= 0;
-
-        auto q = glm::mat4x2(p0, m0, p1, m1);
-
-        glm::vec4 m = times * glm::transpose(A);
-        vec2 result = q * m;
-      
-        double angle = glm::orientedAngle(vec2(1,0), glm::normalize(p1-p0));
-        if( angle != angle )
-          angle = 0;
-        cout << angle << endl;
-        return make_pair(vec2(result.x, result.y), angle);
-      }
-#endif
-      
+      pair<vec2, float> GardnersSplineOn(int turn, float t);
       pair<vec2, float> SplineOn(int turn, float t);
 
   };
 }
 
-#endif  // PERSISTENTS
+#endif  // PERSISTENTS_H
