@@ -63,7 +63,8 @@ extern "C"
 
 
 //commands
-  DLLEXPORT int distance(int fromX, int fromY, int toX, int toY);
+  DLLEXPORT int baseDistance(int fromX, int fromY, int toX, int toY);
+  DLLEXPORT int basePointOnLine(int fromX, int fromY, int toX, int toY, int travel);
   ///Sends in a new ship of this type. Ships must be warped in with the radius of the player's warp ship.
   DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y);
   ///Allows a player to display messages on the screen

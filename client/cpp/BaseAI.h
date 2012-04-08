@@ -38,7 +38,11 @@ public:
   int victoriesNeeded();
   ///The outer radius of the map.  Center of screen is (0,0), with +x right, +y up
   int mapRadius();
-  
+
+  //TODO Document these
+  int distance(int fromX, int fromY, int toX, int toY);
+  void pointOnLine(int fromX, int fromY, int toX, int toY, int travel, int & outX, int & outY);
+
   BaseAI(Connection* c);
   virtual ~BaseAI();
   ///

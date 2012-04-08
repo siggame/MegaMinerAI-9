@@ -208,11 +208,20 @@ DLLEXPORT void getStatus(Connection* c)
 
 
 #include <cmath>
-DLLEXPORT int distance(int fromX, int fromY, int toX, int toY)
+DLLEXPORT int baseDistance(int fromX, int fromY, int toX, int toY)
 {
   int dx = (fromX - toX);
   int dy = (fromY - toY);
   return int(ceil(sqrt(dx * dx + dy * dy)));
+}
+
+DLLEXPORT int basePointOnLine(int fromX, int fromY, int toX, int toY, int travel)
+{
+  int x;
+  int y;
+  // TODO Actually write this logic
+  // Pack the X and Y into a single integer for interlanguage movement
+  return (x+500)<<10 + (y+500); // TODO If the map size changes, god help you
 }
 
 DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y)
@@ -228,7 +237,7 @@ DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y)
   
   //Game state update
   Connection * c = object->_c;
-  if(distance(0, 0, x, y) + object->radius > c->mapRadius)
+  if(baseDistance(0, 0, x, y) + object->radius > c->mapRadius)
   {
     return 0;
   }
@@ -247,7 +256,7 @@ DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y)
         gateIndex = i;
       }
     }
-    if(distance(c->Ships[gateIndex].x, c->Ships[gateIndex].y, x, y) + object->radius > c->Ships[gateIndex].radius)
+    if(baseDistance(c->Ships[gateIndex].x, c->Ships[gateIndex].y, x, y) + object->radius > c->Ships[gateIndex].radius)
     {
       return 0;
     }
@@ -296,12 +305,12 @@ DLLEXPORT int shipMove(_Ship* object, int x, int y)
   
   //Game State Update
   Connection * c = object->_c;
-  int moved = distance(object->x, object->y, x, y);
+  int moved = baseDistance(object->x, object->y, x, y);
   if(object->owner != c->playerID)
   {
     return 0;
   }
-  else if(distance(0, 0, x, y) + object->radius > c->mapRadius)
+  else if(baseDistance(0, 0, x, y) + object->radius > c->mapRadius)
   {
     return 0;
   }
@@ -342,7 +351,7 @@ DLLEXPORT int shipSelfDestruct(_Ship* object)
   {
     if(c->Ships[i].owner != object->owner)
     {
-      if(distance(object->x, object->y, c->Ships[i].x, c->Ships[i].y) < c->Ships[i].radius + object->radius)
+      if(baseDistance(object->x, object->y, c->Ships[i].x, c->Ships[i].y) < c->Ships[i].radius + object->radius)
       {
         c->Ships[i].health -= object->selfDestructDamage;
       }
@@ -385,7 +394,7 @@ DLLEXPORT int shipAttack(_Ship* object, _Ship* target)
   }
   else if(target->owner == object->owner)
     return 0;
-  else if (distance(object->x, object->y, target->x, target->y) > object->range + target->radius)
+  else if (baseDistance(object->x, object->y, target->x, target->y) > object->range + target->radius)
     return 0;
   else
   {
@@ -394,7 +403,7 @@ DLLEXPORT int shipAttack(_Ship* object, _Ship* target)
     {
       if(c->Ships[i].owner == object->owner && strcmp(c->Ships[i].type, "Support") == 0)
       {
-        if(distance(target->x, target->y, c->Ships[i].x, c->Ships[i].y) < c->Ships[i].range + target->radius)
+        if(baseDistance(target->x, target->y, c->Ships[i].x, c->Ships[i].y) < c->Ships[i].range + target->radius)
         {
           modifier += (c->Ships[i].damage / 100.0);
         }
