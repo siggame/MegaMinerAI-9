@@ -73,5 +73,12 @@ class BaseAI:
     return library.getMapRadius(self.connection)
   #\endcond
   mapRadius = property(getMapRadius)
+  #TODO Document this
+  def distance(self, fromX, fromY, toX, toY):
+    return library.baseDistance(fromX, fromY, toX, toY)
+  #TODO Document this
+  def pointOnLine(self, fromX, fromY, toX, toY, travel):
+    ret = library.basePointOnLine(fromX, fromY, toX, toY, travel)
+    return (ret / 1024 - 500, ret / 1024 - 500)
   def __init__(self, connection):
     self.connection = connection

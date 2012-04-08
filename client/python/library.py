@@ -41,6 +41,12 @@ library.networkLoop.restype = c_int
 library.networkLoop.argtypes = [c_void_p]
 
 #Functions
+library.baseDistance.restype = c_int
+library.baseDistance.argtypes = [c_int, c_int, c_int, c_int]
+
+library.basePointOnLine.restype = c_int
+library.basePointOnLine.argtypes = [c_int, c_int, c_int, c_int, c_int]
+
 library.shipTypeWarpIn.restype = c_int
 library.shipTypeWarpIn.argtypes = [c_void_p, c_int, c_int]
 

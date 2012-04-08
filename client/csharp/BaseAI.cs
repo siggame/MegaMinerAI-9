@@ -108,4 +108,17 @@ public abstract class BaseAI
     int value = Client.getMapRadius(connection);
     return value;
   }
+  //TODO Document these
+  public int distance(int fromX, int fromY, int toX, int toY)
+  {
+    return Client.baseDistance(fromX, fromY, toX, toY);
+  }
+  //TODO Document these
+  public void pointOnLine(int fromX, int fromY, int toX, int toY, int travel, out int outX, out int outY)
+  {
+    int ret = Client.basePointOnLine(fromX, fromY, toX, toY, travel);
+    outX = ret / 1024 - 500;
+    outY = ret / 1024 - 500;
+  }
+
 }

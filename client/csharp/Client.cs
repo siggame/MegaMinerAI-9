@@ -25,6 +25,10 @@ public class Client {
 
     //commands
   [DllImport("client")]
+  public static extern int baseDistance(int fromX, int fromY, int toX, int toY);
+  [DllImport("client")]
+  public static extern int basePointOnLine(int fromX, int fromY, int toX, int toY, int travel);
+  [DllImport("client")]
   public static extern int shipTypeWarpIn(IntPtr self, int x, int y);
   [DllImport("client")]
   public static extern int playerTalk(IntPtr self, string message);

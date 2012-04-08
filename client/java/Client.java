@@ -18,6 +18,8 @@ public interface Client extends Library {
 
 
     //commands
+  int baseDistance(int fromX, int fromY, int toX, int toY);
+  int basePointOnLine(int fromX, int fromY, int toX, int toY, int travel);
   int shipTypeWarpIn(Pointer object, int x, int y);
   int playerTalk(Pointer object, String message);
   int shipMove(Pointer object, int x, int y);

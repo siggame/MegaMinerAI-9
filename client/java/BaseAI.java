@@ -1,4 +1,5 @@
 import com.sun.jna.Pointer;
+import java.awt.Point;
 
 /// \brief A basic AI interface.
 
@@ -100,5 +101,16 @@ public abstract class BaseAI
   int mapRadius()
   {
     return Client.INSTANCE.getMapRadius(connection);
+  }
+  //TODO Document
+  int distance(int fromX, int fromY, int toX, int toY)
+  {
+    return Client.INSTANCE.baseDistance(fromX, fromY, toX, toY);
+  }
+  //TODO Document
+  Point pointOnLine(int fromX, int fromY, int toX, int toY, int travel)
+  {
+    int ret = Client.INSTANCE.basePointOnLine(fromX, fromY, toX, toY, travel);
+    return new Point(ret / 1024 - 500, ret / 1024 - 500);
   }
 }
