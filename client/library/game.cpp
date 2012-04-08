@@ -363,9 +363,46 @@ DLLEXPORT int shipAttack(_Ship* object, _Ship* target)
   UNLOCK( &object->_c->mutex);
 
   //Game state update
-  //TODO Complete client side attack logic
-  object->attacksLeft--;
-  target->health -= object->damage;
+  Connection * c = object->_c;
+
+  if(object->owner != c->playerID)
+    return 0;
+  if(object->attacksLeft <= 0)
+    return 0;
+  //TODO Does not check for repeated attacks against the same target
+  if(strcmp(object->type, "Mine Layer") == 0)
+  {
+    object->maxAttacks -= 1;
+    object->attacksLeft -= 1;
+    return 1;
+  }
+  if(strcmp(object->type, "EMP") == 0)
+  {
+    object->maxAttacks -= 1;
+    object->attacksLeft -= 1;
+    // Doesn't do EMP stuff because there is no way for the client to see it happen
+    return 1;
+  }
+  else if(target->owner == object->owner)
+    return 0;
+  else if (distance(object->x, object->y, target->x, target->y) > object->range + target->radius)
+    return 0;
+  else
+  {
+    float modifier = 1;
+    for(int i = 0; i < c->ShipCount; i++)
+    {
+      if(c->Ships[i].owner == object->owner && strcmp(c->Ships[i].type, "Support") == 0)
+      {
+        if(distance(target->x, target->y, c->Ships[i].x, c->Ships[i].y) < c->Ships[i].range + target->radius)
+        {
+          modifier += (c->Ships[i].damage / 100.0);
+        }
+      }
+    }
+    target->health -= int(object->damage*modifier);
+    object->attacksLeft -= 1;
+  }
   return 1;
 }
 
