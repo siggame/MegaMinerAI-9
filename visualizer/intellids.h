@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include <stack>
+#include <map>
 #include <algorithm>
 
 using glm::vec2;
@@ -17,6 +18,7 @@ using std::list;
 using std::stack;
 using std::find_if;
 using std::sort;
+using std::map;
 using std::min_element;
 
 namespace visualizer
@@ -32,6 +34,90 @@ namespace visualizer
 
   }; // Blob
 
+  struct ID
+  {
+    public:
+      ID(const vec2& c, const int& i) : center(c), id(i) {}
+      vec2 center;
+      int id;
+  }; // ID
+
+
+  template <class T>
+  list<ID> createIDs(const list<SmartPointer<T>>& units, const float& idRadius, const float& maxMoveDistance)
+  {
+    list<ID> ids;
+    bool collision = true;
+    for(auto& i: units)
+    {
+      ids.push_back(ID(i.position, i.id));
+    }
+
+    while(collision)
+    {
+
+      collision = false;
+      for(auto& i: ids)
+      {
+        if(collision)
+          break;
+        
+        for(auto& u: units)
+        {
+          if(collision)
+            break;
+
+          if(u.id == i.id)
+            continue;
+
+          if(distance(i.center, u.position) < idRadius+u.radius)
+          {
+            collision = true;
+          }
+        }
+
+        for(auto& j: ids)
+        {
+          if(collision)
+            break;
+
+          if(j.id == i.id)
+            continue;
+
+          if(distance(i.center, j.center) < 2*idRadius)
+          {
+            collision = true;
+          }
+        }
+
+
+        if(collision)
+        {
+          for(auto& i: ids)
+          {
+            vec2 velocity = vec2(0, 0);
+            for(auto& u: units)
+            {
+              float m = glm::max(0, u.radius + idRadius - distance(i.center, u.position))/(u.radius + idRadius);
+              velocity += (normalize(i.center-u.position) * m * maxMoveDistance);
+            }
+
+            for(auto& j: ids)
+            {
+              if(i.id == j.id)
+                continue;
+              float m = glm::max(0, 2 * idRadius - distance(i.center, j.center))/(2 * idRadius);
+              velocity += (normalize(i.center-j.center) * m * maxMoveDistance);
+            }
+
+            i.center += velocity;
+
+          }
+        }
+      }
+    }
+
+  } // createIDs()
 
   template <class T>
   list<SmartPointer<Blob<T>>> createBlobs(const list<SmartPointer<T>>& units, const float& defaultRadius, const float& buffer)
