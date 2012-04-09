@@ -23,7 +23,7 @@ class AI(BaseAI):
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
-    print "Starting Turn %i of round %i"%(self.turnNumber, self.roundNumber)
+    print "Starting turn %i of round %i"%(self.turnNumber, self.roundNumber)
     #Find each player's warp gate
     for ship in self.ships:
       #if this ship is of type Warp Gate

@@ -17,6 +17,7 @@ class AI : BaseAI
   //Return true to end your turn, return false to ask the server for updated information
   public override bool run()
   {
+    Console.WriteLine("Starting turn " + turnNumber() + " of round " + roundNumber());
     // Find each player's warp gate
     int myGateIndex=0, theirGateIndex=0;
     for(int i = 0; i < ships.Length; i++)
