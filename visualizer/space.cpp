@@ -292,15 +292,10 @@ namespace visualizer
         }
       }
 
-      auto blobs = createBlobs<TempShip>(shipsThisTurn, 14.0f, 10.0f);
-      for(auto& subBlob: blobs)
+      auto ids = createIDs<TempShip>(shipsThisTurn, 15, 1.0f);
+      for(auto& i: ids)
       {
-        for(size_t i = 0; i < subBlob->units.size(); i++)
-        {
-          m_PersistentShips[subBlob->units[i]->id]->m_idPositions[state]  
-           = subBlob->idPositions[i];
-          cout << "P: " << m_PersistentShips[subBlob->units[i]->id]->m_idPositions[state]  << endl;
-        }
+        m_PersistentShips[i.id]->m_idPositions[state] = i.center;
       }
 
       // Start adding stuff to draw

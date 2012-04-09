@@ -2,6 +2,7 @@
 #define INTELLIDS_H
 
 #include "glm/glm.hpp"
+#include "glm/gtx/random.hpp"
 #include <vector>
 #include <list>
 #include <stack>
@@ -12,6 +13,7 @@ using glm::vec2;
 using glm::sin;
 using glm::orientedAngle;
 using glm::normalize;
+using glm::distance;
 using glm::rotate;
 using std::vector;
 using std::list;
@@ -50,12 +52,15 @@ namespace visualizer
     bool collision = true;
     for(auto& i: units)
     {
-      ids.push_back(ID(i.position, i.id));
+      ids.push_back(ID(i->position + glm::compRand2(0.0f,0.1f), i->id));
     }
 
-    while(collision)
-    {
+    cout << "------------------" << endl;
 
+    int i = 0;
+    //while(collision)
+    for(size_t p = 0; p < 500; p++)
+    {
       collision = false;
       for(auto& i: ids)
       {
@@ -67,10 +72,10 @@ namespace visualizer
           if(collision)
             break;
 
-          if(u.id == i.id)
+          if(u->id == i.id)
             continue;
 
-          if(distance(i.center, u.position) < idRadius+u.radius)
+          if(distance(i.center, u->position) <= idRadius+u->radius)
           {
             collision = true;
           }
@@ -84,38 +89,45 @@ namespace visualizer
           if(j.id == i.id)
             continue;
 
-          if(distance(i.center, j.center) < 2*idRadius)
+          if(distance(i.center, j.center) <= 2*idRadius)
           {
             collision = true;
           }
         }
+      }
 
 
-        if(collision)
+      if(collision)
+      {
+        for(auto& i: ids)
         {
-          for(auto& i: ids)
+          vec2 velocity = vec2(0, 0);
+          for(auto& u: units)
           {
-            vec2 velocity = vec2(0, 0);
-            for(auto& u: units)
-            {
-              float m = glm::max(0, u.radius + idRadius - distance(i.center, u.position))/(u.radius + idRadius);
-              velocity += (normalize(i.center-u.position) * m * maxMoveDistance);
-            }
+            float m = (glm::max(0.0f, u->radius + idRadius - distance(i.center, u->position)))/(u->radius + idRadius);
 
-            for(auto& j: ids)
-            {
-              if(i.id == j.id)
-                continue;
-              float m = glm::max(0, 2 * idRadius - distance(i.center, j.center))/(2 * idRadius);
-              velocity += (normalize(i.center-j.center) * m * maxMoveDistance);
-            }
-
-            i.center += velocity;
-
+            if(m > 0)
+              velocity += i.center-u->position;
           }
+
+          for(auto& j: ids)
+          {
+            if(i.id == j.id)
+              continue;
+            float m = (glm::max(0.0f, 2 * idRadius - distance(i.center, j.center)))/(2 * idRadius);
+            if(m > 0)
+              velocity += i.center-j.center;
+          }
+
+
+          if(velocity != vec2(0, 0))
+            i.center += normalize(velocity) * maxMoveDistance;
+
         }
       }
     }
+
+    return ids;
 
   } // createIDs()
 
