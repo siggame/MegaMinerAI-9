@@ -58,7 +58,7 @@ DLLEXPORT Connection* createConnection()
   c->turnNumber = 0;
   c->playerID = 0;
   c->gameNumber = 0;
-  c->round = 0;
+  c->roundNumber = 0;
   c->victoriesNeeded = 0;
   c->mapRadius = 0;
   c->ShipTypes = NULL;
@@ -658,7 +658,7 @@ DLLEXPORT int networkLoop(Connection* c)
           c->gameNumber = atoi(sub->val);
           sub = sub->next;
 
-          c->round = atoi(sub->val);
+          c->roundNumber = atoi(sub->val);
           sub = sub->next;
 
           c->victoriesNeeded = atoi(sub->val);
@@ -776,9 +776,9 @@ DLLEXPORT int getGameNumber(Connection* c)
 {
   return c->gameNumber;
 }
-DLLEXPORT int getRound(Connection* c)
+DLLEXPORT int getRoundNumber(Connection* c)
 {
-  return c->round;
+  return c->roundNumber;
 }
 DLLEXPORT int getVictoriesNeeded(Connection* c)
 {

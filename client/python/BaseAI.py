@@ -59,10 +59,10 @@ class BaseAI:
   #\endcond
   gameNumber = property(getGameNumber)
   #\cond
-  def getRound(self):
-    return library.getRound(self.connection)
+  def getRoundNumber(self):
+    return library.getRoundNumber(self.connection)
   #\endcond
-  round = property(getRound)
+  roundNumber = property(getRoundNumber)
   #\cond
   def getVictoriesNeeded(self):
     return library.getVictoriesNeeded(self.connection)

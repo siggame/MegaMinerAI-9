@@ -74,8 +74,8 @@ library.getPlayerID.argtypes = [c_void_p]
 library.getGameNumber.restype = c_int
 library.getGameNumber.argtypes = [c_void_p]
 
-library.getRound.restype = c_int
-library.getRound.argtypes = [c_void_p]
+library.getRoundNumber.restype = c_int
+library.getRoundNumber.argtypes = [c_void_p]
 
 library.getVictoriesNeeded.restype = c_int
 library.getVictoriesNeeded.argtypes = [c_void_p]

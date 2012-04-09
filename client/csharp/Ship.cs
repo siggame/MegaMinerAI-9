@@ -34,19 +34,19 @@ public class Ship: ShipDescription
 
     //commands
 
-  ///Command a ship to move to a specified position. If the position specified by this function is not legal, the position of the ship will be updated, but the movement will be rejected by the server.
+  ///Command a ship to move to a specified position
   public int move(int x, int y)
   {
     validify();
     return Client.shipMove(ptr, x, y);
   }
-  ///Blow yourself up, damage those around you, reduces the ship to 0 health.
+  ///Blow yourself up, damage enemy ships that overlap this ship
   public int selfDestruct()
   {
     validify();
     return Client.shipSelfDestruct(ptr);
   }
-  ///Commands your ship to attack a target. Making an attack will reduce the number of attacks available to the ship, even if the attack is rejected by the game server.
+  ///Commands your ship to attack a target.
   public int attack(Ship target)
   {
     validify();
@@ -70,7 +70,7 @@ public class Ship: ShipDescription
     IntPtr value = Client.shipGetType(ptr);
     return Marshal.PtrToStringAuto(value);
   }
-  ///The amount of money required to purchase this type of ship
+  ///The amount of energy required to warp in this type of ship
   public new int getCost()
   {
     validify();
@@ -84,7 +84,7 @@ public class Ship: ShipDescription
     int value = Client.shipGetRadius(ptr);
     return value;
   }
-  ///The range of attacks for this ship
+  ///The range of attacks for this ship, given as the maximum distance from the center of this ship to the edge of the target
   public new int getRange()
   {
     validify();
@@ -147,21 +147,21 @@ public class Ship: ShipDescription
     int value = Client.shipGetY(ptr);
     return value;
   }
-  ///How many more attacks this ship has
+  ///How many more attacks this ship can make this turn
   public int getAttacksLeft()
   {
     validify();
     int value = Client.shipGetAttacksLeft(ptr);
     return value;
   }
-  ///How much more movement this ship has
+  ///How much more this ship can move this turn
   public int getMovementLeft()
   {
     validify();
     int value = Client.shipGetMovementLeft(ptr);
     return value;
   }
-  ///The total health of the ship
+  ///The current health of the ship
   public int getHealth()
   {
     validify();

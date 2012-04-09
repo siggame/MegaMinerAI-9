@@ -26,15 +26,15 @@ protected:
   std::vector<Player> players;
   std::vector<Ship> ships;
 public:
-  ///How many turns it has been since the beginning of the game
+  ///How many turns it has been since the beginning of the round
   int turnNumber();
   ///Player Number; either 0 or 1
   int playerID();
   ///What number game this is for the server
   int gameNumber();
   ///The current round of the match
-  int round();
-  ///How many victories a player needs to win
+  int roundNumber();
+  ///How many victories a player needs to win this game.  If the last round is a tie, one more victory is needed
   int victoriesNeeded();
   ///The outer radius of the map.  Center of screen is (0,0), with +x right, +y up
   int mapRadius();

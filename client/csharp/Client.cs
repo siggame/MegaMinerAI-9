@@ -47,7 +47,7 @@ public class Client {
   [DllImport("client")]
   public static extern int getGameNumber(IntPtr connection);
   [DllImport("client")]
-  public static extern int getRound(IntPtr connection);
+  public static extern int getRoundNumber(IntPtr connection);
   [DllImport("client")]
   public static extern int getVictoriesNeeded(IntPtr connection);
   [DllImport("client")]

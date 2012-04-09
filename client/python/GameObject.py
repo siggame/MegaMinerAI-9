@@ -40,7 +40,7 @@ class ShipDescription(GameObject):
     self.validify()
     return library.shipDescriptionGetCost(self._ptr)
   #\endcond
-  ##The amount of money required to purchase this type of ship
+  ##The amount of energy required to warp in this type of ship
   cost = property(getCost)
 
   #\cond
@@ -56,7 +56,7 @@ class ShipDescription(GameObject):
     self.validify()
     return library.shipDescriptionGetRange(self._ptr)
   #\endcond
-  ##The range of attacks for this ship
+  ##The range of attacks for this ship, given as the maximum distance from the center of this ship to the edge of the target
   range = property(getRange)
 
   #\cond
@@ -137,7 +137,7 @@ class ShipType(ShipDescription):
         return True
     raise ExistentialError()
   #\endcond
-  ##Sends in a new ship of this type. Ships must be warped in with the radius of the player's warp ship.
+  ##Sends in a new ship of this type. Ships must be warped in within the radius of the player's warp gate.
   def warpIn(self, x, y):
     self.validify()
     return library.shipTypeWarpIn(self._ptr, x, y)
@@ -163,7 +163,7 @@ class ShipType(ShipDescription):
     self.validify()
     return library.shipTypeGetCost(self._ptr)
   #\endcond
-  ##The amount of money required to purchase this type of ship
+  ##The amount of energy required to warp in this type of ship
   cost = property(getCost)
 
   #\cond
@@ -179,7 +179,7 @@ class ShipType(ShipDescription):
     self.validify()
     return library.shipTypeGetRange(self._ptr)
   #\endcond
-  ##The range of attacks for this ship
+  ##The range of attacks for this ship, given as the maximum distance from the center of this ship to the edge of the target
   range = property(getRange)
 
   #\cond
@@ -294,7 +294,7 @@ class Player(GameObject):
     self.validify()
     return library.playerGetVictories(self._ptr)
   #\endcond
-  ##How many rounds you have won this match
+  ##How many rounds you have won this game
   victories = property(getVictories)
 
   #\cond
@@ -338,17 +338,17 @@ class Ship(ShipDescription):
         return True
     raise ExistentialError()
   #\endcond
-  ##Command a ship to move to a specified position. If the position specified by this function is not legal, the position of the ship will be updated, but the movement will be rejected by the server.
+  ##Command a ship to move to a specified position
   def move(self, x, y):
     self.validify()
     return library.shipMove(self._ptr, x, y)
 
-  ##Blow yourself up, damage those around you, reduces the ship to 0 health.
+  ##Blow yourself up, damage enemy ships that overlap this ship
   def selfDestruct(self):
     self.validify()
     return library.shipSelfDestruct(self._ptr)
 
-  ##Commands your ship to attack a target. Making an attack will reduce the number of attacks available to the ship, even if the attack is rejected by the game server.
+  ##Commands your ship to attack a target.
   def attack(self, target):
     self.validify()
     if not isinstance(target, Ship):
@@ -377,7 +377,7 @@ class Ship(ShipDescription):
     self.validify()
     return library.shipGetCost(self._ptr)
   #\endcond
-  ##The amount of money required to purchase this type of ship
+  ##The amount of energy required to warp in this type of ship
   cost = property(getCost)
 
   #\cond
@@ -393,7 +393,7 @@ class Ship(ShipDescription):
     self.validify()
     return library.shipGetRange(self._ptr)
   #\endcond
-  ##The range of attacks for this ship
+  ##The range of attacks for this ship, given as the maximum distance from the center of this ship to the edge of the target
   range = property(getRange)
 
   #\cond
@@ -465,7 +465,7 @@ class Ship(ShipDescription):
     self.validify()
     return library.shipGetAttacksLeft(self._ptr)
   #\endcond
-  ##How many more attacks this ship has
+  ##How many more attacks this ship can make this turn
   attacksLeft = property(getAttacksLeft)
 
   #\cond
@@ -473,7 +473,7 @@ class Ship(ShipDescription):
     self.validify()
     return library.shipGetMovementLeft(self._ptr)
   #\endcond
-  ##How much more movement this ship has
+  ##How much more this ship can move this turn
   movementLeft = property(getMovementLeft)
 
   #\cond
@@ -481,7 +481,7 @@ class Ship(ShipDescription):
     self.validify()
     return library.shipGetHealth(self._ptr)
   #\endcond
-  ##The total health of the ship
+  ##The current health of the ship
   health = property(getHealth)
 
 

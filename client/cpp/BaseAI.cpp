@@ -17,9 +17,9 @@ int BaseAI::gameNumber()
 {
   return getGameNumber(c);
 }
-int BaseAI::round()
+int BaseAI::roundNumber()
 {
-  return getRound(c);
+  return getRoundNumber(c);
 }
 int BaseAI::victoriesNeeded()
 {

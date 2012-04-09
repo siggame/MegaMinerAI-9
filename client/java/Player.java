@@ -56,7 +56,7 @@ class Player
     validify();
     return Client.INSTANCE.playerGetTime(ptr);
   }
-  ///How many rounds you have won this match
+  ///How many rounds you have won this game
   public int getVictories()
   {
     validify();

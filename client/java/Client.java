@@ -30,7 +30,7 @@ public interface Client extends Library {
   int getTurnNumber(Pointer connection);
   int getPlayerID(Pointer connection);
   int getGameNumber(Pointer connection);
-  int getRound(Pointer connection);
+  int getRoundNumber(Pointer connection);
   int getVictoriesNeeded(Pointer connection);
   int getMapRadius(Pointer connection);
 

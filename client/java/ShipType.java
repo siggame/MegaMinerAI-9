@@ -24,7 +24,7 @@ class ShipType extends ShipDescription
 
     //commands
 
-  ///Sends in a new ship of this type. Ships must be warped in with the radius of the player's warp ship.
+  ///Sends in a new ship of this type. Ships must be warped in within the radius of the player's warp gate.
   int warpIn(int x, int y)
   {
     validify();
@@ -45,7 +45,7 @@ class ShipType extends ShipDescription
     validify();
     return Client.INSTANCE.shipTypeGetType(ptr);
   }
-  ///The amount of money required to purchase this type of ship
+  ///The amount of energy required to warp in this type of ship
   public int getCost()
   {
     validify();
@@ -57,7 +57,7 @@ class ShipType extends ShipDescription
     validify();
     return Client.INSTANCE.shipTypeGetRadius(ptr);
   }
-  ///The range of attacks for this ship
+  ///The range of attacks for this ship, given as the maximum distance from the center of this ship to the edge of the target
   public int getRange()
   {
     validify();

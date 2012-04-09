@@ -5,19 +5,19 @@ aspects = ['timer']
 
 gameName = "Space"
 
-globals = [ Variable('turnNumber', int, 'How many turns it has been since the beginning of the game'),
+globals = [ Variable('turnNumber', int, 'How many turns it has been since the beginning of the round'),
   Variable('playerID', int, 'Player Number; either 0 or 1'),
   Variable('gameNumber', int, 'What number game this is for the server'),
-  Variable('round',int,'The current round of the match'),
-  Variable('victoriesNeeded', int,'How many victories a player needs to win'),
-  Variable('mapRadius',int,'The outer radius of the map.  Center of screen is (0,0), with +x right, +y up'),
+  Variable('roundNumber', int, 'The current round of the match'),
+  Variable('victoriesNeeded', int, 'How many victories a player needs to win this game.  If the last round is a tie, one more victory is needed'),
+  Variable('mapRadius', int, 'The outer radius of the map.  Center of screen is (0,0), with +x right, +y up'),
 ]
 
 constants = [
   ]
   
 playerData = [
-  Variable('victories',int,'How many rounds you have won this match'),
+  Variable('victories',int,'How many rounds you have won this game'),
   Variable('energy', int, 'How much energy the player has left to warp in ships'),
   ]
 
@@ -28,9 +28,9 @@ playerFunctions = [
 ShipDescription = Model('ShipDescription',
   data=[
     Variable('type', str, 'The ship type'),
-    Variable('cost', int, 'The amount of money required to purchase this type of ship'),
+    Variable('cost', int, 'The amount of energy required to warp in this type of ship'),
     Variable('radius', int, 'The radius of the ship'),
-    Variable('range', int, 'The range of attacks for this ship'),
+    Variable('range', int, 'The range of attacks for this ship, given as the maximum distance from the center of this ship to the edge of the target'),
     Variable('damage', int, 'The strength of attacks for this ship'),
     Variable('selfDestructDamage', int, 'The amount of damage done when this ship self destructs'),
     Variable('maxMovement', int, 'The largest possible movement for this ship'),
@@ -46,25 +46,25 @@ Ship = Model('Ship',
   data=[ Variable('owner', int, 'The owner of the ship'),
     Variable('x', int, 'X position of the ship'),
     Variable('y', int, 'Y position of the ship'),
-	  Variable('attacksLeft', int, 'How many more attacks this ship has'),
-	  Variable('movementLeft', int, 'How much more movement this ship has'),
-	  Variable('health', int, 'The total health of the ship'),
+	  Variable('attacksLeft', int, 'How many more attacks this ship can make this turn'),
+	  Variable('movementLeft', int, 'How much more this ship can move this turn'),
+	  Variable('health', int, 'The current health of the ship'),
   ],
 
   functions=[ 
-    Function('move', [Variable('x', int), Variable('y', int)], doc='Command a ship to move to a specified position. If the position specified by this function is not legal, the position of the ship will be updated, but the movement will be rejected by the server.'),
-    Function ('selfDestruct', [], doc='Blow yourself up, damage those around you, reduces the ship to 0 health.'),
+    Function('move', [Variable('x', int), Variable('y', int)], doc='Command a ship to move to a specified position'),
+    Function ('selfDestruct', [], doc='Blow yourself up, damage enemy ships that overlap this ship'),
   ],
   doc="A space ship!",
 )
 
 Ship.addFunctions([Function("attack", [Variable("target", Ship)],
-  doc='Commands your ship to attack a target. Making an attack will reduce the number of attacks available to the ship, even if the attack is rejected by the game server.'
+  doc='Commands your ship to attack a target.'
   )])
 
 ShipType = Model('ShipType',
   parent=ShipDescription,
-  functions=[Function('warpIn', [Variable('x', int), Variable('y', int)], doc="Sends in a new ship of this type. Ships must be warped in with the radius of the player's warp ship."),
+  functions=[Function('warpIn', [Variable('x', int), Variable('y', int)], doc="Sends in a new ship of this type. Ships must be warped in within the radius of the player's warp gate."),
     ],
   doc='An available ship type',
   )

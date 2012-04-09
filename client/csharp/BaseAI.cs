@@ -72,7 +72,7 @@ public abstract class BaseAI
   }
 
 
-  ///How many turns it has been since the beginning of the game
+  ///How many turns it has been since the beginning of the round
   public int turnNumber()
   {
     int value = Client.getTurnNumber(connection);
@@ -91,12 +91,12 @@ public abstract class BaseAI
     return value;
   }
   ///The current round of the match
-  public int round()
+  public int roundNumber()
   {
-    int value = Client.getRound(connection);
+    int value = Client.getRoundNumber(connection);
     return value;
   }
-  ///How many victories a player needs to win
+  ///How many victories a player needs to win this game.  If the last round is a tie, one more victory is needed
   public int victoriesNeeded()
   {
     int value = Client.getVictoriesNeeded(connection);
