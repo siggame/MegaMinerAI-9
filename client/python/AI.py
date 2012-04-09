@@ -23,36 +23,37 @@ class AI(BaseAI):
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
+    print "Starting turn %i of round %i"%(self.turnNumber, self.roundNumber)
     #Find each player's warp gate
     for ship in self.ships:
       #if this ship is of type Warp Gate
-      if ship.getType() == "Warp Gate":
+      if ship.type == "Warp Gate":
         #if you own this ship
-        if ship.getOwner() == self.playerID:
+        if ship.owner == self.playerID:
           myGate = ship
         else:
           theirGate = ship
      
      #Warp in some ships
-    for type in self.shipTypes:
+    for shipType in self.shipTypes:
       #If you have enough energy to warp in this type of ship
-      if type.getCost() <= self.players[self.playerID].getEnergy():
+      if shipType.cost <= self.players[self.playerID].energy:
         #Warp it in directly on top of your warp gate
-        type.warpIn(myGate.getX(),myGate.getY())
+        shipType.warpIn(myGate.x,myGate.y)
     
     #Command your ships
     for ship in self.ships:
-      x=y=0
       #If you own this ship, it can move, and it can attack
-      if ship.getOwner() == self.playerID and ship.getMovementLeft()>0 and ship.getAttacksLeft()>0:
-        #Find a point on the line connecting this ship and their warp gate is close enough for this ship to mve to.
-        #x and y are our parameters    
-        x,y = self.pointOnLine(ship.getX(),ship.getY(),theirGate.getX(),theirGate.getY(), ship.getMovementLeft())
+      if ship.owner == self.playerID and ship.movementLeft > 0 and ship.attacksLeft > 0:
+        #Find a point on the line connecting this ship and their warp gate is close enough for this ship to move to.
+        x, y = self.pointOnLine(ship.x, ship.y, theirGate.x, theirGate.y, ship.movementLeft)
         #If I have move to get there
-        if ship.getX() != x or ship.getY()!= y:
-          ship.move(x,y)
-        if self.distance(ship.getX(),ship.getY(),theirGate.getX(),theirGate.getY())<= ship.getRange() + theirGate.getRadius():
-          if theirGate.getHealth()>0:
+        if ship.x != x or ship.y != y:
+          ship.move(x, y)
+        #If the distance from my ship to their warp gate is less than my ships attack range plus their gate's radius
+        if self.distance(ship.x, ship.y, theirGate.x, theirGate.y) <= ship.range + theirGate.radius:
+          #If their warp gate is still alive
+          if theirGate.health > 0:
             ship.attack(theirGate)
     return 1
 

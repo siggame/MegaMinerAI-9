@@ -34,7 +34,7 @@ struct Connection
   int turnNumber;
   int playerID;
   int gameNumber;
-  int round;
+  int roundNumber;
   int victoriesNeeded;
   int mapRadius;
 
@@ -69,11 +69,11 @@ extern "C"
   DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y);
   ///Allows a player to display messages on the screen
   DLLEXPORT int playerTalk(_Player* object, char* message);
-  ///Command a ship to move to a specified position. If the position specified by this function is not legal, the position of the ship will be updated, but the movement will be rejected by the server.
+  ///Command a ship to move to a specified position
   DLLEXPORT int shipMove(_Ship* object, int x, int y);
-  ///Blow yourself up, damage those around you, reduces the ship to 0 health.
+  ///Blow yourself up, damage enemy ships that overlap this ship
   DLLEXPORT int shipSelfDestruct(_Ship* object);
-  ///Commands your ship to attack a target. Making an attack will reduce the number of attacks available to the ship, even if the attack is rejected by the game server.
+  ///Commands your ship to attack a target.
   DLLEXPORT int shipAttack(_Ship* object, _Ship* target);
 
 //derived properties
@@ -85,7 +85,7 @@ extern "C"
 DLLEXPORT int getTurnNumber(Connection* c);
 DLLEXPORT int getPlayerID(Connection* c);
 DLLEXPORT int getGameNumber(Connection* c);
-DLLEXPORT int getRound(Connection* c);
+DLLEXPORT int getRoundNumber(Connection* c);
 DLLEXPORT int getVictoriesNeeded(Connection* c);
 DLLEXPORT int getMapRadius(Connection* c);
 

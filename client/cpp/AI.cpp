@@ -21,6 +21,7 @@ void AI::init(){}
 //Return true to end your turn, return false to ask the server for updated information.
 bool AI::run()
 {
+  std::cout<< "Starting turn " << turnNumber() << " of round " << roundNumber() << std::endl;
   // Find each player's warp gate
   int myGateIndex, theirGateIndex;
   for(size_t i=0; i<ships.size();i++)

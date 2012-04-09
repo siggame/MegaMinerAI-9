@@ -31,7 +31,7 @@ abstract class ShipDescription
     validify();
     return Client.INSTANCE.shipDescriptionGetType(ptr);
   }
-  ///The amount of money required to purchase this type of ship
+  ///The amount of energy required to warp in this type of ship
   public int getCost()
   {
     validify();
@@ -43,7 +43,7 @@ abstract class ShipDescription
     validify();
     return Client.INSTANCE.shipDescriptionGetRadius(ptr);
   }
-  ///The range of attacks for this ship
+  ///The range of attacks for this ship, given as the maximum distance from the center of this ship to the edge of the target
   public int getRange()
   {
     validify();

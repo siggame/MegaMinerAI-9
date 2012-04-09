@@ -18,11 +18,11 @@ class ShipDescription {
   int id();
   ///The ship type
   char* type();
-  ///The amount of money required to purchase this type of ship
+  ///The amount of energy required to warp in this type of ship
   int cost();
   ///The radius of the ship
   int radius();
-  ///The range of attacks for this ship
+  ///The range of attacks for this ship, given as the maximum distance from the center of this ship to the edge of the target
   int range();
   ///The strength of attacks for this ship
   int damage();

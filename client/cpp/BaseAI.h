@@ -26,21 +26,22 @@ protected:
   std::vector<Player> players;
   std::vector<Ship> ships;
 public:
-  ///How many turns it has been since the beginning of the game
+  ///How many turns it has been since the beginning of the round
   int turnNumber();
   ///Player Number; either 0 or 1
   int playerID();
   ///What number game this is for the server
   int gameNumber();
   ///The current round of the match
-  int round();
-  ///How many victories a player needs to win
+  int roundNumber();
+  ///How many victories a player needs to win this game.  If the last round is a tie, one more victory is needed
   int victoriesNeeded();
   ///The outer radius of the map.  Center of screen is (0,0), with +x right, +y up
   int mapRadius();
 
-  //TODO Document these
+  ///Returns the distance between two points
   int distance(int fromX, int fromY, int toX, int toY);
+  ///Find a point "travel" distance from the starting point in the direction of the ending point.  Uses return by reference
   void pointOnLine(int fromX, int fromY, int toX, int toY, int travel, int & outX, int & outY);
 
   BaseAI(Connection* c);

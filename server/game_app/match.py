@@ -201,7 +201,7 @@ class Match(DefaultGameWorld):
     elif player2.victories >= self.victories and player2.victories > player1.victories:
       self.declareWinner(self.players[0], "Player 2 has won the game %i-%i"%(player2.victories, player1.victories))
     # Tied last round
-    elif player1.victories >= self.victories and player2.victories >= self.victories:
+    elif player1.victories > self.victories and player2.victories > self.victories:
       self.declareWinner(random.choice(self.players), "The game is a tie")
 
   def declareWinner(self, winner, reason=''):

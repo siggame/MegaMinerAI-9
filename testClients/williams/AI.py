@@ -398,10 +398,10 @@ class AI(BaseAI):
     if player == 1:
       modifier = 1
     
-    if player == 0:
-      agressiveWarp = [FriendlyWarpGate[0].getX() + FriendlyWarpGate[0].getRange(), FriendlyWarpGate[0].getY()]
-    else:
-      agressiveWarp = [FriendlyWarpGate[0].getX() - FriendlyWarpGate[0].getRange(), FriendlyWarpGate[0].getY()]
+    #if player == 0:
+      #agressiveWarp = [FriendlyWarpGate[0].getX() + FriendlyWarpGate[0].getRange(), FriendlyWarpGate[0].getY()]
+    #else:
+      #agressiveWarp = [FriendlyWarpGate[0].getX() - FriendlyWarpGate[0].getRange(), FriendlyWarpGate[0].getY()]
     #Setting general warp locations   
     #Closest to enemy warpgate 
     #agressiveWarp = self.moveTo(FriendlyWarpGate[0], EnemyWarpGate[0].getX(), EnemyWarpGate[0].getY())   
