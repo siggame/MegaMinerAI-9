@@ -78,5 +78,5 @@ void BaseAI::pointOnLine(int fromX, int fromY, int toX, int toY, int travel, int
 {
   int ret = basePointOnLine(fromX, fromY, toX, toY, travel);
   outX = ret / 1024 - 500;
-  outY = ret / 1024 - 500;
+  outY = ret % 1024 - 500;
 }

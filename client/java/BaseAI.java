@@ -111,6 +111,6 @@ public abstract class BaseAI
   Point pointOnLine(int fromX, int fromY, int toX, int toY, int travel)
   {
     int ret = Client.INSTANCE.basePointOnLine(fromX, fromY, toX, toY, travel);
-    return new Point(ret / 1024 - 500, ret / 1024 - 500);
+    return new Point(ret / 1024 - 500, ret % 1024 - 500);
   }
 }

@@ -217,11 +217,48 @@ DLLEXPORT int baseDistance(int fromX, int fromY, int toX, int toY)
 
 DLLEXPORT int basePointOnLine(int fromX, int fromY, int toX, int toY, int travel)
 {
-  int x;
-  int y;
-  // TODO Actually write this logic
+  int x, y, dx, dy;
+  int toGoal = baseDistance(fromX, fromY, toX, toY);
+  if(toGoal <= travel)
+  {
+    x = toX;
+    y = toY;
+  }
+  else if(travel <= 0)
+  {
+    x = fromX;
+    y = fromY;
+  }
+  else
+  {
+    dx = toX - fromX;
+    dy = toY - fromY;
+    x = fromX + dx * travel / toGoal;
+    y = fromY + dy * travel / toGoal;
+    dx = toX - x;
+    dy = toY - y;
+    float ratio = 1;
+    if(dx != 0)
+    {
+      ratio = static_cast<float>(dy) / dx;
+    }
+    // Do ray tracing to correct for rounding error
+    while(baseDistance(fromX, fromY, x, y) < travel)
+    {
+      if(dx != 0 && static_cast<float>(dy) / dx < ratio)
+      {
+        if(toX > x) {x++; dx--;}
+        else {x--; dx++;}
+      }
+      else
+      {
+        if(toY > y) {y++; dy--;}
+        else {y--; dy++;}
+      }
+    }
+  }
   // Pack the X and Y into a single integer for interlanguage movement
-  return (x+500)<<10 + (y+500); // TODO If the map size changes, god help you
+  return ((x+500)<<10) + (y+500);
 }
 
 DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y)

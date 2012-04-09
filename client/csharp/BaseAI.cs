@@ -118,7 +118,7 @@ public abstract class BaseAI
   {
     int ret = Client.basePointOnLine(fromX, fromY, toX, toY, travel);
     outX = ret / 1024 - 500;
-    outY = ret / 1024 - 500;
+    outY = ret % 1024 - 500;
   }
 
 }
