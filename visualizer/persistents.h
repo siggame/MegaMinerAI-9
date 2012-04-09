@@ -101,7 +101,7 @@ namespace visualizer
 
       PersistentShip(int createdAt, int round, parser::Ship ship)
       {
-        createdAtTurn = createdAt;
+        createdAtTurn = createdAt+1;
         id = ship.id;
         owner = ship.owner;
         radius = ship.radius;
@@ -135,6 +135,8 @@ namespace visualizer
           move.point = moves[i];
           move.start = (float)turn + i * span;
           move.end = (float)turn + (i+1) * span;
+          if(id == 37)
+            cout << " AddTurn(" << turn << "): adding move: (" << move.point.x << "," << move.point.y << " from " << move.start << " to " << move.end << endl;
 
           m_Moves.push_back( move );
         }
@@ -249,7 +251,7 @@ namespace visualizer
       string PointsOn( int turn )
       {
         stringstream pts;
-
+        
         bool nothing = true;
         for( auto& spacemove : m_Moves )
         {
@@ -311,7 +313,7 @@ namespace visualizer
         m_DeathTurn = turn;
         healths.push_back( 0 );
         
-        if(m_Moves.size() > 0)
+        /*if(m_Moves.size() > 0)
         {
           SpaceMove move;
           move.point.x = m_Moves.back().point.x;
@@ -320,16 +322,18 @@ namespace visualizer
           move.end = m_Moves.back().end + 2;
           
           m_Moves.push_back( move );
-        }
+        }*/
       }
       
       int FirstTurn() { return createdAtTurn; }
       
       void MoveInfo()
       {
-        return;
+        if( id != 37 )
+          return;
         
         cout << "Ship " << id << " of type " << type << endl;
+        
         for( auto& move : m_Moves )
         {
           cout << "  (" << move.point.x << "," << move.point.y << ") from " << move.start << " to " << move.end << endl;
@@ -403,10 +407,11 @@ namespace visualizer
       
       pair<SpacePoint, float> SplineOn(int turn, float t)
       {
-        int v2 = -1;
-        bool foundV2 = false;
-        float time = float(turn) + t;
+        int v1, v2, v3, v4;
+        v1 = v2 = v3 = v4 = -1;
+        bool foundV3 = false;
 
+        float time = float(turn) + t;
         if(m_Moves.size() == 0)
           return make_pair( SpacePoint( m_InitialX, m_InitialY ), 0 );
         
@@ -414,16 +419,16 @@ namespace visualizer
         {
           if( m_Moves[i].InRange( time ) )
           {
-            v2 = i;
+            v3 = i;
             i = m_Moves.size();
-            foundV2 = true;
+            foundV3 = true;
           }
           else if( m_Moves[i].start > time )
           {
-            v2 = i-1;
+            v3 = i-1;
             t = 1.0f;
             i = m_Moves.size();
-            foundV2 = true;
+            foundV3 = true;
           }
           else if( m_Moves[i].end < time )
           {
@@ -435,15 +440,17 @@ namespace visualizer
           }
         }
 
-        if( !foundV2 )
+        if( !foundV3 )
         {
-          v2 = m_Moves.size()-1;
+          v3 = m_Moves.size()-1;
           t = 1.0f;
         }
         
-        int v1 = v2-1;
-        int v3 = v2+1;
-        int v4 = v2+2;
+
+          v1 = v3-2;
+          v2 = v3-1;
+          v4 = v3+1;
+        
 
         if( v1 < 0 )
           v1=0;
@@ -456,7 +463,7 @@ namespace visualizer
         
         if( t != 1.0f )  // if we need to calculate a new t, due to multiple moves per turn
         {
-          t = (time - m_Moves[v2].start) / (m_Moves[v2].end - m_Moves[v2].start);
+          t = (time - m_Moves[v3].start) / (m_Moves[v3].end - m_Moves[v3].start);
         }
         
         t = pow(t, (2.0f/3.0f)); // to ease into thier final positions make t = t^(2/3)
@@ -477,6 +484,9 @@ namespace visualizer
 
         float py = (((c4*t + c3)*t +c2)*t + c1);
         float hy = (3*c4*t + 2*c3)*t +c2;
+        
+        if( selected )
+          cout << "at time: " << time << " decided on v2 of " << v2 << " for ship id " << id << " of owner " << owner << " that is at (" << m_Moves[v2].point.x << "," << m_Moves[v2].point.y << ") from " << m_Moves[v2].start << " to " << m_Moves[v2].end << " and calc (" << px << "," << py << ")" << endl;
 
         return make_pair( SpacePoint( px, py ), atan2( hy, hx ) );
       }

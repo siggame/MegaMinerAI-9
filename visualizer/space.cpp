@@ -177,7 +177,7 @@ namespace visualizer
   void Space::run()
   {
     map < int, vector< SmartPointer < Warp > > > Warps;
-    Warps[ -1 ] = vector< SmartPointer< Warp > >();
+    Warps[ 0 ] = vector< SmartPointer< Warp > >();
     
     // Build the Debug Table's Headers
     QStringList header;
@@ -193,7 +193,7 @@ namespace visualizer
     // BEGIN: Look through the game logs and build the m_PersistentShips
     for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
     {
-      Warps[ state ] = vector< SmartPointer< Warp > >();
+      Warps[ state+1 ] = vector< SmartPointer< Warp > >();
       // Loop though each PersistentShip in the current state
       for(auto& i : m_game->states[ state ].ships)
       {
@@ -207,8 +207,8 @@ namespace visualizer
           // Add the warps for this ship (so long as it is not a mine)
           if( strcmp( i.second.type, "Mine" ) != 0)
           {
-            //Warps[ state - 1 ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, false ) );
-            Warps[ state ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, true ) );
+            Warps[ state ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, false ) );
+            Warps[ state+1 ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, true ) );
           }
         }
 
@@ -224,13 +224,13 @@ namespace visualizer
             case parser::MOVE:
             {
               parser::move &move = (parser::move&)*j;
-              if( !m_PersistentShips[shipID]->HasMoves() && state != m_PersistentShips[shipID]->FirstTurn() )
+              if( !m_PersistentShips[shipID]->HasMoves()  )
               {
                   moves.push_back( SpacePoint( move.fromX, move.fromY ) );
               }
               moves.push_back( SpacePoint( move.toX, move.toY ) );
-              //if( shipID == 10 )
-                //cout << "Move found on turn " << state << " with ship id " << shipID << " moving from (" << move.fromX << "," << move.fromY << ") to (" << move.toX << "," << move.toY << ")" << endl;
+              if( shipID == 37 )
+                cout << "Move found on turn " << state << " with ship id " << shipID << " of owner " << m_PersistentShips[shipID]->owner << " moving from (" << move.fromX << "," << move.fromY << ") to (" << move.toX << "," << move.toY << ")" << endl;
             } break;
             case parser::ATTACK:
             {
@@ -274,7 +274,8 @@ namespace visualizer
           }
         }
       }
-
+      
+      //////////////////////////////////////////////////////////////////////////
       // Start adding stuff to draw
       Frame turn;  // The frame that will be drawn
 
