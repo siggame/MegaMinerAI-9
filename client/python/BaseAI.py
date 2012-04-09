@@ -73,10 +73,10 @@ class BaseAI:
     return library.getMapRadius(self.connection)
   #\endcond
   mapRadius = property(getMapRadius)
-  #TODO Document this
+  ##Returns the distance between two points
   def distance(self, fromX, fromY, toX, toY):
     return library.baseDistance(fromX, fromY, toX, toY)
-  #TODO Document this
+  ##Find a point "travel" distance from the starting point in the direction of the ending point.  Returns the tuple (x, y)
   def pointOnLine(self, fromX, fromY, toX, toY, travel):
     ret = library.basePointOnLine(fromX, fromY, toX, toY, travel)
     return (ret / 1024 - 500, ret % 1024 - 500)

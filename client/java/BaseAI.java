@@ -102,12 +102,12 @@ public abstract class BaseAI
   {
     return Client.INSTANCE.getMapRadius(connection);
   }
-  //TODO Document
+  ///Returns the distance between two points
   int distance(int fromX, int fromY, int toX, int toY)
   {
     return Client.INSTANCE.baseDistance(fromX, fromY, toX, toY);
   }
-  //TODO Document
+  ///Find a point "travel" distance from the starting point in the direction of the ending point.  Returns a Point object
   Point pointOnLine(int fromX, int fromY, int toX, int toY, int travel)
   {
     int ret = Client.INSTANCE.basePointOnLine(fromX, fromY, toX, toY, travel);

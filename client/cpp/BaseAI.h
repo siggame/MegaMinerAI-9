@@ -39,8 +39,9 @@ public:
   ///The outer radius of the map.  Center of screen is (0,0), with +x right, +y up
   int mapRadius();
 
-  //TODO Document these
+  ///Returns the distance between two points
   int distance(int fromX, int fromY, int toX, int toY);
+  ///Find a point "travel" distance from the starting point in the direction of the ending point.  Uses return by reference
   void pointOnLine(int fromX, int fromY, int toX, int toY, int travel, int & outX, int & outY);
 
   BaseAI(Connection* c);
