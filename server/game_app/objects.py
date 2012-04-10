@@ -78,7 +78,7 @@ class Player:
   def talk(self, message):
     # Ensure I can't make my opponent talk
     if self.game.playerID == self.id:
-      self.game.animations.append(['playerTalk', self.id, message])
+      self.game.animations.append(['player-talk', self.id, message])
     else:
       return "You can't speak for your opponent"
     return True
@@ -197,7 +197,7 @@ class Ship(ShipDescription):
       if target.health <= 0:
         self.game.removeObject(target)
     self.game.removeObject(self)
-    self.game.animations.append(['selfDestruct', self.id])
+    self.game.animations.append(['self-destruct', self.id])
     return True
 
   def attack(self, target):
@@ -244,7 +244,7 @@ class Ship(ShipDescription):
       self.targeted.add(target.id)
       if self.type == 'Stealth':
         self.isStealthed = False
-        self.game.animations.append(['deStealth',self.id])
+        self.game.animations.append(['de-stealth',self.id])
     return True
     
   def inRange(self, target):
