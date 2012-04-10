@@ -4,6 +4,7 @@
 #include "version.h"
 #include "animations.h"
 #include "persistents.h"
+#include <utility>
 
 namespace visualizer
 {
@@ -194,8 +195,48 @@ namespace visualizer
     for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
     {
       Warps[ state+1 ] = vector< SmartPointer< Warp > >();
-      // Loop though each PersistentShip in the current state
+      
+      // Find all the ships we need to look at this turn
+      vector< pair<int, parser::Ship> > ships;
+      
+      // Loop though each PersistentShip in the current state, and them to the shipIDs to look at
       for(auto& i : m_game->states[ state ].ships)
+      {
+        pair< int, parser::Ship > p;
+        p.first = i.first;
+        p.second = i.second;
+        ships.push_back( p );
+      }
+      
+      // 
+      if( state >= 2 )
+      {
+        for(auto& ship : m_game->states[ state - 2 ].ships)
+        {
+          bool existsInCurrentShips = false;
+          for( auto& currentShip : ships )
+          {
+            if( currentShip.first == ship.first )
+            {
+              existsInCurrentShips = true;
+              break;
+            }
+          }
+          
+          if( !existsInCurrentShips )
+          {
+            pair< int, parser::Ship > p;
+            p.first = ship.first;
+            p.second = ship.second;
+            
+            p.second.health = 0;
+            
+            ships.push_back( p );
+          }
+        }
+      }
+      
+      for( auto& i : ships )
       {
         int shipID = i.second.id;
 
@@ -252,6 +293,10 @@ namespace visualizer
             case parser::DESTEALTH:
             {
               m_PersistentShips[shipID]->AddDeStealth( state );
+            } break;
+            case parser::SELFDESTRUCT:
+            {
+              m_PersistentShips[shipID]->SelfDestructs = true;
             } break;
           }
         }

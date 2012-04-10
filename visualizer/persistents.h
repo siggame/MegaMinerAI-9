@@ -98,6 +98,7 @@ namespace visualizer
       int maxMovement;
       string type;
       bool selected;
+      bool SelfDestructs;
 
       PersistentShip(int createdAt, int round, parser::Ship ship)
       {
@@ -114,6 +115,7 @@ namespace visualizer
         m_Round = round;
         selected = false;
         m_DeathTurn = 99999;
+        SelfDestructs = false;
         
         if( strcmp( "Mine", type.c_str() ) == 0 )
           radius /= 2.0f;
