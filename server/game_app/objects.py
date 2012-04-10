@@ -159,7 +159,10 @@ class Ship(ShipDescription):
           # For Mine Layer's, you get 1 attack if you have any mines left, otherwise you get 0 attacks
           self.attacksLeft = min(1, self.maxAttacks)
       if self.type == "Stealth":
+        if self.isStealthed == False:
+          self.game.animations.append(['stealth', self.id])
         self.isStealthed = True
+        
                     
   def move(self, x, y):
     #moved is the distance they've moved, where they were to where they're going
@@ -239,8 +242,9 @@ class Ship(ShipDescription):
       if target.health <= 0:
         self.game.removeObject(target)
       self.targeted.add(target.id)
-      if self.type == "Stealth":
+      if self.type == 'Stealth':
         self.isStealthed = False
+        self.game.animations.append(['deStealth',self.id])
     return True
     
   def inRange(self, target):
