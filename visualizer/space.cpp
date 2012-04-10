@@ -212,10 +212,8 @@ namespace visualizer
           }
         }
 
-        // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
-        m_PersistentShips[shipID]->healths.push_back( i.second.health );
-        
         vector< SpacePoint > moves;
+        
         // Check for this ship's animations in the gamelog
         for( auto& j : m_game->states[state].animations[shipID] )
         {
@@ -250,11 +248,11 @@ namespace visualizer
             case parser::STEALTH:
             {
               m_PersistentShips[shipID]->AddStealth( state );
-            }
+            } break;
             case parser::DESTEALTH:
             {
               m_PersistentShips[shipID]->AddDeStealth( state );
-            }
+            } break;
           }
         }
         
@@ -263,7 +261,7 @@ namespace visualizer
           moves.push_back( SpacePoint( i.second.x, i.second.y ) );
         }
         
-        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.movementLeft );
+        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.health, i.second.movementLeft );
         
         // Check to see if this ship dies next turn (doesn't exist next turn)
         if( state + 1 != m_game->states.size() )

@@ -101,7 +101,7 @@ namespace visualizer
 
       PersistentShip(int createdAt, int round, parser::Ship ship)
       {
-        createdAtTurn = createdAt+1;
+        m_CreatedAtTurn = createdAt+1;
         id = ship.id;
         owner = ship.owner;
         radius = ship.radius;
@@ -117,15 +117,9 @@ namespace visualizer
         
         if( strcmp( "Mine", type.c_str() ) == 0 )
           radius /= 2.0f;
-
-        // have it stealth now (only Stealth ships care...)
-        AddStealth( createdAt );
       }
 
-      // Stats that change each turn
-      vector< int > healths;
-
-      void AddTurn( int turn, vector< SpacePoint > &moves, int movementLeft )
+      void AddTurn( int turn, vector< SpacePoint > &moves, int health, int movementLeft )
       {
         // Add the moves
         float span = 1.0f / float(moves.size());
@@ -150,15 +144,21 @@ namespace visualizer
           }
         }
         
-        // Add the movement left
-        m_MovementLeft.push_back( movementLeft );
+        if( turn >= m_CreatedAtTurn )
+        {
+          // Add the movement left
+          m_MovementLeft.push_back( movementLeft );
+          
+          // Add the health this turn
+          m_Healths.push_back( health );
+        }
       }
 
       bool HasMoves() { return m_Moves.size() > 0; }
 
       bool ExistsAtTurn(int turn, int round)
       {
-        return ( turn >= createdAtTurn && turn <= m_DeathTurn && (m_Round == round || round == -1) );
+        return ( turn >= m_CreatedAtTurn && turn <= m_DeathTurn && (m_Round == round || round == -1) );
       }
 
       SpacePoint LocationOn(int turn, float t)
@@ -175,10 +175,10 @@ namespace visualizer
 
       float HealthOn(int turn, float t)
       {
-        turn -= createdAtTurn;
+        turn -= m_CreatedAtTurn;
 
         // h(t) = a + t(b - a)
-        return healths[PreviousTurn(turn)] + t * ( healths[turn] - healths[PreviousTurn(turn)] );
+        return m_Healths[PreviousTurn(turn)] + t * ( m_Healths[turn] - m_Healths[PreviousTurn(turn)] );
       }
 
       bool EMPedOn(int turn)
@@ -305,7 +305,7 @@ namespace visualizer
       
       string MovementOn( int turn )
       {
-        turn -= createdAtTurn;
+        turn -= m_CreatedAtTurn;
         stringstream ss;
         if( turn >= m_MovementLeft.size() || turn < 0 )
         {
@@ -320,7 +320,7 @@ namespace visualizer
       void AddDeath( int turn )
       {
         m_DeathTurn = turn;
-        healths.push_back( 0 );
+        m_Healths.push_back( 0 );
         
         /*if(m_Moves.size() > 0)
         {
@@ -334,7 +334,7 @@ namespace visualizer
         }*/
       }
       
-      int FirstTurn() { return createdAtTurn; }
+      int FirstTurn() { return m_CreatedAtTurn; }
       
       void MoveInfo()
       {        
@@ -347,7 +347,8 @@ namespace visualizer
       }
       
     private:
-      int createdAtTurn;
+      int m_CreatedAtTurn;
+      vector< int > m_Healths;
       float m_InitialX;
       float m_InitialY;
       map< int, vector < PersistentShip* > > m_AttackVictims;
@@ -367,7 +368,7 @@ namespace visualizer
       {
         // Index setup from Jake F. 
         
-        turn -= createdAtTurn;
+        turn -= m_CreatedAtTurn;
         int i = turn;
         const int step = 1;
         int v0 = i-step;
@@ -452,12 +453,10 @@ namespace visualizer
           t = 1.0f;
         }
         
-
-          v1 = v3-2;
-          v2 = v3-1;
-          v4 = v3+1;
+        v1 = v3-2;
+        v2 = v3-1;
+        v4 = v3+1;
         
-
         if( v1 < 0 )
           v1=0;
         if( v2 < 0 )
