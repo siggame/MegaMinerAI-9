@@ -229,8 +229,8 @@ namespace visualizer
                   moves.push_back( SpacePoint( move.fromX, move.fromY ) );
               }
               moves.push_back( SpacePoint( move.toX, move.toY ) );
-              if( shipID == 37 )
-                cout << "Move found on turn " << state << " with ship id " << shipID << " of owner " << m_PersistentShips[shipID]->owner << " moving from (" << move.fromX << "," << move.fromY << ") to (" << move.toX << "," << move.toY << ")" << endl;
+              //if( shipID == 37 )
+                //cout << "Move found on turn " << state << " with ship id " << shipID << " of owner " << m_PersistentShips[shipID]->owner << " moving from (" << move.fromX << "," << move.fromY << ") to (" << move.toX << "," << move.toY << ")" << endl;
             } break;
             case parser::ATTACK:
             {
@@ -385,8 +385,6 @@ namespace visualizer
 
     for(auto& i : m_PersistentShips)
     {
-      i.second->MoveInfo();
-      
       if( m_suicide )
         break;
     }

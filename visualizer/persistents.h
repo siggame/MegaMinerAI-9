@@ -135,10 +135,19 @@ namespace visualizer
           move.point = moves[i];
           move.start = (float)turn + i * span;
           move.end = (float)turn + (i+1) * span;
-          if(id == 37)
-            cout << " AddTurn(" << turn << "): adding move: (" << move.point.x << "," << move.point.y << " from " << move.start << " to " << move.end << endl;
-
-          m_Moves.push_back( move );
+          
+          // to stop duplicate move to the same location in the same turn... because that is apperntly happening on the first turn.
+          if(m_Moves.size() > 0)
+          {
+            if(m_Moves.back().point.x != move.point.x && m_Moves.back().point.y != move.point.y)
+            {
+              m_Moves.push_back( move );
+            }
+          }
+          else
+          {
+            m_Moves.push_back( move );
+          }
         }
         
         // Add the movement left
@@ -328,10 +337,7 @@ namespace visualizer
       int FirstTurn() { return createdAtTurn; }
       
       void MoveInfo()
-      {
-        if( id != 37 )
-          return;
-        
+      {        
         cout << "Ship " << id << " of type " << type << endl;
         
         for( auto& move : m_Moves )
@@ -486,8 +492,10 @@ namespace visualizer
         float hy = (3*c4*t + 2*c3)*t +c2;
         
         if( selected )
-          cout << "at time: " << time << " decided on v2 of " << v2 << " for ship id " << id << " of owner " << owner << " that is at (" << m_Moves[v2].point.x << "," << m_Moves[v2].point.y << ") from " << m_Moves[v2].start << " to " << m_Moves[v2].end << " and calc (" << px << "," << py << ")" << endl;
-
+        {
+          //MoveInfo();
+          //cout << "at time: " << time << " decided on v3 of " << v3 << " for ship id " << id << " of owner " << owner << " that is at (" << m_Moves[v3].point.x << "," << m_Moves[v3].point.y << ") from " << m_Moves[v3].start << " to " << m_Moves[v3].end << " and calc (" << px << "," << py << ")" << endl;
+        }
         return make_pair( SpacePoint( px, py ), atan2( hy, hx ) );
       }
       
