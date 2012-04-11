@@ -426,7 +426,18 @@ DLLEXPORT int shipAttack(_Ship* object, _Ship* target)
   {
     object->maxAttacks -= 1;
     object->attacksLeft -= 1;
-    // Doesn't do EMP stuff because there is no way for the client to see it happen
+    for(int i = 0; i < c->ShipCount; i++)
+    {
+      if(c->Ships[i].owner != object->owner)
+      {
+        if(baseDistance(object->x, object->y, c->Ships[i].x, c->Ships[i].y) < c->Ships[i].radius + object->range)
+        {
+          // EMP the ship
+          c->Ships[i].movementLeft = -1;
+          c->Ships[i].attacksLeft = -1;
+        }
+      }
+    }
     return 1;
   }
   else if(target->owner == object->owner)
