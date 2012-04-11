@@ -103,7 +103,7 @@ class Ship(ShipDescription):
     self.attacksLeft = attacksLeft
     self.movementLeft = movementLeft
     self.health = health
-    self.isStealthed = False
+    self.isStealthed = self.type == "Stealth"
     self.targeted = set()
 
   def toList(self):
@@ -161,8 +161,7 @@ class Ship(ShipDescription):
       if self.type == "Stealth":
         if self.isStealthed == False:
           self.game.animations.append(['stealth', self.id])
-        self.isStealthed = True
-        
+          self.isStealthed = True
                     
   def move(self, x, y):
     #moved is the distance they've moved, where they were to where they're going
