@@ -247,7 +247,7 @@ class Ship(ShipDescription):
     return True
     
   def inRange(self, target):
-    return inRange(self.x, self.y, self.range, target.x, target.y, target.range)
+    return inRange(self.x, self.y, self.range, target.x, target.y, target.radius)
 
 class ShipType(ShipDescription):
   def __init__(self, game, id, type, cost, radius, range, damage, selfDestructDamage, maxMovement, maxAttacks, maxHealth):
