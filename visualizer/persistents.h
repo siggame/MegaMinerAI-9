@@ -123,6 +123,18 @@ namespace visualizer
 
       void AddTurn( int turn, vector< SpacePoint > &moves, int health, int movementLeft )
       {
+        if( id == 14 )
+        {
+          if( moves.size() > 0 )
+          {
+            cout << "ADDING MOVES TO THE EMP ON TURN " << turn << ":\n";
+            for( auto& move : moves )
+            {
+              cout << "  (" << move.x << "," << move.y << ")" << endl;
+            }
+          }
+        }
+        
         // Add the moves
         float span = 1.0f / float(moves.size());
         for(float i = 0; i < (float)moves.size(); i++)
@@ -135,14 +147,22 @@ namespace visualizer
           // to stop duplicate move to the same location in the same turn... because that is apperntly happening on the first turn.
           if(m_Moves.size() > 0)
           {
-            if(m_Moves.back().point.x != move.point.x && m_Moves.back().point.y != move.point.y)
+            if(m_Moves.back().point.x == move.point.x && m_Moves.back().point.y == move.point.y)
+            {
+              
+            }
+            else
             {
               m_Moves.push_back( move );
+              if( id == 14 )
+                cout << " ADDED MOVE (" << move.point.x << "," << move.point.y << ")" << endl;
             }
           }
           else
           {
             m_Moves.push_back( move );
+            if( id == 14 )
+                cout << " ADDED MOVE (" << move.point.x << "," << move.point.y << ")" << endl;
           }
         }
         
