@@ -199,7 +199,7 @@ class Match(DefaultGameWorld):
       self.declareWinner(self.players[0], "Player 1 has won the game %i-%i"%(player1.victories, player2.victories))
     # Strictly player 2 victory
     elif player2.victories >= self.victories and player2.victories > player1.victories:
-      self.declareWinner(self.players[0], "Player 2 has won the game %i-%i"%(player2.victories, player1.victories))
+      self.declareWinner(self.players[1], "Player 2 has won the game %i-%i"%(player2.victories, player1.victories))
     # Tied last round
     elif player1.victories > self.victories and player2.victories > self.victories:
       self.declareWinner(random.choice(self.players), "The game is a tie")
@@ -207,7 +207,7 @@ class Match(DefaultGameWorld):
   def declareWinner(self, winner, reason=''):
     print "Game", self.id, "over"
     self.winner = winner
-
+    self.sendStatus(self.spectators)
     msg = ["game-winner", self.id, self.winner.user, self.getPlayerIndex(self.winner), reason]
     self.scribe.writeSExpr(msg)
     self.scribe.finalize()
