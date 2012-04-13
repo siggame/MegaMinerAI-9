@@ -104,9 +104,11 @@ namespace visualizer
   {
     // BEGIN: Variables we will need
     int shipOwner = m_PersistentShip->owner;
-    SpacePoint shipCenter = m_PersistentShip->LocationOn(m_Turn, t);
+    glm::vec2 shipCenter = m_PersistentShip->LocationOn(m_Turn, t);
     shipCenter.x += *m_MapRadius;
     shipCenter.y += *m_MapRadius;
+    // HeadingOn and LocationOn call the same function.  Should probably fix this
+    // so it's less expensive.  2 per animate
     float shipHeading = m_PersistentShip->HeadingOn(m_Turn, t) * 57.3f + 270;
     float shipStealth = m_PersistentShip->StealthOn(m_Turn, t);
     bool shipIsEMPed = m_PersistentShip->EMPedOn(m_Turn);
@@ -121,7 +123,7 @@ namespace visualizer
     bool renderRange = m_PersistentShip->RenderRange();
     int shipRange = m_PersistentShip->range;
 
-    vector< SpacePoint > shipAttacks = m_PersistentShip->AttacksOn( m_Turn, t );
+    vector<glm::vec2> shipAttacks = m_PersistentShip->AttacksOn( m_Turn, t );
     for(unsigned int i = 0; i < shipAttacks.size(); i++)
     {
       shipAttacks[i].x += *m_MapRadius;
