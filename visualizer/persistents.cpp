@@ -37,7 +37,7 @@ namespace visualizer
 
   PersistentShip::PersistentShip(int createdAt, int round, parser::Ship ship)
   {
-    m_CreatedAtTurn = createdAt;
+    m_CreatedAtTurn = createdAt+1;
     id = ship.id;
     owner = ship.owner;
     radius = ship.radius;
@@ -50,15 +50,13 @@ namespace visualizer
     m_Round = round;
     selected = false;
     m_DeathTurn = 99999;
+    SelfDestructs = false;
     
     if( strcmp( "Mine", type.c_str() ) == 0 )
       radius /= 2.0f;
-
-    // have it stealth now (only Stealth ships care...)
-    AddStealth( createdAt );
   }
 
-  void PersistentShip::AddTurn(int turn, vector<vec2> &moves, int health, int movementLeft)
+  void PersistentShip::AddTurn(int turn, vector<vec2> &moves, int health, int movementLeft, int attacksLeft)
   {
     // Add the moves
     float span = 1.0f / float(moves.size());
@@ -68,13 +66,36 @@ namespace visualizer
       move.point = moves[i];
       move.start = (float)turn + i * span;
       move.end = (float)turn + (i+1) * span;
-
-      m_Moves.push_back( move );
+      
+      // to stop duplicate move to the same location in the same turn... because that is apperntly happening on the first turn.
+      if(m_Moves.size() > 0)
+      {
+        if(m_Moves.back().point.x == move.point.x && m_Moves.back().point.y == move.point.y)
+        {
+          
+        }
+        else
+        {
+          m_Moves.push_back( move );
+        }
+      }
+      else
+      {
+        m_Moves.push_back( move );
+      }
     }
     
-    // Add the movement left
-    m_MovementLeft.push_back( movementLeft );
+    if( turn >= m_CreatedAtTurn )
+    {
+      // Add the movement left
+      m_MovementLeft.push_back( movementLeft );
+      
+      // Add the health this turn
+      m_Healths.push_back( health );
+    }
   }
+  
+  bool PersistentShip::HasMoves() { return m_Moves.size() > 0; }
 
   bool PersistentShip::ExistsAtTurn(int turn, int round)
   {
@@ -174,7 +195,7 @@ namespace visualizer
 
   bool PersistentShip::RenderRange()
   {
-    return (strcmp( "Mine", type.c_str() ) == 0) || (strcmp( "Support", type.c_str() ) == 0) || (strcmp( "Warp Gate", type.c_str() ) == 0);
+    return (strcmp( "Mine", type.c_str() ) == 0) || (strcmp( "Support", type.c_str() ) == 0);
   }
 
   string PersistentShip::PointsOn( int turn )
@@ -241,17 +262,6 @@ namespace visualizer
   {
     m_DeathTurn = turn;
     m_Healths.push_back( 0 );
-    
-    if(m_Moves.size() > 0)
-    {
-      SpaceMove move;
-      move.point.x = m_Moves.back().point.x;
-      move.point.y = m_Moves.back().point.y;
-      move.start = m_Moves.back().end;
-      move.end = m_Moves.back().end + 2;
-      
-      m_Moves.push_back( move );
-    }
   }
       
   void PersistentShip::MoveInfo()
@@ -267,27 +277,28 @@ namespace visualizer
       
   pair<vec2, float> PersistentShip::SplineOn(int turn, float t)
   {
-    int v2 = -1;
-    bool foundV2 = false;
-    float time = float(turn) + t;
+    int v1, v2, v3, v4;
+    v1 = v2 = v3 = v4 = -1;
+    bool foundV3 = false;
 
+    float time = float(turn) + t;
     if(m_Moves.size() == 0)
-      return make_pair(vec2( m_InitialX, m_InitialY ), 0);
+      return make_pair( vec2( m_InitialX, m_InitialY ), 0 );
     
     for(int i = 0; i < m_Moves.size(); i++)
     {
       if( m_Moves[i].InRange( time ) )
       {
-        v2 = i;
+        v3 = i;
         i = m_Moves.size();
-        foundV2 = true;
+        foundV3 = true;
       }
       else if( m_Moves[i].start > time )
       {
-        v2 = i-1;
+        v3 = i-1;
         t = 1.0f;
         i = m_Moves.size();
-        foundV2 = true;
+        foundV3 = true;
       }
       else if( m_Moves[i].end < time )
       {
@@ -295,23 +306,20 @@ namespace visualizer
       }
       else
       {
-        // TODO: Put this back when we find out 
-        // what's wrong.
-        //THROW(Exception, "Shouldn't Happen");
           // Shouldn't happen
       }
     }
 
-    if( !foundV2 )
+    if( !foundV3 )
     {
-      v2 = m_Moves.size()-1;
+      v3 = m_Moves.size()-1;
       t = 1.0f;
     }
     
-    int v1 = v2-1;
-    int v3 = v2+1;
-    int v4 = v2+2;
-
+    v1 = v3-2;
+    v2 = v3-1;
+    v4 = v3+1;
+    
     if( v1 < 0 )
       v1=0;
     if( v2 < 0 )
@@ -323,7 +331,7 @@ namespace visualizer
     
     if( t != 1.0f )  // if we need to calculate a new t, due to multiple moves per turn
     {
-      t = (time - m_Moves[v2].start) / (m_Moves[v2].end - m_Moves[v2].start);
+      t = (time - m_Moves[v3].start) / (m_Moves[v3].end - m_Moves[v3].start);
     }
     
     t = pow(t, (2.0f/3.0f)); // to ease into thier final positions make t = t^(2/3)
@@ -347,55 +355,4 @@ namespace visualizer
 
     return make_pair(vec2(px, py), atan2(hy, hx));
   }
-
-  pair<vec2, float> PersistentShip::GardnersSplineOn(int turn, float t)
-  {
-#if 0
-    // Index setup from Jake F. 
-    
-    turn -= createdAtTurn;
-    int i = turn;
-    const int step = 1;
-    int v0 = i-step;
-    int v1 = i;
-    int v2 = i+step;
-    int v3 = i+2*step;
-
-    if( i-step < 0 )
-      v0=0;
-    if( (signed)points.size() <= i+step )
-      v2=points.size()-1;
-    if( (signed)points.size() <= i+step*2 )
-      v3=points.size()-1;		
-
-    // Setting up the verticies
-
-    auto times = glm::vec4(1, t, t*t, t*t*t);
-    auto p0 = vec2(points[v1].x, points[v1].y);
-    auto p1 = vec2(points[v2].x, points[v2].y);
-    auto m0 = glm::normalize(p0 - vec2(points[v0].x, points[v0].y));
-    auto m1 = glm::normalize(vec2(points[v3].x, points[v3].y) - p1);
-
-    if( m0.x != m0.x )
-      m0 = vec2(0, 0);
-
-    if( m1.x != m1.x )
-      m1 = vec2(0, 0);
-
-    m0 *= 0;
-    m1 *= 0;
-
-    auto q = glm::mat4x2(p0, m0, p1, m1);
-
-    glm::vec4 m = times * glm::transpose(A);
-    vec2 result = q * m;
-  
-    double angle = glm::orientedAngle(vec2(1,0), glm::normalize(p1-p0));
-    if( angle != angle )
-      angle = 0;
-    cout << angle << endl;
-    return make_pair(vec2(result.x, result.y), angle);
-#endif
-  }
-
 } // visualizer
