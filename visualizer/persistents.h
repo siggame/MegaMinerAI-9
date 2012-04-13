@@ -288,7 +288,7 @@ namespace visualizer
         {
           if( (int)spacemove.start == turn - 1)
           {
-            pts << "(" << spacemove.point.x << "," << spacemove.point.y << ")";
+            pts << "(" << spacemove.point.x << "," << -spacemove.point.y << ")";
             nothing = false;
           }
           else if( spacemove.start > (float)turn )

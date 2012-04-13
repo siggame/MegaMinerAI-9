@@ -202,6 +202,7 @@ namespace visualizer
       // Loop though each PersistentShip in the current state, and them to the shipIDs to look at
       for(auto& i : m_game->states[ state ].ships)
       {
+        i.second.y *= -1;
         pair< int, parser::Ship > p;
         p.first = i.first;
         p.second = i.second;
@@ -265,9 +266,9 @@ namespace visualizer
               parser::move &move = (parser::move&)*j;
               if( !m_PersistentShips[shipID]->HasMoves()  )
               {
-                  moves.push_back( SpacePoint( move.fromX, move.fromY ) );
+                  moves.push_back( SpacePoint( move.fromX, -move.fromY ) );
               }
-              moves.push_back( SpacePoint( move.toX, move.toY ) );
+              moves.push_back( SpacePoint( move.toX, -move.toY ) );
               //if( shipID == 37 )
                 //cout << "Move found on turn " << state << " with ship id " << shipID << " of owner " << m_PersistentShips[shipID]->owner << " moving from (" << move.fromX << "," << move.fromY << ") to (" << move.toX << "," << move.toY << ")" << endl;
             } break;
