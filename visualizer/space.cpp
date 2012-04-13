@@ -244,7 +244,7 @@ namespace visualizer
         // If the current ship's ID does not map to a PersistentShip in the map, create it and the warp for it
         if( m_PersistentShips.find(shipID) == m_PersistentShips.end() )
         {
-          m_PersistentShips[shipID] = new PersistentShip(state, m_game->states[ state ].round, i.second);
+          m_PersistentShips[shipID] = new PersistentShip(state, m_game->states[ state ].roundNumber, i.second);
 
           // Add the warps for this ship (so long as it is not a mine)
           if( strcmp( i.second.type, "Mine" ) != 0)
@@ -350,7 +350,7 @@ namespace visualizer
       for( auto& i : m_PersistentShips )
       {
         // If it exists
-        if(i.second->ExistsAtTurn( state, m_game->states[ state ].round ))
+        if(i.second->ExistsAtTurn( state, m_game->states[ state ].roundNumber ))
         {
           stringstream dto; // debug table output
           turn[i.first]["Owner"] = i.second->owner; 
@@ -402,7 +402,7 @@ namespace visualizer
         shipTypes.push_back( shipType.second.type );
       }
       
-      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].round, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].round < m_game->states[ state + 1 ].round, shipTypes );
+      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].roundNumber, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].roundNumber < m_game->states[ state + 1 ].roundNumber, shipTypes );
       roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
       turn.addAnimatable( roundHUD );
 

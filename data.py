@@ -112,6 +112,7 @@ deStealth = Animation('deStealth',
   
 roundVictory = Animation('roundVictory',
   data=[
+    Variable('identifier', int), #Magic number in the land of OZ: -17
     Variable('message', str),
   ],
 )

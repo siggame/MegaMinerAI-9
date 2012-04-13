@@ -137,7 +137,7 @@ class Match(DefaultGameWorld):
     return True
 
   def declareRoundWinner(self, winners, message):
-    #self.animations.append(['roundVictory', message])
+    self.animations.append(['round-victory', -17, message])
     self.sendStatus(self.spectators)
     for winner in winners:
       winner.victories += 1

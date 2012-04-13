@@ -97,6 +97,7 @@ std::ostream& operator<<(std::ostream& stream, selfDestruct ob)
 std::ostream& operator<<(std::ostream& stream, roundVictory ob)
 {
   stream << "roundVictory" << "\n";
+  stream << "identifier: " << ob.identifier  <<'\n';
   stream << "message: " << ob.message  <<'\n';
   return stream;
 }
@@ -141,7 +142,7 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
   stream << "turnNumber: " << ob.turnNumber  <<'\n';
   stream << "playerID: " << ob.playerID  <<'\n';
   stream << "gameNumber: " << ob.gameNumber  <<'\n';
-  stream << "round: " << ob.round  <<'\n';
+  stream << "roundNumber: " << ob.roundNumber  <<'\n';
   stream << "victoriesNeeded: " << ob.victoriesNeeded  <<'\n';
   stream << "mapRadius: " << ob.mapRadius  <<'\n';
 

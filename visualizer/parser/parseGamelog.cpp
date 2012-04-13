@@ -509,6 +509,13 @@ static bool parseRoundVictory(roundVictory& object, sexp_t* expression)
     cerr << "Error in parseroundVictory.\n Parsing: " << *expression << endl;
     return false;
   }
+  object.identifier = atoi(sub->val);
+  sub = sub->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parseroundVictory.\n Parsing: " << *expression << endl;
+    return false;
+  }
   object.message = new char[strlen(sub->val)+1];
   strncpy(object.message, sub->val, strlen(sub->val));
   object.message[strlen(sub->val)] = 0;
@@ -624,7 +631,7 @@ static bool parseSexp(Game& game, sexp_t* expression)
           gs.gameNumber = atoi(sub->val);
           sub = sub->next;
           if ( !sub ) return false;
-          gs.round = atoi(sub->val);
+          gs.roundNumber = atoi(sub->val);
           sub = sub->next;
           if ( !sub ) return false;
           gs.victoriesNeeded = atoi(sub->val);
