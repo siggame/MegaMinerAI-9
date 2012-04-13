@@ -83,6 +83,7 @@ namespace visualizer
       }
     }
 
+    // Draw the round end win screen
     if( m_RoundHUD->drawWinScreen )
     {
       float op = t;
@@ -97,6 +98,7 @@ namespace visualizer
 
       game->renderer->setColor( textColor );
       game->renderer->drawText( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius - 30, "Roboto", winnerText.str(), 300, IRenderer::Center );
+      game->renderer->drawText( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius + 70, "Roboto", m_RoundHUD->message, 170, IRenderer::Center );
     }
   }
 
