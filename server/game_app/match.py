@@ -165,9 +165,9 @@ class Match(DefaultGameWorld):
     if player1.warpGate.health <= 0 and player2.warpGate.health <= 0:
       self.declareRoundWinner([player1, player2], "Draw due to mutual warp gate destruction")
     elif player2.warpGate.health <= 0:
-      self.declareRoundWinner([player1], "Player 1 wins by warp gate destruction")
+      self.declareRoundWinner([player1], player1.playerName + " wins by warp gate destruction")
     elif player1.warpGate.health <= 0:
-      self.declareRoundWinner([player2], "Player 2 wins by warp gate destruction")
+      self.declareRoundWinner([player2], player2.playerName + " wins by warp gate destruction")
     # End by turn limit
     elif self.smartEnd():
       if player1.warpGate.health > player2.warpGate.health:
