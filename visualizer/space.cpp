@@ -394,6 +394,7 @@ namespace visualizer
       
       // Add the RoundHUD
       int roundWinnerID = -1;
+      string roundWinnerMessage = "";
       if( m_game->states.size() == state+1 )
       {
         roundWinnerID = m_game->winner;
@@ -415,6 +416,13 @@ namespace visualizer
             roundWinnerID = 1;
           }
         }
+        
+        for( auto& vic : m_game->states[state].animations[ -17 ] )
+        {
+          parser::roundVictory &victory = (parser::roundVictory&)*vic;
+          roundWinnerMessage = victory.message;
+        }
+        
       }
       
       // Get all the ship types for this round
@@ -424,7 +432,7 @@ namespace visualizer
         shipTypes.push_back( shipType.second.type );
       }
       
-      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].roundNumber, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].roundNumber < m_game->states[ state + 1 ].roundNumber, shipTypes );
+      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].roundNumber, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerMessage, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].roundNumber < m_game->states[ state + 1 ].roundNumber, shipTypes );
       roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
       turn.addAnimatable( roundHUD );
 
