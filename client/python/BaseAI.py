@@ -59,10 +59,10 @@ class BaseAI:
   #\endcond
   gameNumber = property(getGameNumber)
   #\cond
-  def getRound(self):
-    return library.getRound(self.connection)
+  def getRoundNumber(self):
+    return library.getRoundNumber(self.connection)
   #\endcond
-  round = property(getRound)
+  roundNumber = property(getRoundNumber)
   #\cond
   def getVictoriesNeeded(self):
     return library.getVictoriesNeeded(self.connection)
@@ -73,5 +73,12 @@ class BaseAI:
     return library.getMapRadius(self.connection)
   #\endcond
   mapRadius = property(getMapRadius)
+  ##Returns the distance between two points
+  def distance(self, fromX, fromY, toX, toY):
+    return library.baseDistance(fromX, fromY, toX, toY)
+  ##Find a point "travel" distance from the starting point in the direction of the ending point.  Returns the tuple (x, y)
+  def pointOnLine(self, fromX, fromY, toX, toY, travel):
+    ret = library.basePointOnLine(fromX, fromY, toX, toY, travel)
+    return (ret / 1024 - 500, ret % 1024 - 500)
   def __init__(self, connection):
     self.connection = connection

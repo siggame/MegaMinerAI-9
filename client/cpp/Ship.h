@@ -19,11 +19,11 @@ class Ship : public ShipDescription {
   int id();
   ///The ship type
   char* type();
-  ///The amount of money required to purchase this type of ship
+  ///The amount of energy required to warp in this type of ship
   int cost();
   ///The radius of the ship
   int radius();
-  ///The range of attacks for this ship
+  ///The range of attacks for this ship, given as the maximum distance from the center of this ship to the edge of the target
   int range();
   ///The strength of attacks for this ship
   int damage();
@@ -41,19 +41,19 @@ class Ship : public ShipDescription {
   int x();
   ///Y position of the ship
   int y();
-  ///How many more attacks this ship has
+  ///How many more attacks this ship can make this turn
   int attacksLeft();
-  ///How much more movement this ship has
+  ///How much more this ship can move this turn
   int movementLeft();
-  ///The total health of the ship
+  ///The current health of the ship
   int health();
 
   // Actions
-  ///Command a ship to move to a specified position. If the position specified by this function is not legal, the position of the ship will be updated, but the movement will be rejected by the server.
+  ///Command a ship to move to a specified position
   int move(int x, int y);
-  ///Blow yourself up, damage those around you, reduces the ship to 0 health.
+  ///Blow yourself up, damage enemy ships that overlap this ship
   int selfDestruct();
-  ///Commands your ship to attack a target. Making an attack will reduce the number of attacks available to the ship, even if the attack is rejected by the game server.
+  ///Commands your ship to attack a target.
   int attack(Ship& target);
 
   // Properties

@@ -1,4 +1,5 @@
 import com.sun.jna.Pointer;
+import java.awt.Point;
 
 /// \brief A basic AI interface.
 
@@ -71,7 +72,7 @@ public abstract class BaseAI
   }
 
 
-  ///How many turns it has been since the beginning of the game
+  ///How many turns it has been since the beginning of the round
   int turnNumber()
   {
     return Client.INSTANCE.getTurnNumber(connection);
@@ -87,11 +88,11 @@ public abstract class BaseAI
     return Client.INSTANCE.getGameNumber(connection);
   }
   ///The current round of the match
-  int round()
+  int roundNumber()
   {
-    return Client.INSTANCE.getRound(connection);
+    return Client.INSTANCE.getRoundNumber(connection);
   }
-  ///How many victories a player needs to win
+  ///How many victories a player needs to win this game.  If the last round is a tie, one more victory is needed
   int victoriesNeeded()
   {
     return Client.INSTANCE.getVictoriesNeeded(connection);
@@ -100,5 +101,16 @@ public abstract class BaseAI
   int mapRadius()
   {
     return Client.INSTANCE.getMapRadius(connection);
+  }
+  ///Returns the distance between two points
+  int distance(int fromX, int fromY, int toX, int toY)
+  {
+    return Client.INSTANCE.baseDistance(fromX, fromY, toX, toY);
+  }
+  ///Find a point "travel" distance from the starting point in the direction of the ending point.  Returns a Point object
+  Point pointOnLine(int fromX, int fromY, int toX, int toY, int travel)
+  {
+    int ret = Client.INSTANCE.basePointOnLine(fromX, fromY, toX, toY, travel);
+    return new Point(ret / 1024 - 500, ret % 1024 - 500);
   }
 }

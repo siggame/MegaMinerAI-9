@@ -78,12 +78,11 @@ namespace visualizer
       int maxMovement;
       string type;
       bool selected;
-      // Stats that change each turn
-      vector< int > healths;
+      bool SelfDestructs;
 
       PersistentShip(int createdAt, int round, parser::Ship ship)
       {
-        createdAtTurn = createdAt;
+        m_CreatedAtTurn = createdAt+1;
         id = ship.id;
         owner = ship.owner;
         radius = ship.radius;
@@ -96,16 +95,26 @@ namespace visualizer
         m_Round = round;
         selected = false;
         m_DeathTurn = 99999;
+        SelfDestructs = false;
         
         if( strcmp( "Mine", type.c_str() ) == 0 )
           radius /= 2.0f;
-
-        // have it stealth now (only Stealth ships care...)
-        AddStealth( createdAt );
       }
 
-      void AddTurn(int turn, vector<vec2> &moves, int movementLeft)
+      void AddTurn(int turn, vector<vec2> &moves, int health, int movementLeft)
       {
+        if( id == 14 )
+        {
+          if( moves.size() > 0 )
+          {
+            cout << "ADDING MOVES TO THE EMP ON TURN " << turn << ":\n";
+            for( auto& move : moves )
+            {
+              cout << "  (" << move.x << "," << move.y << ")" << endl;
+            }
+          }
+        }
+        
         // Add the moves
         float span = 1.0f / float(moves.size());
         for(float i = 0; i < (float)moves.size(); i++)
@@ -114,19 +123,44 @@ namespace visualizer
           move.point = moves[i];
           move.start = (float)turn + i * span;
           move.end = (float)turn + (i+1) * span;
-
-          m_Moves.push_back( move );
+          
+          // to stop duplicate move to the same location in the same turn... because that is apperntly happening on the first turn.
+          if(m_Moves.size() > 0)
+          {
+            if(m_Moves.back().point.x == move.point.x && m_Moves.back().point.y == move.point.y)
+            {
+              
+            }
+            else
+            {
+              m_Moves.push_back( move );
+              if( id == 14 )
+                cout << " ADDED MOVE (" << move.point.x << "," << move.point.y << ")" << endl;
+            }
+          }
+          else
+          {
+            m_Moves.push_back( move );
+            if( id == 14 )
+                cout << " ADDED MOVE (" << move.point.x << "," << move.point.y << ")" << endl;
+          }
         }
         
-        // Add the movement left
-        m_MovementLeft.push_back( movementLeft );
+        if( turn >= m_CreatedAtTurn )
+        {
+          // Add the movement left
+          m_MovementLeft.push_back( movementLeft );
+          
+          // Add the health this turn
+          m_Healths.push_back( health );
+        }
       }
 
       bool HasMoves() { return m_Moves.size() > 0; }
 
       bool ExistsAtTurn(int turn, int round)
       {
-        return ( turn >= createdAtTurn && turn <= m_DeathTurn && (m_Round == round || round == -1) );
+        return ( turn >= m_CreatedAtTurn && turn <= m_DeathTurn && (m_Round == round || round == -1) );
       }
 
       vec2 LocationOn(int turn, float t)
@@ -143,10 +177,10 @@ namespace visualizer
 
       float HealthOn(int turn, float t)
       {
-        turn -= createdAtTurn;
+        turn -= m_CreatedAtTurn;
 
         // h(t) = a + t(b - a)
-        return healths[PreviousTurn(turn)] + t * ( healths[turn] - healths[PreviousTurn(turn)] );
+        return m_Healths[PreviousTurn(turn)] + t * ( m_Healths[turn] - m_Healths[PreviousTurn(turn)] );
       }
 
       bool EMPedOn(int turn)
@@ -228,13 +262,13 @@ namespace visualizer
       string PointsOn( int turn )
       {
         stringstream pts;
-
+        
         bool nothing = true;
         for( auto& spacemove : m_Moves )
         {
           if( (int)spacemove.start == turn - 1)
           {
-            pts << "(" << spacemove.point.x << "," << spacemove.point.y << ")";
+            pts << "(" << spacemove.point.x << "," << -spacemove.point.y << ")";
             nothing = false;
           }
           else if( spacemove.start > (float)turn )
@@ -273,7 +307,7 @@ namespace visualizer
       
       string MovementOn( int turn )
       {
-        turn -= createdAtTurn;
+        turn -= m_CreatedAtTurn;
         stringstream ss;
         if( turn >= m_MovementLeft.size() || turn < 0 )
         {
@@ -288,9 +322,9 @@ namespace visualizer
       void AddDeath( int turn )
       {
         m_DeathTurn = turn;
-        healths.push_back( 0 );
+        m_Healths.push_back( 0 );
         
-        if(m_Moves.size() > 0)
+        /*if(m_Moves.size() > 0)
         {
           SpaceMove move;
           move.point.x = m_Moves.back().point.x;
@@ -299,16 +333,15 @@ namespace visualizer
           move.end = m_Moves.back().end + 2;
           
           m_Moves.push_back( move );
-        }
+        }*/
       }
       
-      int FirstTurn() { return createdAtTurn; }
+      int FirstTurn() { return m_CreatedAtTurn; }
       
       void MoveInfo()
-      {
-        return;
-        
+      {        
         cout << "Ship " << id << " of type " << type << endl;
+        
         for( auto& move : m_Moves )
         {
           cout << "  (" << move.point.x << "," << move.point.y << ") from " << move.start << " to " << move.end << endl;
@@ -316,7 +349,8 @@ namespace visualizer
       }
       
     private:
-      int createdAtTurn;
+      int m_CreatedAtTurn;
+      vector< int > m_Healths;
       float m_InitialX;
       float m_InitialY;
 
@@ -338,7 +372,7 @@ namespace visualizer
       {
         // Index setup from Jake F. 
         
-        turn -= createdAtTurn;
+        turn -= m_CreatedAtTurn;
         int i = turn;
         const int step = 1;
         int v0 = i-step;
@@ -385,10 +419,11 @@ namespace visualizer
       
       pair<vec2, float> SplineOn(int turn, float t)
       {
-        int v2 = -1;
-        bool foundV2 = false;
-        float time = float(turn) + t;
+        int v1, v2, v3, v4;
+        v1 = v2 = v3 = v4 = -1;
+        bool foundV3 = false;
 
+        float time = float(turn) + t;
         if(m_Moves.size() == 0)
           return make_pair(vec2( m_InitialX, m_InitialY ), 0);
         
@@ -396,21 +431,16 @@ namespace visualizer
         {
           if( m_Moves[i].InRange( time ) )
           {
-            v2 = i;
+            v3 = i;
             i = m_Moves.size();
-            foundV2 = true;
-            
-            if( selected )
-            {
-              cout << "for turn: " << turn << "decided on v2: " << v2 << " which is: (" << m_Moves[v2].point.x << "," << m_Moves[v2].point.y << ") from " << m_Moves[v2].start << " to " << m_Moves[v2].end << endl;
-            }
+            foundV3 = true;
           }
           else if( m_Moves[i].start > time )
           {
-            v2 = i-1;
+            v3 = i-1;
             t = 1.0f;
             i = m_Moves.size();
-            foundV2 = true;
+            foundV3 = true;
           }
           else if( m_Moves[i].end < time )
           {
@@ -425,16 +455,16 @@ namespace visualizer
           }
         }
 
-        if( !foundV2 )
+        if( !foundV3 )
         {
-          v2 = m_Moves.size()-1;
+          v3 = m_Moves.size()-1;
           t = 1.0f;
         }
         
-        int v1 = v2-1;
-        int v3 = v2+1;
-        int v4 = v2+2;
-
+        v1 = v3-2;
+        v2 = v3-1;
+        v4 = v3+1;
+        
         if( v1 < 0 )
           v1=0;
         if( v2 < 0 )
@@ -446,8 +476,10 @@ namespace visualizer
         
         if( t != 1.0f )  // if we need to calculate a new t, due to multiple moves per turn
         {
-          t = (time - m_Moves[v2].start) / (m_Moves[v2].end - m_Moves[v2].start);
+          t = (time - m_Moves[v3].start) / (m_Moves[v3].end - m_Moves[v3].start);
         }
+        
+        t = pow(t, (2.0f/3.0f)); // to ease into thier final positions make t = t^(2/3)
         double c1,c2,c3,c4;   
 
         c1 = M12*m_Moves[v2].point.x;   

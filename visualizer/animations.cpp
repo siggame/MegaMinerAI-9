@@ -183,11 +183,15 @@ namespace visualizer
     {
       attackTrans = 1 - (t - 0.5) * 2;
     }
+    
+    Color teamBaseColor = shipOwner ? Color(0, 0.4f, 1, 1) : Color(1, 0, 0, 1);
     Color attackColor[] = { Color(1, 0, 0, attackTrans), Color(0, 0.4f, 1, attackTrans) };
     Color healthColor = Color(0, 1, 0, (shipIsExploding? 1 - t : shipStealth) );
     Color rangeColor = shipOwner ? Color(0, 0.4f, 1, attackTrans/4.0f + 0.25f) : Color(1, 0, 0, attackTrans/4.0f + 0.25f);
     Color normalColor = Color (1, 1, 1, 1);
+    Color explosionColor = m_PersistentShip->SelfDestructs ? teamBaseColor : normalColor;
     // END: Variables we will need
+    ////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -200,7 +204,7 @@ namespace visualizer
 
     if(shipIsExploding)
     {
-      game->renderer->setColor( Color(1, 1, 1) );
+      game->renderer->setColor( explosionColor );
       game->renderer->drawTexturedQuad(shipCenter.x - shipRadius * 2.4f, shipCenter.y - shipRadius * 2.4f, shipRadius * 5.0f, shipRadius * 5.0f, shipExplosionTexture.str());
     }
     else

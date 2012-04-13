@@ -17,9 +17,9 @@ int BaseAI::gameNumber()
 {
   return getGameNumber(c);
 }
-int BaseAI::round()
+int BaseAI::roundNumber()
 {
-  return getRound(c);
+  return getRoundNumber(c);
 }
 int BaseAI::victoriesNeeded()
 {
@@ -68,3 +68,15 @@ bool BaseAI::startTurn()
 
 BaseAI::BaseAI(Connection* conn) : c(conn) {}
 BaseAI::~BaseAI() {}
+
+int BaseAI::distance(int fromX, int fromY, int toX, int toY)
+{
+  return baseDistance(fromX, fromY, toX, toY);
+}
+
+void BaseAI::pointOnLine(int fromX, int fromY, int toX, int toY, int travel, int & outX, int & outY)
+{
+  int ret = basePointOnLine(fromX, fromY, toX, toY, travel);
+  outX = ret / 1024 - 500;
+  outY = ret % 1024 - 500;
+}

@@ -41,7 +41,7 @@ public abstract class ShipDescription
     IntPtr value = Client.shipDescriptionGetType(ptr);
     return Marshal.PtrToStringAuto(value);
   }
-  ///The amount of money required to purchase this type of ship
+  ///The amount of energy required to warp in this type of ship
   public int getCost()
   {
     validify();
@@ -55,7 +55,7 @@ public abstract class ShipDescription
     int value = Client.shipDescriptionGetRadius(ptr);
     return value;
   }
-  ///The range of attacks for this ship
+  ///The range of attacks for this ship, given as the maximum distance from the center of this ship to the edge of the target
   public int getRange()
   {
     validify();

@@ -78,7 +78,7 @@ class Player:
   def talk(self, message):
     # Ensure I can't make my opponent talk
     if self.game.playerID == self.id:
-      self.game.animations.append(['playerTalk', self.id, message])
+      self.game.animations.append(['player-talk', self.id, message])
     else:
       return "You can't speak for your opponent"
     return True
@@ -103,7 +103,7 @@ class Ship(ShipDescription):
     self.attacksLeft = attacksLeft
     self.movementLeft = movementLeft
     self.health = health
-    self.isStealthed = False
+    self.isStealthed = self.type == "Stealth"
     self.targeted = set()
 
   def toList(self):
@@ -159,7 +159,9 @@ class Ship(ShipDescription):
           # For Mine Layer's, you get 1 attack if you have any mines left, otherwise you get 0 attacks
           self.attacksLeft = min(1, self.maxAttacks)
       if self.type == "Stealth":
-        self.isStealthed = True
+        if self.isStealthed == False:
+          self.game.animations.append(['stealth', self.id])
+          self.isStealthed = True
                     
   def move(self, x, y):
     #moved is the distance they've moved, where they were to where they're going
@@ -194,7 +196,7 @@ class Ship(ShipDescription):
       if target.health <= 0:
         self.game.removeObject(target)
     self.game.removeObject(self)
-    self.game.animations.append(['selfDestruct', self.id])
+    self.game.animations.append(['self-destruct', self.id])
     return True
 
   def attack(self, target):
@@ -239,12 +241,13 @@ class Ship(ShipDescription):
       if target.health <= 0:
         self.game.removeObject(target)
       self.targeted.add(target.id)
-      if self.type == "Stealth":
+      if self.type == 'Stealth':
         self.isStealthed = False
+        self.game.animations.append(['de-stealth',self.id])
     return True
     
   def inRange(self, target):
-    return inRange(self.x, self.y, self.range, target.x, target.y, target.range)
+    return inRange(self.x, self.y, self.range, target.x, target.y, target.radius)
 
 class ShipType(ShipDescription):
   def __init__(self, game, id, type, cost, radius, range, damage, selfDestructDamage, maxMovement, maxAttacks, maxHealth):
@@ -280,11 +283,11 @@ class ShipType(ShipDescription):
 
   def warpIn(self, x, y):
     player = self.game.objects.players[self.game.playerID]
-    if distance(0, 0, x, y) + cfgUnits[self.type]["radius"] > self.game.mapRadius:
+    if distance(0, 0, x, y) + self.radius > self.game.mapRadius:
       return "Warping in that ship to %i, %i would be lost in space...forever"%(x, y)
     elif player.energy < self.cost:
       return "You need to not be poor to buy that %s"%(self.type)
-    elif distance(player.warpGate.x, player.warpGate.y, x, y) + cfgUnits[self.type]["radius"] > player.warpGate.radius:
+    elif distance(player.warpGate.x, player.warpGate.y, x, y) + self.radius > player.warpGate.radius:
       return "You must spawn that %s closer to your Warp Gate"%(self.type)
     else:
       #spawn the unit with its stats, from units.cfg in config directory

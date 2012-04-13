@@ -34,7 +34,7 @@ public class ShipType: ShipDescription
 
     //commands
 
-  ///Sends in a new ship of this type. Ships must be warped in with the radius of the player's warp ship.
+  ///Sends in a new ship of this type. Ships must be warped in within the radius of the player's warp gate.
   public int warpIn(int x, int y)
   {
     validify();
@@ -57,7 +57,7 @@ public class ShipType: ShipDescription
     IntPtr value = Client.shipTypeGetType(ptr);
     return Marshal.PtrToStringAuto(value);
   }
-  ///The amount of money required to purchase this type of ship
+  ///The amount of energy required to warp in this type of ship
   public new int getCost()
   {
     validify();
@@ -71,7 +71,7 @@ public class ShipType: ShipDescription
     int value = Client.shipTypeGetRadius(ptr);
     return value;
   }
-  ///The range of attacks for this ship
+  ///The range of attacks for this ship, given as the maximum distance from the center of this ship to the edge of the target
   public new int getRange()
   {
     validify();

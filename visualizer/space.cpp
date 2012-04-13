@@ -4,6 +4,7 @@
 #include "version.h"
 #include "animations.h"
 #include "persistents.h"
+#include <utility>
 
 #include <list>
 using std::list;
@@ -184,7 +185,7 @@ namespace visualizer
   {
     cout << "LOADING..." << endl;
     map < int, vector< SmartPointer < Warp > > > Warps;
-    Warps[ -1 ] = vector< SmartPointer< Warp > >();
+    Warps[ 0 ] = vector< SmartPointer< Warp > >();
     
     // Build the Debug Table's Headers
     QStringList header;
@@ -200,6 +201,7 @@ namespace visualizer
     // BEGIN: Look through the game logs and build the m_PersistentShips
     for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
     {
+<<<<<<< HEAD
       cout << "LOADING..." << __LINE__ << endl;
       Warps[ state ] = vector< SmartPointer< Warp > >();
       // Loop though each PersistentShip in the current state
@@ -207,7 +209,52 @@ namespace visualizer
       // The list of ships this turn to do some blob calculations on
       list<SmartPointer<TempShip>> shipsThisTurn;
       
+=======
+      Warps[ state+1 ] = vector< SmartPointer< Warp > >();
+      
+      // Find all the ships we need to look at this turn
+      vector< pair<int, parser::Ship> > ships;
+      
+      // Loop though each PersistentShip in the current state, and them to the shipIDs to look at
+>>>>>>> 30163592b4f65b0611a7305ec6e86881e9abb65f
       for(auto& i : m_game->states[ state ].ships)
+      {
+        i.second.y *= -1;
+        pair< int, parser::Ship > p;
+        p.first = i.first;
+        p.second = i.second;
+        ships.push_back( p );
+      }
+      
+      // 
+      if( state >= 2 )
+      {
+        for(auto& ship : m_game->states[ state - 2 ].ships)
+        {
+          bool existsInCurrentShips = false;
+          for( auto& currentShip : ships )
+          {
+            if( currentShip.first == ship.first )
+            {
+              existsInCurrentShips = true;
+              break;
+            }
+          }
+          
+          if( !existsInCurrentShips )
+          {
+            pair< int, parser::Ship > p;
+            p.first = ship.first;
+            p.second = ship.second;
+            
+            p.second.health = 0;
+            
+            ships.push_back( p );
+          }
+        }
+      }
+      
+      for( auto& i : ships )
       {
         int shipID = i.second.id;
 
@@ -220,13 +267,13 @@ namespace visualizer
         // If the current ship's ID does not map to a PersistentShip in the map, create it and the warp for it
         if( m_PersistentShips.find(shipID) == m_PersistentShips.end() )
         {
-          m_PersistentShips[shipID] = new PersistentShip(state, m_game->states[ state ].round, i.second);
+          m_PersistentShips[shipID] = new PersistentShip(state, m_game->states[ state ].roundNumber, i.second);
 
           // Add the warps for this ship (so long as it is not a mine)
           if( strcmp( i.second.type, "Mine" ) != 0)
           {
-            //Warps[ state - 1 ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, false ) );
-            Warps[ state ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, true ) );
+            Warps[ state ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, false ) );
+            Warps[ state+1 ].push_back( new Warp( i.second.x + m_mapRadius, i.second.y + m_mapRadius, i.second.radius, i.second.owner, true ) );
           }
         }
 
@@ -244,13 +291,11 @@ namespace visualizer
             case parser::MOVE:
             {
               parser::move &move = (parser::move&)*j;
-              if( !m_PersistentShips[shipID]->HasMoves() && state != m_PersistentShips[shipID]->FirstTurn() )
+              if( !m_PersistentShips[shipID]->HasMoves()  )
               {
                   moves.push_back( vec2( move.fromX, move.fromY ) );
               }
               moves.push_back( vec2( move.toX, move.toY ) );
-              //if( shipID == 10 )
-                //cout << "Move found on turn " << state << " with ship id " << shipID << " moving from (" << move.fromX << "," << move.fromY << ") to (" << move.toX << "," << move.toY << ")" << endl;
             } break;
             case parser::ATTACK:
             {
@@ -270,11 +315,15 @@ namespace visualizer
             case parser::STEALTH:
             {
               m_PersistentShips[shipID]->AddStealth( state );
-            }
+            } break;
             case parser::DESTEALTH:
             {
               m_PersistentShips[shipID]->AddDeStealth( state );
-            }
+            } break;
+            case parser::SELFDESTRUCT:
+            {
+              m_PersistentShips[shipID]->SelfDestructs = true;
+            } break;
           }
         }
         
@@ -283,7 +332,7 @@ namespace visualizer
           moves.push_back(vec2(i.second.x, i.second.y));
         }
         
-        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.movementLeft );
+        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.health, i.second.movementLeft );
         
         // Check to see if this ship dies next turn (doesn't exist next turn)
         if( state + 1 != m_game->states.size() )
@@ -327,7 +376,7 @@ namespace visualizer
       for( auto& i : m_PersistentShips )
       {
         // If it exists
-        if(i.second->ExistsAtTurn( state, m_game->states[ state ].round ))
+        if(i.second->ExistsAtTurn( state, m_game->states[ state ].roundNumber ))
         {
           stringstream dto; // debug table output
           turn[i.first]["Owner"] = i.second->owner; 
@@ -379,7 +428,7 @@ namespace visualizer
         shipTypes.push_back( shipType.second.type );
       }
       
-      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].round, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].round < m_game->states[ state + 1 ].round, shipTypes );
+      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].roundNumber, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].roundNumber < m_game->states[ state + 1 ].roundNumber, shipTypes );
       roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
       turn.addAnimatable( roundHUD );
 
@@ -412,8 +461,6 @@ namespace visualizer
 
     for(auto& i : m_PersistentShips)
     {
-      i.second->MoveInfo();
-      
       if( m_suicide )
         break;
     }

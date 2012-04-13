@@ -19,7 +19,7 @@ class Player {
   char* playerName();
   ///Time remaining, updated at start of turn
   float time();
-  ///How many rounds you have won this match
+  ///How many rounds you have won this game
   int victories();
   ///How much energy the player has left to warp in ships
   int energy();

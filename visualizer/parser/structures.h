@@ -93,6 +93,7 @@ struct selfDestruct : public Animation
 
 struct roundVictory : public Animation
 {
+  int identifier;
   char* message;
 
   friend std::ostream& operator<<(std::ostream& stream, roundVictory obj);
@@ -144,7 +145,7 @@ struct GameState
   int turnNumber;
   int playerID;
   int gameNumber;
-  int round;
+  int roundNumber;
   int victoriesNeeded;
   int mapRadius;
 

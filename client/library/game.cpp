@@ -58,7 +58,7 @@ DLLEXPORT Connection* createConnection()
   c->turnNumber = 0;
   c->playerID = 0;
   c->gameNumber = 0;
-  c->round = 0;
+  c->roundNumber = 0;
   c->victoriesNeeded = 0;
   c->mapRadius = 0;
   c->ShipTypes = NULL;
@@ -207,6 +207,59 @@ DLLEXPORT void getStatus(Connection* c)
 }
 
 
+#include <cmath>
+DLLEXPORT int baseDistance(int fromX, int fromY, int toX, int toY)
+{
+  int dx = (fromX - toX);
+  int dy = (fromY - toY);
+  return int(ceil(sqrt(dx * dx + dy * dy)));
+}
+
+DLLEXPORT int basePointOnLine(int fromX, int fromY, int toX, int toY, int travel)
+{
+  int x, y, dx, dy;
+  int toGoal = baseDistance(fromX, fromY, toX, toY);
+  if(toGoal <= travel)
+  {
+    x = toX;
+    y = toY;
+  }
+  else if(travel <= 0)
+  {
+    x = fromX;
+    y = fromY;
+  }
+  else
+  {
+    dx = toX - fromX;
+    dy = toY - fromY;
+    x = fromX + dx * travel / toGoal;
+    y = fromY + dy * travel / toGoal;
+    dx = toX - x;
+    dy = toY - y;
+    float ratio = 1;
+    if(dx != 0)
+    {
+      ratio = static_cast<float>(dy) / dx;
+    }
+    // Do ray tracing to correct for rounding error
+    while(baseDistance(fromX, fromY, x, y) < travel)
+    {
+      if(dx != 0 && static_cast<float>(dy) / dx < ratio)
+      {
+        if(toX > x) {x++; dx--;}
+        else {x--; dx++;}
+      }
+      else
+      {
+        if(toY > y) {y++; dy--;}
+        else {y--; dy++;}
+      }
+    }
+  }
+  // Pack the X and Y into a single integer for interlanguage movement
+  return ((x+500)<<10) + (y+500);
+}
 
 DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y)
 {
@@ -221,8 +274,35 @@ DLLEXPORT int shipTypeWarpIn(_ShipType* object, int x, int y)
   
   //Game state update
   Connection * c = object->_c;
-  c->Players[c->playerID].energy -= object->cost;
-  return 1;
+  if(baseDistance(0, 0, x, y) + object->radius > c->mapRadius)
+  {
+    return 0;
+  }
+  else if (c->Players[c->playerID].energy < object->cost)
+  {
+    return 0;
+  }
+  else
+  {
+    // Find the player's warp gate
+    int gateIndex = -1;
+    for(int i=0; i < c->ShipCount && gateIndex == -1; i++)
+    {
+      if(c->Ships[i].owner == c->playerID && strcmp("Warp Gate", c->Ships[i].type) == 0)
+      {
+        gateIndex = i;
+      }
+    }
+    if(baseDistance(c->Ships[gateIndex].x, c->Ships[gateIndex].y, x, y) + object->radius > c->Ships[gateIndex].radius)
+    {
+      return 0;
+    }
+    else
+    {
+      c->Players[c->playerID].energy -= object->cost;
+      return 1;
+    }
+  }
 }
 
 
@@ -235,7 +315,17 @@ DLLEXPORT int playerTalk(_Player* object, char* message)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
-  return 1;
+
+  //Game State Update
+  Connection * c = object->_c;
+  if(object->id == c->playerID)
+  {
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 
@@ -250,10 +340,28 @@ DLLEXPORT int shipMove(_Ship* object, int x, int y)
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
   
-  //Game state update
-  object->movementLeft = object->movementLeft - sqrt(pow(x - object->x,2)+pow(y-object->y,2));
+  //Game State Update
+  Connection * c = object->_c;
+  int moved = baseDistance(object->x, object->y, x, y);
+  if(object->owner != c->playerID)
+  {
+    return 0;
+  }
+  else if(baseDistance(0, 0, x, y) + object->radius > c->mapRadius)
+  {
+    return 0;
+  }
+  else if(object->movementLeft < moved)
+  {
+    return 0;
+  }
+  else if (moved == 0)
+  {
+    return 0;
+  }
   object->x = x;
   object->y = y;
+  object->movementLeft -= moved;
   return 1;
 }
 
@@ -267,18 +375,26 @@ DLLEXPORT int shipSelfDestruct(_Ship* object)
   UNLOCK( &object->_c->mutex);
   
   //Game state update
-  object->health = 0;
   Connection * c = object->_c;
+  if(strcmp(object->type,"Warp Gate") == 0)
+  {
+    return 0;
+  }
+  else if(object->owner != c->playerID)
+  {
+    return 0;
+  }
   for(int i = 0; i < c->ShipCount; i++)
   {
     if(c->Ships[i].owner != object->owner)
     {
-      if(sqrt(pow(c->Ships[i].x - object->x,2)+pow(c->Ships[i].y - object->y,2)) <= c->Ships[i].radius + object->radius)
+      if(baseDistance(object->x, object->y, c->Ships[i].x, c->Ships[i].y) < c->Ships[i].radius + object->radius)
       {
         c->Ships[i].health -= object->selfDestructDamage;
       }
     }
   }
+  object->health = 0;
   return 1;
 }
 
@@ -293,9 +409,57 @@ DLLEXPORT int shipAttack(_Ship* object, _Ship* target)
   UNLOCK( &object->_c->mutex);
 
   //Game state update
-  //TODO Support
-  object->attacksLeft--;
-  target->health -= object->damage;
+  Connection * c = object->_c;
+
+  if(object->owner != c->playerID)
+    return 0;
+  if(object->attacksLeft <= 0)
+    return 0;
+  //TODO Does not check for repeated attacks against the same target
+  if(strcmp(object->type, "Mine Layer") == 0)
+  {
+    object->maxAttacks -= 1;
+    object->attacksLeft -= 1;
+    return 1;
+  }
+  if(strcmp(object->type, "EMP") == 0)
+  {
+    object->maxAttacks -= 1;
+    object->attacksLeft -= 1;
+    for(int i = 0; i < c->ShipCount; i++)
+    {
+      if(c->Ships[i].owner != object->owner)
+      {
+        if(baseDistance(object->x, object->y, c->Ships[i].x, c->Ships[i].y) < c->Ships[i].radius + object->range)
+        {
+          // EMP the ship
+          c->Ships[i].movementLeft = -1;
+          c->Ships[i].attacksLeft = -1;
+        }
+      }
+    }
+    return 1;
+  }
+  else if(target->owner == object->owner)
+    return 0;
+  else if (baseDistance(object->x, object->y, target->x, target->y) > object->range + target->radius)
+    return 0;
+  else
+  {
+    float modifier = 1;
+    for(int i = 0; i < c->ShipCount; i++)
+    {
+      if(c->Ships[i].owner == object->owner && strcmp(c->Ships[i].type, "Support") == 0)
+      {
+        if(baseDistance(target->x, target->y, c->Ships[i].x, c->Ships[i].y) < c->Ships[i].range + target->radius)
+        {
+          modifier += (c->Ships[i].damage / 100.0);
+        }
+      }
+    }
+    target->health -= int(object->damage*modifier);
+    object->attacksLeft -= 1;
+  }
   return 1;
 }
 
@@ -505,7 +669,7 @@ DLLEXPORT int networkLoop(Connection* c)
           c->gameNumber = atoi(sub->val);
           sub = sub->next;
 
-          c->round = atoi(sub->val);
+          c->roundNumber = atoi(sub->val);
           sub = sub->next;
 
           c->victoriesNeeded = atoi(sub->val);
@@ -623,9 +787,9 @@ DLLEXPORT int getGameNumber(Connection* c)
 {
   return c->gameNumber;
 }
-DLLEXPORT int getRound(Connection* c)
+DLLEXPORT int getRoundNumber(Connection* c)
 {
-  return c->round;
+  return c->roundNumber;
 }
 DLLEXPORT int getVictoriesNeeded(Connection* c)
 {

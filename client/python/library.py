@@ -41,6 +41,12 @@ library.networkLoop.restype = c_int
 library.networkLoop.argtypes = [c_void_p]
 
 #Functions
+library.baseDistance.restype = c_int
+library.baseDistance.argtypes = [c_int, c_int, c_int, c_int]
+
+library.basePointOnLine.restype = c_int
+library.basePointOnLine.argtypes = [c_int, c_int, c_int, c_int, c_int]
+
 library.shipTypeWarpIn.restype = c_int
 library.shipTypeWarpIn.argtypes = [c_void_p, c_int, c_int]
 
@@ -68,8 +74,8 @@ library.getPlayerID.argtypes = [c_void_p]
 library.getGameNumber.restype = c_int
 library.getGameNumber.argtypes = [c_void_p]
 
-library.getRound.restype = c_int
-library.getRound.argtypes = [c_void_p]
+library.getRoundNumber.restype = c_int
+library.getRoundNumber.argtypes = [c_void_p]
 
 library.getVictoriesNeeded.restype = c_int
 library.getVictoriesNeeded.argtypes = [c_void_p]

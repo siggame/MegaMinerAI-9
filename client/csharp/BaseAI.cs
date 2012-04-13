@@ -72,7 +72,7 @@ public abstract class BaseAI
   }
 
 
-  ///How many turns it has been since the beginning of the game
+  ///How many turns it has been since the beginning of the round
   public int turnNumber()
   {
     int value = Client.getTurnNumber(connection);
@@ -91,12 +91,12 @@ public abstract class BaseAI
     return value;
   }
   ///The current round of the match
-  public int round()
+  public int roundNumber()
   {
-    int value = Client.getRound(connection);
+    int value = Client.getRoundNumber(connection);
     return value;
   }
-  ///How many victories a player needs to win
+  ///How many victories a player needs to win this game.  If the last round is a tie, one more victory is needed
   public int victoriesNeeded()
   {
     int value = Client.getVictoriesNeeded(connection);
@@ -108,4 +108,17 @@ public abstract class BaseAI
     int value = Client.getMapRadius(connection);
     return value;
   }
+  ///Returns the distance between two points
+  public int distance(int fromX, int fromY, int toX, int toY)
+  {
+    return Client.baseDistance(fromX, fromY, toX, toY);
+  }
+  ///Find a point "travel" distance from the starting point in the direction of the ending point.  Uses out parameters
+  public void pointOnLine(int fromX, int fromY, int toX, int toY, int travel, out int outX, out int outY)
+  {
+    int ret = Client.basePointOnLine(fromX, fromY, toX, toY, travel);
+    outX = ret / 1024 - 500;
+    outY = ret % 1024 - 500;
+  }
+
 }
