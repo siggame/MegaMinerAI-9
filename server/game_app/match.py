@@ -138,6 +138,7 @@ class Match(DefaultGameWorld):
 
   def declareRoundWinner(self, winners, message):
     #self.animations.append(['roundVictory', message])
+    self.sendStatus(self.spectators)
     for winner in winners:
       winner.victories += 1
     self.turnNumber = 0
