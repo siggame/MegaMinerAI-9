@@ -183,7 +183,6 @@ namespace visualizer
 
   void Space::run()
   {
-    cout << "LOADING..." << endl;
     map < int, vector< SmartPointer < Warp > > > Warps;
     Warps[ 0 ] = vector< SmartPointer< Warp > >();
     
@@ -197,26 +196,19 @@ namespace visualizer
 
     m_mapRadius = m_game->states[ 0 ].mapRadius;
 
-    cout << "LOADING..." << __LINE__ << endl;
     // BEGIN: Look through the game logs and build the m_PersistentShips
     for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
     {
-<<<<<<< HEAD
-      cout << "LOADING..." << __LINE__ << endl;
-      Warps[ state ] = vector< SmartPointer< Warp > >();
       // Loop though each PersistentShip in the current state
 
       // The list of ships this turn to do some blob calculations on
       list<SmartPointer<TempShip>> shipsThisTurn;
-      
-=======
       Warps[ state+1 ] = vector< SmartPointer< Warp > >();
       
       // Find all the ships we need to look at this turn
       vector< pair<int, parser::Ship> > ships;
       
       // Loop though each PersistentShip in the current state, and them to the shipIDs to look at
->>>>>>> 30163592b4f65b0611a7305ec6e86881e9abb65f
       for(auto& i : m_game->states[ state ].ships)
       {
         i.second.y *= -1;
@@ -344,7 +336,11 @@ namespace visualizer
         }
       }
 
-      //auto blobs = createBlobs<TempShip>(shipsThisTurn, 14.0f, 10.0f);
+      auto ids = createIDs<TempShip>(shipsThisTurn, 15, 1.0f);
+      for(auto& i: ids)
+      {
+        m_PersistentShips[i.id]->m_idPositions[state] = i.center;
+      }
 
       // Start adding stuff to draw
       Frame turn;  // The frame that will be drawn
@@ -433,11 +429,9 @@ namespace visualizer
       turn.addAnimatable( roundHUD );
 
       animationEngine->buildAnimations(turn);
-      cout << "LOADING..." << __LINE__ << endl;
       addFrame(turn);
       if(state > 5)
       {
-        cout << "LOADING..." << __LINE__ << endl;
         timeManager->setNumTurns(state - 5);
         animationEngine->registerGame( this, this );
         if(state == 6)
@@ -449,7 +443,6 @@ namespace visualizer
       }
     }
 
-    cout << "LOADING..." << __LINE__ << endl;
 
     // END: Add every draw animation
 

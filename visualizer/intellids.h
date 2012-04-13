@@ -2,21 +2,25 @@
 #define INTELLIDS_H
 
 #include "glm/glm.hpp"
+#include "glm/gtx/random.hpp"
 #include <vector>
 #include <list>
 #include <stack>
+#include <map>
 #include <algorithm>
 
 using glm::vec2;
 using glm::sin;
 using glm::orientedAngle;
 using glm::normalize;
+using glm::distance;
 using glm::rotate;
 using std::vector;
 using std::list;
 using std::stack;
 using std::find_if;
 using std::sort;
+using std::map;
 using std::min_element;
 
 namespace visualizer
@@ -32,6 +36,100 @@ namespace visualizer
 
   }; // Blob
 
+  struct ID
+  {
+    public:
+      ID(const vec2& c, const int& i) : center(c), id(i) {}
+      vec2 center;
+      int id;
+  }; // ID
+
+
+  template <class T>
+  list<ID> createIDs(const list<SmartPointer<T>>& units, const float& idRadius, const float& maxMoveDistance)
+  {
+    list<ID> ids;
+    bool collision = true;
+    for(auto& i: units)
+    {
+      ids.push_back(ID(i->position + glm::compRand2(0.0f,0.1f), i->id));
+    }
+
+    cout << "------------------" << endl;
+
+    int i = 0;
+    //while(collision)
+    for(size_t p = 0; p < 500; p++)
+    {
+      collision = false;
+      for(auto& i: ids)
+      {
+        if(collision)
+          break;
+        
+        for(auto& u: units)
+        {
+          if(collision)
+            break;
+
+          if(u->id == i.id)
+            continue;
+
+          if(distance(i.center, u->position) <= idRadius+u->radius)
+          {
+            collision = true;
+          }
+        }
+
+        for(auto& j: ids)
+        {
+          if(collision)
+            break;
+
+          if(j.id == i.id)
+            continue;
+
+          if(distance(i.center, j.center) <= 2*idRadius)
+          {
+            collision = true;
+          }
+        }
+      }
+
+
+      if(collision)
+      {
+        for(auto& i: ids)
+        {
+          vec2 velocity = vec2(0, 0);
+          for(auto& u: units)
+          {
+            float m = (glm::max(0.0f, u->radius + idRadius - distance(i.center, u->position)))/(u->radius + idRadius);
+
+            if(m > 0)
+              velocity += i.center-u->position;
+          }
+
+          for(auto& j: ids)
+          {
+            if(i.id == j.id)
+              continue;
+            float m = (glm::max(0.0f, 2 * idRadius - distance(i.center, j.center)))/(2 * idRadius);
+            if(m > 0)
+              velocity += i.center-j.center;
+          }
+
+
+          if(velocity != vec2(0, 0))
+            i.center += normalize(velocity) * maxMoveDistance;
+
+        }
+      }
+    }
+
+    return ids;
+
+  } // createIDs()
 
   template <class T>
   list<SmartPointer<Blob<T>>> createBlobs(const list<SmartPointer<T>>& units, const float& defaultRadius, const float& buffer)
@@ -61,7 +159,8 @@ namespace visualizer
       for(auto& s: units)
       {
         // is the id in the usedUnits. 
-        if(b->units[0]->id == s->id || (find_if(
+        if(b->units[0]->id != s->id  // We don't want to test against our own unit
+            && (find_if(
               usedUnits.begin(), 
               usedUnits.end(), 
               [&](const int& c) { return c == s->id; }) == usedUnits.end()))
@@ -125,7 +224,6 @@ namespace visualizer
         availableAngles.push_back(i * interval);
       }
 
-      cout << "-------" << endl;
       for(size_t i = 0; i < b->units.size(); i++)
       {
         auto &u = b->units[i];
@@ -147,6 +245,20 @@ namespace visualizer
         
       }
       
+    }
+
+    for(auto& i: units)
+    {
+      if(find_if(
+              usedUnits.begin(), 
+              usedUnits.end(), 
+              [&i](const int& c) { return c == i->id; }) == usedUnits.end())
+      {
+        SmartPointer<Blob<T>> t = new Blob<T>;
+        t->units.push_back(i);
+        t->idPositions.push_back(i->position);
+        blobs.push_back(t);
+      }
     }
 
     return blobs;
