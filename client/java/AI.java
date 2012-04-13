@@ -2,7 +2,7 @@ import com.sun.jna.Pointer;
 import java.awt.Point;
 
 ///The class implementing gameplay logic.
-class AI extends BaseAI
+public class AI extends BaseAI
 {
   public String username()
   {
