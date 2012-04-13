@@ -260,24 +260,23 @@ namespace visualizer
       game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRange, 100 );
     }
 
-    //stringstream idName;
-    //idName << m_PersistentShip->id;
+    stringstream idName;
+    idName << m_PersistentShip->id;
 
+    game->renderer->setColor(Color(0, 0, 0));
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
 
-    //game->renderer->setColor(Color(0, 0, 0));
-    //glEnable(GL_DEPTH_TEST);
-    //glDepthFunc(GL_GREATER);
-
-    //vec2 idp = vec2(idPosition.x + *m_MapRadius, idPosition.y + *m_MapRadius);
-    //idp -= vec2(15, 15);
+    vec2 idp = vec2(idPosition.x + *m_MapRadius, idPosition.y + *m_MapRadius);
+    idp -= vec2(15, 15);
     
-    //game->renderer->drawProgressBar(idp.x, idp.y + 2, 30, 15, 1, Color(1, 1, 1), 1, 2); 
-    //game->renderer->setColor(Color(1, 1, 1));
+    game->renderer->drawProgressBar(idp.x, idp.y + 2, 30, 15, 1, Color(1, 1, 1), 1, 0); 
+    game->renderer->setColor(Color(1, 1, 1));
 
-    //game->renderer->drawText(idp.x + 30/2, idp.y + 1, "Roboto", idName.str(), 58.0f, IRenderer::Alignment::Center);
+    game->renderer->drawText(idp.x + 30/2, idp.y + 1, "Roboto", idName.str(), 58.0f, IRenderer::Alignment::Center);
 
-    //game->renderer->drawLine(idp.x, idp.y, shipCenter.x, shipCenter.y, -2);
-    //glDisable(GL_DEPTH_TEST);
+    game->renderer->drawLine(idp.x, idp.y, shipCenter.x, shipCenter.y, -2);
+    glDisable(GL_DEPTH_TEST);
     
 
   } // DrawPersistentShip::animation()
