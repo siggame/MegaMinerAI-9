@@ -127,7 +127,7 @@ class Match(DefaultGameWorld):
 
     for obj in self.objects.values():
       obj.nextTurn()
-    self.checkWinner()
+    self.checkRoundWinner()
 
     if self.winner is None:
       self.sendStatus([self.turn] +  self.spectators)
@@ -141,8 +141,10 @@ class Match(DefaultGameWorld):
     self.sendStatus(self.spectators)
     for winner in winners:
       winner.victories += 1
-    self.turnNumber = 0
-    self.nextRound()
+    self.checkWinner()
+    if self.winner is None:
+      self.turnNumber = 0
+      self.nextRound()
 
   def smartEnd(self):
     player1 = self.objects.players[0]
@@ -191,8 +193,6 @@ class Match(DefaultGameWorld):
           self.declareRoundWinner([player1, player2], "Draw by because you are twins")
 
   def checkWinner(self):
-    # First, the round
-    self.checkRoundWinner()
     player1 = self.objects.players[0]
     player2 = self.objects.players[1]
     # Strictly player 1 victory
