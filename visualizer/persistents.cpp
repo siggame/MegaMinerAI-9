@@ -37,7 +37,7 @@ namespace visualizer
 
   PersistentShip::PersistentShip(int createdAt, int round, parser::Ship ship)
   {
-    createdAtTurn = createdAt;
+    m_CreatedAtTurn = createdAt;
     id = ship.id;
     owner = ship.owner;
     radius = ship.radius;
@@ -58,7 +58,7 @@ namespace visualizer
     AddStealth( createdAt );
   }
 
-  void PersistentShip::AddTurn(int turn, vector<vec2> &moves, int movementLeft)
+  void PersistentShip::AddTurn(int turn, vector<vec2> &moves, int health, int movementLeft)
   {
     // Add the moves
     float span = 1.0f / float(moves.size());
@@ -78,7 +78,7 @@ namespace visualizer
 
   bool PersistentShip::ExistsAtTurn(int turn, int round)
   {
-    return ( turn >= createdAtTurn && turn <= m_DeathTurn && (m_Round == round || round == -1) );
+    return ( turn >= m_CreatedAtTurn && turn <= m_DeathTurn && (m_Round == round || round == -1) );
   }
 
   vec2 PersistentShip::LocationOn(int turn, float t)
@@ -95,10 +95,10 @@ namespace visualizer
 
   float PersistentShip::HealthOn(int turn, float t)
   {
-    turn -= createdAtTurn;
+    turn -= m_CreatedAtTurn;
 
     // h(t) = a + t(b - a)
-    return healths[PreviousTurn(turn)] + t * ( healths[turn] - healths[PreviousTurn(turn)] );
+    return m_Healths[PreviousTurn(turn)] + t * ( m_Healths[turn] - m_Healths[PreviousTurn(turn)] );
   }
 
   bool PersistentShip::EMPedOn(int turn)
@@ -225,7 +225,7 @@ namespace visualizer
 
   string PersistentShip::MovementOn( int turn )
   {
-    turn -= createdAtTurn;
+    turn -= m_CreatedAtTurn;
     stringstream ss;
     if( turn >= m_MovementLeft.size() || turn < 0 )
     {
@@ -240,7 +240,7 @@ namespace visualizer
   void PersistentShip::AddDeath( int turn )
   {
     m_DeathTurn = turn;
-    healths.push_back( 0 );
+    m_Healths.push_back( 0 );
     
     if(m_Moves.size() > 0)
     {

@@ -272,7 +272,7 @@ namespace visualizer
         shipsThisTurn.push_back(tShip);
 
         // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
-        m_PersistentShips[shipID]->healths.push_back( i.second.health );
+        m_PersistentShips[shipID]->m_Healths.push_back( i.second.health );
         
         vector< vec2 > moves;
         // Check for this ship's animations in the gamelog

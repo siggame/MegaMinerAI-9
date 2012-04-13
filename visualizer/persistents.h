@@ -84,7 +84,7 @@ namespace visualizer
       bool HasMoves() { return m_Moves.size() > 0; }
 
       PersistentShip(int createdAt, int round, parser::Ship ship);
-      void AddTurn(int turn, vector<vec2> &moves, int movementLeft);
+      void AddTurn(int turn, vector<vec2> &moves, int health, int movementLeft);
       bool ExistsAtTurn(int turn, int round);
       vec2 LocationOn(int turn, float t);
       float HeadingOn(int turn, float t);
@@ -103,7 +103,7 @@ namespace visualizer
       string AttacksWhoOn( int turn );
       string MovementOn( int turn );
       void AddDeath( int turn );
-      int FirstTurn() { return createdAtTurn; }
+      int FirstTurn() { return m_CreatedAtTurn; }
       void MoveInfo();
       map<int, vec2> m_idPositions;
 
