@@ -282,9 +282,9 @@ namespace visualizer
               parser::move &move = (parser::move&)*j;
               if( !m_PersistentShips[shipID]->HasMoves()  )
               {
-                  moves.push_back( vec2( move.fromX, move.fromY ) );
+                  moves.push_back( vec2( move.fromX, -move.fromY ) );
               }
-              moves.push_back( vec2( move.toX, move.toY ) );
+              moves.push_back( vec2( move.toX, -move.toY ) );
             } break;
             case parser::ATTACK:
             {
