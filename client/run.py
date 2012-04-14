@@ -4,7 +4,7 @@ import subprocess
 import argparse
 import random
 
-host = 'localhost'
+host = 'server.megaminerai.com'
 game = -1
 
 def run(*args):
