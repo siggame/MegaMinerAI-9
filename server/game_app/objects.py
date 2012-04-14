@@ -220,9 +220,10 @@ class Ship(ShipDescription):
       self.attacksLeft -= 1
       foe = self.owner^1
       for ship in self.allInRange(foe):
-        ship.attacksLeft = -1
-        ship.movementLeft = -1
-        self.game.animations.append(['attack',self.id,ship.id])
+        if ship.type != "Mine":
+          ship.attacksLeft = -1
+          ship.movementLeft = -1
+          self.game.animations.append(['attack',self.id,ship.id])
     elif target.owner == self.owner:
       return "No friendly fire. Your %s %i cannot attack your %s %i "%(self.type,self.id,target.type,target.id)
     elif not self.inRange(target):
