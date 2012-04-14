@@ -372,7 +372,7 @@ namespace visualizer
       {
 #endif
         cout << "========" << state << "========" << endl;
-        auto ids = createIDs<TempShip>(shipsThisTurn, 45, 1.0f);
+        auto ids = createIDs<TempShip>(shipsThisTurn, options->getNumber("Unit ID Distance"), 1.0f);
         for(auto& i: ids)
         {
           if(i.id == 11)

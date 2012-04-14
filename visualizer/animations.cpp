@@ -263,7 +263,7 @@ namespace visualizer
       game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRange, 100 );
     }
 
-    if(m_Turn < m_PersistentShip->m_DeathTurn)
+    if(m_Turn < m_PersistentShip->m_DeathTurn && game->options->getNumber( "Draw Unit IDs" ))
     {
       stringstream idName;
       idName << m_PersistentShip->id;
