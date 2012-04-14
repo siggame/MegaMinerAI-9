@@ -127,7 +127,7 @@ texture planet textures/effects/planet.png
 fshader testShader shaders/shockwave.frag
 fshader post1 shaders/post.frag
 texture selected textures/effects/selected.png
-texture background-0 textures/backgrounds/1.png
+texture background-0 textures/backgrounds/1.jpg
 texture background-1 textures/backgrounds/2.png
 texture background-2 textures/backgrounds/3.png
 texture background-3 textures/backgrounds/4.png
