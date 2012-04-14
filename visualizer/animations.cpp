@@ -118,7 +118,6 @@ namespace visualizer
     bool shipIsEMPed = m_PersistentShip->EMPedOn(m_Turn);
     bool shipIsEMP = strcmp( "EMP", m_PersistentShip->type.c_str() ) == 0;
     bool shipIsSelected = m_PersistentShip->selected;
-    vec2 idPosition = m_PersistentShip->m_idPositions[m_Turn];
     
     float shipSizeScale = game->options->getNumber( "Ship Render Size" ) / 100.0f;
 
@@ -269,20 +268,35 @@ namespace visualizer
       stringstream idName;
       idName << m_PersistentShip->id;
 
-      game->renderer->setColor(Color(0, 0, 0));
+      float alpha = 1;
 
-      vec2 idp = vec2(idPosition.x + *m_MapRadius, idPosition.y + *m_MapRadius);
+      vec2 idPosition = m_PersistentShip->m_idPositions[m_Turn];
+      vec2 next;
+      if(m_Turn+1 < m_PersistentShip->m_DeathTurn)
+      {
+        next = m_PersistentShip->m_idPositions[m_Turn+1];
+      }
+      else
+      {
+        next = idPosition;
+        alpha = 1 - t;
+      }
+
+      vec2 mix = idPosition + (next - idPosition) * t;
+
+      vec2 idp = vec2(mix.x + *m_MapRadius, mix.y + *m_MapRadius);
       idp -= vec2(15, 15);
 
       
-      game->renderer->drawProgressBar(idp.x, idp.y + 2, 30, 15, 1, Color(1, 1, 1), 1, -10); 
-      game->renderer->setColor(Color(1, 1, 1));
+      game->renderer->setColor(Color(0, 0, 0, alpha));
+      game->renderer->drawProgressBar(idp.x, idp.y + 2, 30, 15, 1, Color(1, 1, 1, alpha), 1, -10); 
+      game->renderer->setColor(Color(1, 1, 1, alpha));
 
       game->renderer->translate(0, 0, -10);
       game->renderer->drawText(idp.x + 30/2, idp.y + 1, "Roboto", idName.str(), 58.0f, IRenderer::Alignment::Center);
       game->renderer->translate(0, 0, 10);
 
-      game->renderer->drawLine(idp.x, idp.y, shipCenter.x, shipCenter.y, -9.0f);
+      game->renderer->drawLine(idp.x + 15, idp.y + 15, shipCenter.x, shipCenter.y, -9.0f);
     }
     
 
