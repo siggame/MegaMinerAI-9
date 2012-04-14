@@ -381,7 +381,7 @@ namespace visualizer
           turn[i.first]["Health"] = dto.str().c_str();
           dto.str("");
           turn[i.first]["Attacks Who"] = i.second->AttacksWhoOn( state ).c_str();
-          turn[i.first]["Attacks Left"] = 0;
+          turn[i.first]["Attacks Left"] = i.second->AttacksLeftOn( state ).c_str();
 
           // Then and and draw it
           SmartPointer<PersistentShipAnim> ship = new PersistentShipAnim();

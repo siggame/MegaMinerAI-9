@@ -92,6 +92,9 @@ namespace visualizer
       
       // Add the health this turn
       m_Healths.push_back( health );
+      
+      // Add the number of attacks left this turn
+      m_AttacksLeft.push_back( attacksLeft );
     }
   }
   
@@ -120,6 +123,21 @@ namespace visualizer
 
     // h(t) = a + t(b - a)
     return m_Healths[PreviousTurn(turn)] + t * ( m_Healths[turn] - m_Healths[PreviousTurn(turn)] );
+  }
+  
+  string PersistentShip::AttacksLeftOn( int turn )
+  {
+    stringstream ss;
+    
+    if( turn >= m_CreatedAtTurn && turn <= m_DeathTurn )
+    {
+      ss << m_AttacksLeft[ turn - m_CreatedAtTurn ];
+    }
+    else
+    {
+      ss << "-";
+    }
+    return ss.str();
   }
 
   bool PersistentShip::EMPedOn(int turn)

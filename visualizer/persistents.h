@@ -104,6 +104,7 @@ namespace visualizer
       void AddDeath( int turn );
       int FirstTurn() { return m_CreatedAtTurn; }
       void MoveInfo();
+      string AttacksLeftOn( int turn );
       map<int, vec2> m_idPositions;
 
     private:
