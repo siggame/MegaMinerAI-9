@@ -1,21 +1,26 @@
 import com.sun.jna.Pointer;
 import java.awt.Point;
 import java.util.*;
-import java.lang.*;
+//import java.lang.*;
 
 ///The class implementing gameplay logic.
 public class AI extends BaseAI
 {
-	// Origin
-	// Uno
-	// Dos
-	// Tres
+	// Origin - Shell AI
+	// Uno - Wanders around and attacks at total random
+	// Dos - Makes only one type of ship and wanders towards the enemy
+	// Tres - Makes ships at random and wanders towards the enemy
 	// WeaponsPlatform3
-	public static String personality = "Tres";
-	public static String persona0 = "Dos";
-	public static String persona1 = "WeaponsPlatform3";
+	public static String personality = "Uno";
+	public static String persona0 = "WeaponsPlatform3";
+	public static String persona1 = "Origin";
 	public Random gen;
 	public static boolean splitPersonality = true;
+	
+//	public Fleet myFleet;
+//	public Fleet opFleet;
+	public Fleet myFleet;
+	public Fleet opFleet;
 
 public String username()
 {
@@ -35,6 +40,13 @@ public String password()
 //Return true to end your turn, return false to ask the server for updated information
 public boolean run()
 {
+System.out.print("ID: " + new Integer(playerID()).toString() + "\n");
+
+	myFleet = new Fleet(ships, playerID());
+	for(int i = 0; i < myFleet.size; i++){myFleet.at(i).ownerFleet = myFleet;}
+	opFleet = new Fleet(ships, (playerID() == 0) ? 1 : 0);
+	for(int i = 0; i < opFleet.size; i++){opFleet.at(i).ownerFleet = opFleet;}
+
 	if(splitPersonality){
 		if(playerID() == 0){
 			decisionEngine(persona0);
@@ -66,7 +78,8 @@ public void decisionEngine(String persona){
 //This function is called once, before your first turn
 public void init() {
 	gen = new Random();
-	
+	myFleet = new Fleet(ships, playerID());
+	opFleet = new Fleet(ships, (playerID() == 0) ? 1 : 0);
 }
 
 //This function is called once, after your last turn
@@ -136,7 +149,7 @@ public void aiOrigin(){
 public void aiUno(){
 	System.out.print("Uno: " + new Integer(turnNumber()).toString() + " " + new Integer(roundNumber()).toString() + "\n");
 	
-	while(players[playerID()].getEnergy() > shipTypes[0].getCost()){
+	while(players[playerID()].getEnergy() >= shipTypes[0].getCost()){
 		shipTypes[0].warpIn(ships[playerID()].getX(), ships[playerID()].getY());
 	}
 	
@@ -195,10 +208,11 @@ public void aiDos(){
 public void aiTres(){
 	System.out.print("Tres: " + new Integer(turnNumber()).toString() + " " + new Integer(roundNumber()).toString() + "\n");
 	
-	int var = gen.nextInt() % 4;
+	int var = Math.abs(gen.nextInt() % 3);
+System.out.print("Making: " + new Integer(var).toString() + "\n");
 	while(players[playerID()].getEnergy() >= shipTypes[var].getCost()){
 		shipTypes[var].warpIn(ships[playerID()].getX(), ships[playerID()].getY());
-		var = gen.nextInt() % 4;
+		var = Math.abs(gen.nextInt() % 4);
 	}
 	
 	for(int i = 0; i < ships.length; i++){
@@ -240,28 +254,25 @@ public void aiWeaponsPlatform3(){
 			shipTypes[wp].warpIn(ships[playerID()].getX(), ships[playerID()].getY());
 		}
 		
-		for(int i = 0; i < ships.length; i++){
-			if(ships[i].getOwner() != playerID() && ships[i].getType().equals("Weapons Platform")){
-				int opH = ships[i].getHealth();
-				int j = 0;
-				while(opH > 0){
-					if(ships[j].getOwner() == playerID()){
-						ships[j].attack(ships[i]);
-						opH -= ships[j].getDamage();
-						if(opH <= 0)
-							j--;
-					}
-					j++;
+		for(int i = 0; i < myFleet.size; i++){
+			boolean attacked = false;
+			for(int j = 0; j < opFleet.size; j++){
+				if(opFleet.at(j).type.equals("Weapons Platform")){
+					myFleet.at(i).attack(opFleet.at(j));
+					attacked = true;
 				}
 			}
-			for(int j = 0; j < ships.length; j++){
-				if(ships[j].getOwner() == playerID())
-					ships[j].attack(ships[(playerID() == 0) ? 1 : 0]);
+			if(!attacked){
+				myFleet.at(i).attack(opFleet.at(0));
 			}
+		}
+		
+		for(int i = 0; i < myFleet.size; i++){
+			myFleet.at(i).move(3,4);
 		}
 	}
 	else
-		aiDos();
+		aiTres();
 }
 
 

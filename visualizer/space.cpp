@@ -191,7 +191,7 @@ namespace visualizer
     
     for(int ran = 0; ran < m_game->states.back().roundNumber; ran++)
     {
-      random[ ran ] = rand()%11;
+      random[ ran ] = rand()%9;
     }
     
     // Build the Debug Table's Headers
