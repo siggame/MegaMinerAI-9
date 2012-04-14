@@ -108,7 +108,7 @@ Whenever a Support is in range of the enemy, its provides a targeting bonus to a
 percentage.  Also, at the end of each turn, all of your ships that are within range of the Support ship are healed by a percentage of their total health, 
 up to their maxHealth.  The percentage used is equal to the damage of the support ship / 100.  Note: Support ships do not heal themselves.
 cost = 5
-damage = 15
+damage = 20
 radius = 35
 maxMovement = 120
 maxHealth = 110
