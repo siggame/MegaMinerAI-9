@@ -250,12 +250,6 @@ namespace visualizer
       {
         int shipID = i.second.id;
 
-        SmartPointer<TempShip> tShip = new TempShip;
-        tShip->position.x = i.second.x;
-        tShip->position.y = i.second.y;
-        tShip->radius = i.second.radius;
-        tShip->id = i.second.id;
-
         // If the current ship's ID does not map to a PersistentShip in the map, create it and the warp for it
         if( m_PersistentShips.find(shipID) == m_PersistentShips.end() )
         {
@@ -269,8 +263,6 @@ namespace visualizer
           }
         }
 
-        shipsThisTurn.push_back(tShip);
-        
         vector< vec2 > moves;
         // Check for this ship's animations in the gamelog
         for( auto& j : m_game->states[state].animations[shipID] )
@@ -333,10 +325,34 @@ namespace visualizer
         }
       }
 
-      auto ids = createIDs<TempShip>(shipsThisTurn, 15, 1.0f);
-      for(auto& i: ids)
+
+      if(state > 0)
       {
-        m_PersistentShips[i.id]->m_idPositions[state] = i.center;
+        for(auto& ship : m_game->states[ state - 1 ].ships)
+        {
+          SmartPointer<TempShip> tShip = new TempShip;
+          auto shipID = ship.second.id;
+          auto sPosition = m_PersistentShips[shipID]->LocationOn(state-1, 0);
+          tShip->position.x = sPosition.x;
+          tShip->position.y = sPosition.y;
+          tShip->radius = m_PersistentShips[shipID]->radius;
+          tShip->id = shipID;
+
+          shipsThisTurn.push_back(tShip);
+        }
+      }
+        
+
+      if(state > 0)
+      {
+        cout << "========" << state-1 << "========" << endl;
+        auto ids = createIDs<TempShip>(shipsThisTurn, 15, 1.0f);
+        for(auto& i: ids)
+        {
+          if(i.id == 11)
+            cout << "YHESLERKJLK" << endl;
+          m_PersistentShips[i.id]->m_idPositions[state-1] = i.center;
+        }
       }
 
       // Start adding stuff to draw
