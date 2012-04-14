@@ -82,7 +82,7 @@ namespace visualizer
       vector< int > m_Healths;
 
       PersistentShip(int createdAt, int round, parser::Ship ship);
-      void AddTurn(int turn, vector<vec2> &moves, int health, int movementLeft, int attacksLeft);
+      void AddTurn(int turn, vector<vec2> &moves, int health, int movementLeft, int attacksLeft, char stealth);
       bool HasMoves();
       bool ExistsAtTurn(int turn, int round);
       vec2 LocationOn(int turn, float t);
@@ -91,8 +91,6 @@ namespace visualizer
       bool EMPedOn(int turn);
       vector<vec2> AttacksOn( int turn, float t );
       void AddAttack( PersistentShip* victim, int turn );
-      void AddStealth( int turn );
-      void AddDeStealth( int turn );
       void AddEMPed( int turn );
       float StealthOn( int /*turn*/, float /*t*/);
       float ExplodingOn( int turn );
@@ -113,7 +111,7 @@ namespace visualizer
       float m_InitialY;
 
       map< int, vector < PersistentShip* > > m_AttackVictims;
-      vector< pair< int, char > > m_Stealths;  // int represents the turn, char 's' represents that it went into stealth, 'd' is destealth
+      vector< bool > m_Stealths;
       vector< SpaceMove > m_Moves;
       int m_Round;
       vector<int> m_MovementLeft;

@@ -56,7 +56,7 @@ namespace visualizer
       radius /= 2.0f;
   }
 
-  void PersistentShip::AddTurn(int turn, vector<vec2> &moves, int health, int movementLeft, int attacksLeft)
+  void PersistentShip::AddTurn(int turn, vector<vec2> &moves, int health, int movementLeft, int attacksLeft, char stealth )
   {
     // Add the moves
     float span = 1.0f / float(moves.size());
@@ -95,6 +95,27 @@ namespace visualizer
       
       // Add the number of attacks left this turn
       m_AttacksLeft.push_back( attacksLeft );
+      
+      // Add Stealth state
+      if( stealth == 's' )
+      {
+        m_Stealths.push_back( true );
+      }
+      else if( stealth == 'd' )
+      {
+        m_Stealths.push_back( false );
+      }
+      else
+      {
+        if( m_Stealths.size() == 0 )
+        {
+          m_Stealths.push_back( true );
+        }
+        else
+        {
+          m_Stealths.push_back( m_Stealths.back() );
+        }
+      }
     }
   }
   
@@ -181,24 +202,14 @@ namespace visualizer
     m_AttackVictims[turn].push_back( victim );
   }
 
-  void PersistentShip::AddStealth( int turn )
-  {
-    m_Stealths.push_back( pair<int,char>(turn, 's') );
-  }
-
-  void PersistentShip::AddDeStealth( int turn )
-  {
-    m_Stealths.push_back( pair<int,char>(turn, 'd') );
-  }
-
   void PersistentShip::AddEMPed( int turn )
   {
     m_EMPeds.push_back( turn );
   }
 
-  float PersistentShip::StealthOn( int /*turn*/, float /*t*/)
+  float PersistentShip::StealthOn( int turn, float /*t*/)
   {
-    return (strcmp("Stealth", type.c_str()) != 0) ? 1 : 0.3f;
+    return strcmp("Stealth", type.c_str()) != 0 ? 1 : (m_Stealths[ turn - m_CreatedAtTurn ] ? 0.5f : 1.0f);
   }
 
   float PersistentShip::ExplodingOn( int turn )

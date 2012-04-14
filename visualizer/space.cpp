@@ -275,6 +275,7 @@ namespace visualizer
         shipsThisTurn.push_back(tShip);
         
         vector< vec2 > moves;
+        char stealthState = 'u';
         // Check for this ship's animations in the gamelog
         for( auto& j : m_game->states[state].animations[shipID] )
         {
@@ -306,11 +307,11 @@ namespace visualizer
             } break;
             case parser::STEALTH:
             {
-              m_PersistentShips[shipID]->AddStealth( state );
+              stealthState = 's';
             } break;
             case parser::DESTEALTH:
             {
-              m_PersistentShips[shipID]->AddDeStealth( state );
+              stealthState = 'd';
             } break;
             case parser::SELFDESTRUCT:
             {
@@ -324,7 +325,7 @@ namespace visualizer
           moves.push_back(vec2(i.second.x, i.second.y));
         }
         
-        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.health, i.second.movementLeft, i.second.attacksLeft );
+        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.health, i.second.movementLeft, i.second.attacksLeft, stealthState );
         
         // Check to see if this ship dies next turn (doesn't exist next turn)
         if( state + 1 != m_game->states.size() )
