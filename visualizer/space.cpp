@@ -187,9 +187,9 @@ namespace visualizer
     Warps[ 0 ] = vector< SmartPointer< Warp > >();
     
     srand( time( NULL ) );
-    int random[ m_game->states.back().roundNumber ];
+    int random[ m_game->states.back().roundNumber + 1 ];
     
-    for(int ran = 0; ran < m_game->states.back().roundNumber; ran++)
+    for(int ran = 0; ran < m_game->states.back().roundNumber + 1; ran++)
     {
       random[ ran ] = rand()%9;
     }
@@ -451,7 +451,7 @@ namespace visualizer
         shipTypes.push_back( shipType.second.type );
       }
       
-      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].roundNumber, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerMessage, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].roundNumber < m_game->states[ state + 1 ].roundNumber, shipTypes );
+      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].roundNumber, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerMessage, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].roundNumber < m_game->states[ state + 1 ].roundNumber, shipTypes, m_game->states[ state ].gameNumber );
       roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
       turn.addAnimatable( roundHUD );
 

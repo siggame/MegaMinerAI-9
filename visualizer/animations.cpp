@@ -53,11 +53,18 @@ namespace visualizer
 
   void DrawRoundHUD::animate( const float& t, AnimData * /* d */, IGame* game )
   {
-    stringstream round;
-    round << "Round: " << (m_RoundHUD->round + 1) << "  Turn: " << m_RoundHUD->turn;
+    stringstream round, gameNum;
+    round << "Round: " << m_RoundHUD->round << "  Turn: " << m_RoundHUD->turn;
     game->renderer->setColor( Color( 1, 1, 1, 1 ) );
+    
     game->renderer->drawText( m_RoundHUD->mapRadius, 1, "Roboto", round.str(), 100, IRenderer::Center);
-
+    
+    if( game->options->getNumber( "Display Game Number" ) )
+    {
+      gameNum << "Game Number: " << m_RoundHUD->gameNumber;
+      game->renderer->drawText( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius*2 - 30, "Roboto", gameNum.str(), 100, IRenderer::Center);
+    }
+    
     // Draw the t "hand"
     //game->renderer->drawArc( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius, m_RoundHUD->mapRadius, 60, 0, 360.0f * t );
     
