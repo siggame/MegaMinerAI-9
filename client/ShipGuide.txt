@@ -1,7 +1,7 @@
 
 [Battleship]
 "I accidentally... their entire team"
-The uncontested heavy of space, no one can match a Battleship's single target power.  
+The uncontested heavy of space; no one can match a Battleship's single target power.  
 
 cost = 25
 damage = 100
@@ -13,7 +13,7 @@ range = 110
 selfDestructDamage = 120
 
 [Bomber]
-"If God had wanted you to live he would not have created ME!"
+"If God had wanted you to live, he would not have created ME!"
 Cheap, single target, damage specialists. Bomber's are great for swarming larger ships.  
 While each is fragile, the collective is mighty.  
 
@@ -27,9 +27,9 @@ range = 75
 selfDestructDamage = 15
 
 [Cruiser]
-"“You’ve never heard of the Millennium Falcon? … It’s the ship that made the Kessel run in less than 12 parsecs.”
-Must use a Cruiser.  The unchallenged speed demon of space, the Cruiser is your cavalry.  
-Great for jumping past Mines and hoping in and out of an enemy's range.
+"You’ve never heard of the Millennium Falcon? ... It’s the ship that made the Kessel run in less than 12 parsecs."
+The unchallenged speed demon of space, the Cruiser is your cavalry.  
+Great for jumping past Mines and hopping in and out of an enemy's range.
 
 cost = 15
 damage = 35
@@ -42,7 +42,7 @@ selfDestructDamage = 60
 
 [EMP]
 "Systems failure, power overload, we've been EMP'd captain!"
-When an EMP attacks it freezes all of the enemy ships in range for their next turn, preventing them from moving or attacking (they can still self destruct). 
+When an EMP attacks, it freezes all of the enemy ships in range for their next turn, preventing them from moving or attacking, but they can still self destruct. 
 Be careful though, as EMP's have a limited number of charges.  
 Each time they attack, their maxAttacks is reduced by one.  Once out of charges, and EMP can no longer attack.
 
@@ -56,7 +56,7 @@ selfDestructDamage = 35
 
 [Interceptor]
 "Like a shotgun...but in space"
-Cheap but effective swarm fighters, Interceptor's specialize in working as a group to take down large fleets.  
+Cheap but effective swarm fighters. Interceptor's specialize in working as a group to take down large fleets.  
 An Interceptor reaches its top efficiency when attacking multiple targets per turn, making them the bane of the zerg rush. 
  
 cost = 2
@@ -70,7 +70,7 @@ selfDestructDamage = 15
 
 [Juggernaut]
 "What do you do when you have too many guns?  Add more guns!"  
-The Juggernaut is built to fight a crowd; able to attack more targets in single turn than any other ship.  
+The Juggernaut is built to fight a crowd, able to attack more targets in single turn than any other ship.  
 Note: each attack in the same turn must target a different ship.
 cost = 15
 damage = 15
@@ -82,12 +82,11 @@ range = 75
 selfDestructDamage = 60
 
 [Mine Layer]
-"What makes me a good mine layer? If I were a bad mine layer I wouldn't be sitting here, discussing it with you, now would I?!"  
+"What makes me a good mine layer? If I were a bad mine layer, I wouldn't be sitting here, discussing it with you, now would I?!"  
 The Mine Layer specializes in this kind of combat.  
-Instead of attack opponents directly, when a Mine Layer is commanded to attack it will drop a Mine at its current location.  
+Instead of attacking opponents directly, when a Mine Layer is commanded to attack, it will drop a Mine at its current location.  
 This Mine will then act as a remote detonation device, ready to obliterate your opponent.  Choose your Mine placement wisely, 
-as each turn a Mine Layer can only place a single Mine and placing a Mine will reduce your maxAttacks by one.  
-This means each Mine Layer has a limited number of Mines before it can no longer attack.
+as each turn a Mine Layer can only place a single Mine and you have a limited supply.  
 
 cost = 5
 radius = 35
@@ -100,7 +99,7 @@ selfDestructDamage = 35
 Created by Mine Layers, Mines have but one function: self-destruction for enemy destruction.  
 A Mine cannot move and it cannot attack.  
 What it can do is wait until it overlaps enough enemy ships, then blow itself up, dealing damage to all of them.  
-While shooting Mines will eventually destroy them, your best bet is probably to just to fly around them.
+While shooting Mines will eventually destroy them, your best bet is probably just to fly around them.
 
 radius = 40
 maxHealth = 300
@@ -123,13 +122,13 @@ selfDestructDamage = 35
 
 [Support]
 "Mechanics are expensive and so is a good targeting system."  Instead of wasting money beefing up all of your ships, the Support ship is here to help.  
-Whenever a Support is in range of the enemy it provides a targeting bonus to all of your ships that choose to attack that enemy, increasing their damage by a percentage.
-Also, at the end of each turn all of your ships that are within range of the Support ship are healed by a percentage of their total health, up to their maxHealth.  
+Whenever a Support is near its allies it provides a targeting bonus to all of your ships that choose to attack, increasing their damage by a percentage.
+Also, at the end of each turn, all of your ships that are within range of the Support ship are healed by a percentage of their max health, up to their maxHealth.  
 The percentage used is equal to the damage of the support ship / 100.  
 Note: Support ships do not heal themselves.
 
 cost = 5
-damage = 15
+damage = 20
 radius = 35
 maxMovement = 120
 maxHealth = 110
@@ -149,7 +148,7 @@ maxHealth = 1000
 [Weapons Platform]
 "Boom, headshot."
 This is the sniper of space, with a range greater than the radius of the map.  
-There is no escape for his devestating cannon. He is however very squishy 
+There is no escape for his devestating cannon. He is, however, very squishy.
 
 cost = 15
 damage = 33
