@@ -31,8 +31,10 @@ namespace visualizer
 
   void DrawBackground::animate( const float& /*t*/, AnimData * /*d*/, IGame* game )
   {
+    stringstream ss;
+    ss << "background-" << m_Background->random;
     game->renderer->setColor( Color( 1, 1, 1, 1 ) );
-    game->renderer->drawTexturedQuad(0, 0, m_Background->radius * 2, m_Background->radius * 2, "background");
+    game->renderer->drawTexturedQuad(0, 0, m_Background->radius * 2, m_Background->radius * 2, ss.str());
     //game->renderer->drawTexturedQuad(m_Background->outerRadius - m_Background->innerRadius, m_Background->outerRadius - m_Background->innerRadius, m_Background->innerRadius * 3, m_Background->innerRadius * 2, "planet");
     game->renderer->setColor( Color( 1, 1, 1, 0.1f ) );
     game->renderer->drawArc(500, 500, 500, 80 );
