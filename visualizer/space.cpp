@@ -203,10 +203,12 @@ namespace visualizer
     animationEngine->registerGame(0, 0);
 
     m_mapRadius = m_game->states[ 0 ].mapRadius;
+    string playerTalks[ 2 ];
 
     // BEGIN: Look through the game logs and build the m_PersistentShips
     for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
     {
+      cout << "State: " << state << endl;
       // Loop though each PersistentShip in the current state
 
       // The list of ships this turn to do some blob calculations on
@@ -451,7 +453,22 @@ namespace visualizer
         shipTypes.push_back( shipType.second.type );
       }
       
+      for( auto& player : m_game->states[ state ].players )
+      { 
+        for( auto& t : m_game->states[state].animations[ player.first ] )
+        {
+          parser::playerTalk &talk = (parser::playerTalk&)*t;
+          stringstream talkstring;
+          talkstring << "(" << state << ") " << talk.message;
+          playerTalks[ player.first ] = talkstring.str();
+        }
+      }
+      
       SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].roundNumber, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerMessage, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].roundNumber < m_game->states[ state + 1 ].roundNumber, shipTypes, m_game->states[ state ].gameNumber );
+      
+      roundHUD->playerTalk[0] = playerTalks[0];
+      roundHUD->playerTalk[1] = playerTalks[1];
+      
       roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
       turn.addAnimatable( roundHUD );
 

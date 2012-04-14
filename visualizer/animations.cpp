@@ -96,6 +96,13 @@ namespace visualizer
         i++;
       }
     }
+    
+    // Draw player talk
+    for(int i = 0; i < 2; i++)
+    {
+      game->renderer->setColor( i ? Color( 0, 0.4, 1, 1 ) : Color(1, 0, 0, 1 ) );
+      game->renderer->drawText( m_RoundHUD->mapRadius * 2.1, m_RoundHUD->mapRadius + i * 50 + 250, "Roboto", m_RoundHUD->playerTalk[i], 70 );
+    }
 
     // Draw the round end win screen
     if( m_RoundHUD->drawWinScreen && game->options->getNumber( "Display Round Winner" ) )

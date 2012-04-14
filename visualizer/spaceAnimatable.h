@@ -59,6 +59,7 @@ namespace visualizer
             bool drawWinScreen;
             vector< string > shipTypes;
             int gameNumber;
+            string playerTalk[2];
             
             RoundHUD( int n, int t, string win, string mes, int id, int r, bool b, vector< char* > ships, int gameNum )
             {
