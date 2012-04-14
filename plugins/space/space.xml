@@ -14,23 +14,16 @@
     <maxvalue>1</maxvalue>
   </option>
   <option>
-    <key>Display Unit IDs</key>
+    <key>Display Ships' Sheild</key>
     <type>Integer</type>
     <value>1</value>
     <minvalue>0</minvalue>
     <maxvalue>1</maxvalue>
   </option>
   <option>
-    <key>Unit ID Distance</key>
+    <key>Display Unit IDs</key>
     <type>Integer</type>
-    <value>20</value>
-    <minvalue>14</minvalue>
-    <maxvalue>100</maxvalue>
-  </option>
-  <option>
-    <key>Display Ships' Sheild</key>
-    <type>Integer</type>
-    <value>1</value>
+    <value>0</value>
     <minvalue>0</minvalue>
     <maxvalue>1</maxvalue>
   </option>
@@ -54,5 +47,12 @@
     <value>0</value>
     <minvalue>0</minvalue>
     <maxvalue>1</maxvalue>
+  </option>
+  <option>
+    <key>Unit ID Distance</key>
+    <type>Integer</type>
+    <value>20</value>
+    <minvalue>14</minvalue>
+    <maxvalue>100</maxvalue>
   </option>
 </options>
