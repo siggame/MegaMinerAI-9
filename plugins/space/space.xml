@@ -1,5 +1,12 @@
 <options>
   <option>
+    <key>Display Round Winner</key>
+    <type>Integer</type>
+    <value>0</value>
+    <minvalue>0</minvalue>
+    <maxvalue>1</maxvalue>
+  </option>
+  <option>
     <key>Display Ships' Range</key>
     <type>Integer</type>
     <value>0</value>
@@ -21,16 +28,16 @@
     <maxvalue>100</maxvalue>
   </option>
   <option>
-    <key>Show Round's Ship Types</key>
+    <key>Show Grid</key>
     <type>Integer</type>
     <value>1</value>
     <minvalue>0</minvalue>
     <maxvalue>1</maxvalue>
   </option>
   <option>
-    <key>Show Grid</key>
+    <key>Show Round's Ship Types</key>
     <type>Integer</type>
-    <value>1</value>
+    <value>0</value>
     <minvalue>0</minvalue>
     <maxvalue>1</maxvalue>
   </option>

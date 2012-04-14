@@ -188,7 +188,7 @@ namespace visualizer
     
     // Build the Debug Table's Headers
     QStringList header;
-    header << "Owner" << "Type" << "Locations" << "Movement Left" << "Health" << "Attacks Who";
+    header << "Owner" << "Type" << "Locations" << "Movement Left" << "Health" << "Attacks Who" << "Attacks Left";
     gui->setDebugHeader( header );
     timeManager->setNumTurns( 0 );
 
@@ -270,9 +270,6 @@ namespace visualizer
         }
 
         shipsThisTurn.push_back(tShip);
-
-        // Now the current ship we are looking at for sure exists as a PersistentShip, so fill it's values for this turn
-        m_PersistentShips[shipID]->m_Healths.push_back( i.second.health );
         
         vector< vec2 > moves;
         // Check for this ship's animations in the gamelog
@@ -324,7 +321,7 @@ namespace visualizer
           moves.push_back(vec2(i.second.x, i.second.y));
         }
         
-        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.health, i.second.movementLeft );
+        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.health, i.second.movementLeft, i.second.attacksLeft );
         
         // Check to see if this ship dies next turn (doesn't exist next turn)
         if( state + 1 != m_game->states.size() )
@@ -384,6 +381,7 @@ namespace visualizer
           turn[i.first]["Health"] = dto.str().c_str();
           dto.str("");
           turn[i.first]["Attacks Who"] = i.second->AttacksWhoOn( state ).c_str();
+          turn[i.first]["Attacks Left"] = 0;
 
           // Then and and draw it
           SmartPointer<PersistentShipAnim> ship = new PersistentShipAnim();
@@ -394,6 +392,7 @@ namespace visualizer
       
       // Add the RoundHUD
       int roundWinnerID = -1;
+      string roundWinnerMessage = "";
       if( m_game->states.size() == state+1 )
       {
         roundWinnerID = m_game->winner;
@@ -415,6 +414,13 @@ namespace visualizer
             roundWinnerID = 1;
           }
         }
+        
+        for( auto& vic : m_game->states[state].animations[ -17 ] )
+        {
+          parser::roundVictory &victory = (parser::roundVictory&)*vic;
+          roundWinnerMessage = victory.message;
+        }
+        
       }
       
       // Get all the ship types for this round
@@ -424,7 +430,7 @@ namespace visualizer
         shipTypes.push_back( shipType.second.type );
       }
       
-      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].roundNumber, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].roundNumber < m_game->states[ state + 1 ].roundNumber, shipTypes );
+      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].roundNumber, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerMessage, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].roundNumber < m_game->states[ state + 1 ].roundNumber, shipTypes );
       roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
       turn.addAnimatable( roundHUD );
 

@@ -81,10 +81,9 @@ namespace visualizer
       bool SelfDestructs;
       vector< int > m_Healths;
 
-      bool HasMoves() { return m_Moves.size() > 0; }
-
       PersistentShip(int createdAt, int round, parser::Ship ship);
-      void AddTurn(int turn, vector<vec2> &moves, int health, int movementLeft);
+      void AddTurn(int turn, vector<vec2> &moves, int health, int movementLeft, int attacksLeft);
+      bool HasMoves();
       bool ExistsAtTurn(int turn, int round);
       vec2 LocationOn(int turn, float t);
       float HeadingOn(int turn, float t);
@@ -119,6 +118,8 @@ namespace visualizer
       vector<int> m_MovementLeft;
       int m_DeathTurn;
       vector< int > m_EMPeds;
+      vector< int > m_AttacksLeft;
+      
 
       int PreviousTurn(int turn)
       {
