@@ -1,3 +1,4 @@
+
 [Battleship]
 "I accidentally... their entire team"
 The uncontested heavy of space, no one can match a Battleship's single target power.  
@@ -139,3 +140,4 @@ maxMovement = 50
 maxHealth = 100
 range = 1001
 selfDestructDamage = 60
+
