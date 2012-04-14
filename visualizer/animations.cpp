@@ -33,7 +33,7 @@ namespace visualizer
   {
     stringstream ss;
     int rand = m_Background->random;
-    if( rand > 8 || rand < 0 )
+    if( rand > 20 || rand < 0 )
     {
       rand = 0;
     }
