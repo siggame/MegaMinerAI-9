@@ -212,7 +212,7 @@ DLLEXPORT int baseDistance(int fromX, int fromY, int toX, int toY)
 {
   int dx = (fromX - toX);
   int dy = (fromY - toY);
-  return int(ceil(sqrt((float)(dx * dx + dy * dy))));
+  return int(ceil(sqrt(dx * dx + dy * dy)));
 }
 
 DLLEXPORT int basePointOnLine(int fromX, int fromY, int toX, int toY, int travel)

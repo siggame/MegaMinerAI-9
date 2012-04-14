@@ -5,7 +5,7 @@
 #include "animations.h"
 #include "persistents.h"
 #include <utility>
-
+#include <time.h>
 #include <list>
 using std::list;
 using glm::vec2;
@@ -186,6 +186,9 @@ namespace visualizer
     map < int, vector< SmartPointer < Warp > > > Warps;
     Warps[ 0 ] = vector< SmartPointer< Warp > >();
     
+    srand( time( NULL ) );
+    int random = rand()%11;
+    
     // Build the Debug Table's Headers
     QStringList header;
     header << "Owner" << "Type" << "Locations" << "Movement Left" << "Health" << "Attacks Who" << "Attacks Left";
@@ -216,6 +219,15 @@ namespace visualizer
         p.first = i.first;
         p.second = i.second;
         ships.push_back( p );
+
+        SmartPointer<TempShip> tShip = new TempShip;
+        tShip->position.x = i.second.x;
+        tShip->position.y = i.second.y;
+        tShip->radius = i.second.radius; 
+        tShip->id = i.second.id;
+
+        shipsThisTurn.push_back(tShip);
+
       }
       
       // 
@@ -242,6 +254,17 @@ namespace visualizer
             p.second.health = 0;
             
             ships.push_back( p );
+
+            SmartPointer<TempShip> tShip = new TempShip;
+            auto shipID = ship.second.id;
+            auto sPosition = m_PersistentShips[shipID]->LocationOn(state, 0);
+            tShip->position.x = sPosition.x;
+            tShip->position.y = sPosition.y;
+            tShip->radius = m_PersistentShips[shipID]->radius;
+            tShip->id = shipID;
+
+            shipsThisTurn.push_back(tShip);
+
           }
         }
       }
@@ -249,12 +272,6 @@ namespace visualizer
       for( auto& i : ships )
       {
         int shipID = i.second.id;
-
-        SmartPointer<TempShip> tShip = new TempShip;
-        tShip->position.x = i.second.x;
-        tShip->position.y = i.second.y;
-        tShip->radius = i.second.radius;
-        tShip->id = i.second.id;
 
         // If the current ship's ID does not map to a PersistentShip in the map, create it and the warp for it
         if( m_PersistentShips.find(shipID) == m_PersistentShips.end() )
@@ -269,9 +286,8 @@ namespace visualizer
           }
         }
 
-        shipsThisTurn.push_back(tShip);
-        
         vector< vec2 > moves;
+        char stealthState = 'u';
         // Check for this ship's animations in the gamelog
         for( auto& j : m_game->states[state].animations[shipID] )
         {
@@ -282,9 +298,9 @@ namespace visualizer
               parser::move &move = (parser::move&)*j;
               if( !m_PersistentShips[shipID]->HasMoves()  )
               {
-                  moves.push_back( vec2( move.fromX, move.fromY ) );
+                  moves.push_back( vec2( move.fromX, -move.fromY ) );
               }
-              moves.push_back( vec2( move.toX, move.toY ) );
+              moves.push_back( vec2( move.toX, -move.toY ) );
             } break;
             case parser::ATTACK:
             {
@@ -297,17 +313,15 @@ namespace visualizer
                 m_PersistentShips[ attack.targetID ]->AddEMPed( state + 1 );
               }
               
-              //if( shipID == 10 )
-                //cout << "Attack found on turn " << state << " of attacker " << shipID << " attacking " << attack.targetID << endl;
               
             } break;
             case parser::STEALTH:
             {
-              m_PersistentShips[shipID]->AddStealth( state );
+              stealthState = 's';
             } break;
             case parser::DESTEALTH:
             {
-              m_PersistentShips[shipID]->AddDeStealth( state );
+              stealthState = 'd';
             } break;
             case parser::SELFDESTRUCT:
             {
@@ -321,7 +335,7 @@ namespace visualizer
           moves.push_back(vec2(i.second.x, i.second.y));
         }
         
-        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.health, i.second.movementLeft, i.second.attacksLeft );
+        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.health, i.second.movementLeft, i.second.attacksLeft, stealthState );
         
         // Check to see if this ship dies next turn (doesn't exist next turn)
         if( state + 1 != m_game->states.size() )
@@ -333,7 +347,8 @@ namespace visualizer
         }
       }
 
-      auto ids = createIDs<TempShip>(shipsThisTurn, 15, 1.0f);
+
+      auto ids = createIDs<TempShip>(shipsThisTurn, options->getNumber("Unit ID Distance"), 1.0f);
       for(auto& i: ids)
       {
         m_PersistentShips[i.id]->m_idPositions[state] = i.center;
@@ -346,6 +361,7 @@ namespace visualizer
       SmartPointer<Background> background = new Background();
       background->radius = m_mapRadius;
       background->turn = m_game->states[ state ].turnNumber;
+      background->random = random;
       background->addKeyFrame( new DrawBackground( background ) );
       turn.addAnimatable( background );
 
@@ -381,7 +397,7 @@ namespace visualizer
           turn[i.first]["Health"] = dto.str().c_str();
           dto.str("");
           turn[i.first]["Attacks Who"] = i.second->AttacksWhoOn( state ).c_str();
-          turn[i.first]["Attacks Left"] = 0;
+          turn[i.first]["Attacks Left"] = i.second->AttacksLeftOn( state ).c_str();
 
           // Then and and draw it
           SmartPointer<PersistentShipAnim> ship = new PersistentShipAnim();
