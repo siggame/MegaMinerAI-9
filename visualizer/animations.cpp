@@ -118,7 +118,6 @@ namespace visualizer
     bool shipIsEMPed = m_PersistentShip->EMPedOn(m_Turn);
     bool shipIsEMP = strcmp( "EMP", m_PersistentShip->type.c_str() ) == 0;
     bool shipIsSelected = m_PersistentShip->selected;
-    vec2 idPosition = m_PersistentShip->m_idPositions[m_Turn];
     
     float shipSizeScale = game->options->getNumber( "Ship Render Size" ) / 100.0f;
 
@@ -154,8 +153,6 @@ namespace visualizer
     }
     else
     {
-      //shipTexture << "Ship-Default";
-      //cout << "Ship-" << (m_PersistentShip->owner ? "Blue-" : "Red-") << m_PersistentShip->type << endl;
       shipTexture << "Ship-" << (m_PersistentShip->owner ? "Blue-" : "Red-") << shipType;
     }
 
@@ -264,24 +261,41 @@ namespace visualizer
       game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRange, 100 );
     }
 
-    //stringstream idName;
-    //idName << m_PersistentShip->id;
+    if(m_Turn < m_PersistentShip->m_DeathTurn && game->options->getNumber( "Display Unit IDs" ))
+    {
+      stringstream idName;
+      idName << m_PersistentShip->id;
 
+      float alpha = 1;
 
-    //game->renderer->setColor(Color(0, 0, 0));
-    //glEnable(GL_DEPTH_TEST);
-    //glDepthFunc(GL_GREATER);
+      vec2 idPosition = m_PersistentShip->m_idPositions[m_Turn];
+      vec2 next;
+      if(m_Turn+1 < m_PersistentShip->m_DeathTurn)
+      {
+        next = m_PersistentShip->m_idPositions[m_Turn+1];
+      }
+      else
+      {
+        next = idPosition;
+        alpha = 1 - t;
+      }
 
-    //vec2 idp = vec2(idPosition.x + *m_MapRadius, idPosition.y + *m_MapRadius);
-    //idp -= vec2(15, 15);
-    
-    //game->renderer->drawProgressBar(idp.x, idp.y + 2, 30, 15, 1, Color(1, 1, 1), 1, 2); 
-    //game->renderer->setColor(Color(1, 1, 1));
+      vec2 mix = idPosition + (next - idPosition) * t;
 
-    //game->renderer->drawText(idp.x + 30/2, idp.y + 1, "Roboto", idName.str(), 58.0f, IRenderer::Alignment::Center);
+      vec2 idp = vec2(mix.x + *m_MapRadius, mix.y + *m_MapRadius);
+      idp -= vec2(15, 15);
 
-    //game->renderer->drawLine(idp.x, idp.y, shipCenter.x, shipCenter.y, -2);
-    //glDisable(GL_DEPTH_TEST);
+      
+      game->renderer->setColor(Color(0, 0, 0, alpha));
+      game->renderer->drawProgressBar(idp.x, idp.y + 2, 30, 15, 1, Color(1, 1, 1, alpha), 1, -10); 
+      game->renderer->setColor(Color(1, 1, 1, alpha));
+
+      game->renderer->translate(0, 0, -10);
+      game->renderer->drawText(idp.x + 30/2, idp.y + 1, "Roboto", idName.str(), 58.0f, IRenderer::Alignment::Center);
+      game->renderer->translate(0, 0, 10);
+
+      game->renderer->drawLine(idp.x + 15, idp.y + 15, shipCenter.x, shipCenter.y, -9.0f);
+    }
     
 
   } // DrawPersistentShip::animation()

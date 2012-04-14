@@ -104,6 +104,7 @@ namespace visualizer
       void MoveInfo();
       string AttacksLeftOn( int turn );
       map<int, vec2> m_idPositions;
+      int m_DeathTurn;
 
     private:
       int m_CreatedAtTurn;
@@ -115,7 +116,6 @@ namespace visualizer
       vector< SpaceMove > m_Moves;
       int m_Round;
       vector<int> m_MovementLeft;
-      int m_DeathTurn;
       vector< int > m_EMPeds;
       vector< int > m_AttacksLeft;
       

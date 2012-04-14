@@ -187,7 +187,12 @@ namespace visualizer
     Warps[ 0 ] = vector< SmartPointer< Warp > >();
     
     srand( time( NULL ) );
-    int random = rand()%11;
+    int random[ m_game->states.back().roundNumber ];
+    
+    for(int ran = 0; ran < m_game->states.back().roundNumber; ran++)
+    {
+      random[ ran ] = rand()%11;
+    }
     
     // Build the Debug Table's Headers
     QStringList header;
@@ -219,6 +224,15 @@ namespace visualizer
         p.first = i.first;
         p.second = i.second;
         ships.push_back( p );
+
+        SmartPointer<TempShip> tShip = new TempShip;
+        tShip->position.x = i.second.x;
+        tShip->position.y = i.second.y;
+        tShip->radius = i.second.radius; 
+        tShip->id = i.second.id;
+
+        shipsThisTurn.push_back(tShip);
+
       }
       
       // 
@@ -245,6 +259,17 @@ namespace visualizer
             p.second.health = 0;
             
             ships.push_back( p );
+
+            SmartPointer<TempShip> tShip = new TempShip;
+            auto shipID = ship.second.id;
+            auto sPosition = m_PersistentShips[shipID]->LocationOn(state, 0);
+            tShip->position.x = sPosition.x;
+            tShip->position.y = sPosition.y;
+            tShip->radius = m_PersistentShips[shipID]->radius;
+            tShip->id = shipID;
+
+            shipsThisTurn.push_back(tShip);
+
           }
         }
       }
@@ -252,12 +277,6 @@ namespace visualizer
       for( auto& i : ships )
       {
         int shipID = i.second.id;
-
-        SmartPointer<TempShip> tShip = new TempShip;
-        tShip->position.x = i.second.x;
-        tShip->position.y = i.second.y;
-        tShip->radius = i.second.radius;
-        tShip->id = i.second.id;
 
         // If the current ship's ID does not map to a PersistentShip in the map, create it and the warp for it
         if( m_PersistentShips.find(shipID) == m_PersistentShips.end() )
@@ -272,8 +291,6 @@ namespace visualizer
           }
         }
 
-        shipsThisTurn.push_back(tShip);
-        
         vector< vec2 > moves;
         char stealthState = 'u';
         // Check for this ship's animations in the gamelog
@@ -301,8 +318,6 @@ namespace visualizer
                 m_PersistentShips[ attack.targetID ]->AddEMPed( state + 1 );
               }
               
-              //if( shipID == 10 )
-                //cout << "Attack found on turn " << state << " of attacker " << shipID << " attacking " << attack.targetID << endl;
               
             } break;
             case parser::STEALTH:
@@ -337,7 +352,8 @@ namespace visualizer
         }
       }
 
-      auto ids = createIDs<TempShip>(shipsThisTurn, 15, 1.0f);
+
+      auto ids = createIDs<TempShip>(shipsThisTurn, options->getNumber("Unit ID Distance"), 1.0f);
       for(auto& i: ids)
       {
         m_PersistentShips[i.id]->m_idPositions[state] = i.center;
@@ -350,7 +366,7 @@ namespace visualizer
       SmartPointer<Background> background = new Background();
       background->radius = m_mapRadius;
       background->turn = m_game->states[ state ].turnNumber;
-      background->random = random;
+      background->random = random[ m_game->states[ state ].roundNumber ];
       background->addKeyFrame( new DrawBackground( background ) );
       turn.addAnimatable( background );
 
