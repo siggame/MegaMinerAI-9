@@ -187,7 +187,12 @@ namespace visualizer
     Warps[ 0 ] = vector< SmartPointer< Warp > >();
     
     srand( time( NULL ) );
-    int random = rand()%11;
+    int random[ m_game->states.back().roundNumber ];
+    
+    for(int ran = 0; ran < m_game->states.back().roundNumber; ran++)
+    {
+      random[ ran ] = rand()%11;
+    }
     
     // Build the Debug Table's Headers
     QStringList header;
@@ -361,7 +366,7 @@ namespace visualizer
       SmartPointer<Background> background = new Background();
       background->radius = m_mapRadius;
       background->turn = m_game->states[ state ].turnNumber;
-      background->random = random;
+      background->random = random[ m_game->states[ state ].roundNumber ];
       background->addKeyFrame( new DrawBackground( background ) );
       turn.addAnimatable( background );
 
