@@ -127,7 +127,7 @@ class Match(DefaultGameWorld):
 
     for obj in self.objects.values():
       obj.nextTurn()
-    self.checkWinner()
+    self.checkRoundWinner()
 
     if self.winner is None:
       self.sendStatus([self.turn] +  self.spectators)
@@ -141,8 +141,10 @@ class Match(DefaultGameWorld):
     self.sendStatus(self.spectators)
     for winner in winners:
       winner.victories += 1
-    self.turnNumber = 0
-    self.nextRound()
+    self.checkWinner()
+    if self.winner is None:
+      self.turnNumber = 0
+      self.nextRound()
 
   def smartEnd(self):
     player1 = self.objects.players[0]
@@ -165,15 +167,15 @@ class Match(DefaultGameWorld):
     if player1.warpGate.health <= 0 and player2.warpGate.health <= 0:
       self.declareRoundWinner([player1, player2], "Draw due to mutual warp gate destruction")
     elif player2.warpGate.health <= 0:
-      self.declareRoundWinner([player1], "Player 1 wins by warp gate destruction")
+      self.declareRoundWinner([player1], player1.playerName + " wins by warp gate destruction")
     elif player1.warpGate.health <= 0:
-      self.declareRoundWinner([player2], "Player 2 wins by warp gate destruction")
+      self.declareRoundWinner([player2], player2.playerName + " wins by warp gate destruction")
     # End by turn limit
     elif self.smartEnd():
       if player1.warpGate.health > player2.warpGate.health:
-        self.declareRoundWinner([player1], "Player 1 wins by warp gate shield integrity")
+        self.declareRoundWinner([player1], player1.playerName + " wins by warp gate shield integrity")
       elif player1.warpGate.health < player2.warpGate.health:
-        self.declareRoundWinner([player2], "Player 2 wins by warp gate shield integrity")
+        self.declareRoundWinner([player2], player2.playerName + " wins by warp gate shield integrity")
       else:
         # score
         scores = [player1.energy, player2.energy]
@@ -184,23 +186,21 @@ class Match(DefaultGameWorld):
           for ship in player.warping:
             scores[ship.owner] += cfgUnits[ship.type]["cost"]
         if scores[0] > scores[1]:
-          self.declareRoundWinner([player1], "Player 1 wins by total living army value")
+          self.declareRoundWinner([player1], player1.playerName + " wins by total living army value")
         elif scores[0] < scores[1]:
-          self.declareRoundWinner([player2], "Player 2 wins by total living army value")
+          self.declareRoundWinner([player2], player2.playerName + " wins by total living army value")
         else:
           self.declareRoundWinner([player1, player2], "Draw by because you are twins")
 
   def checkWinner(self):
-    # First, the round
-    self.checkRoundWinner()
     player1 = self.objects.players[0]
     player2 = self.objects.players[1]
     # Strictly player 1 victory
     if player1.victories >= self.victories and player1.victories > player2.victories:
-      self.declareWinner(self.players[0], "Player 1 has won the game %i-%i"%(player1.victories, player2.victories))
+      self.declareWinner(self.players[0], player1.playerName + " has won the game %i-%i"%(player1.victories, player2.victories))
     # Strictly player 2 victory
     elif player2.victories >= self.victories and player2.victories > player1.victories:
-      self.declareWinner(self.players[1], "Player 2 has won the game %i-%i"%(player2.victories, player1.victories))
+      self.declareWinner(self.players[1], player2.playerName + " has won the game %i-%i"%(player2.victories, player1.victories))
     # Tied last round
     elif player1.victories > self.victories and player2.victories > self.victories:
       self.declareWinner(random.choice(self.players), "The game is a tie")
