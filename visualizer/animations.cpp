@@ -270,14 +270,14 @@ namespace visualizer
     vec2 idp = vec2(idPosition.x + *m_MapRadius, idPosition.y + *m_MapRadius);
     idp -= vec2(15, 15);
     
-    game->renderer->drawProgressBar(idp.x, idp.y + 2, 30, 15, 1, Color(1, 1, 1), 1, -1); 
+    game->renderer->drawProgressBar(idp.x, idp.y + 2, 30, 15, 1, Color(1, 1, 1), 1, -10); 
     game->renderer->setColor(Color(1, 1, 1));
 
-    game->renderer->translate(0, 0, -1);
+    game->renderer->translate(0, 0, -10);
     game->renderer->drawText(idp.x + 30/2, idp.y + 1, "Roboto", idName.str(), 58.0f, IRenderer::Alignment::Center);
-    game->renderer->translate(0, 0, 1);
+    game->renderer->translate(0, 0, 10);
 
-    game->renderer->drawLine(idp.x, idp.y, shipCenter.x, shipCenter.y, -0.5f);
+    game->renderer->drawLine(idp.x, idp.y, shipCenter.x, shipCenter.y, -9.0f);
 
     
 
