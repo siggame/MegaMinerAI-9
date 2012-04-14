@@ -327,7 +327,7 @@ namespace visualizer
 
     game->renderer->setColor( m_PlayerHUD->id ? Color(0, 0.4f, 1, 1) : Color(1, 0, 0, 1) );
     // Draw the player's name
-    game->renderer->drawText( m_PlayerHUD->NameX(), 20, "Roboto", m_PlayerHUD->name, 200 , align);
+    game->renderer->drawText( m_PlayerHUD->NameX(), 20, "Roboto", m_PlayerHUD->name, m_PlayerHUD->name.length() > 9 ? 200 * (9.0f / m_PlayerHUD->name.length()) : 200, align);
 
     // Draw the player's energy
     stringstream energy;
