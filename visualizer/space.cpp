@@ -216,6 +216,15 @@ namespace visualizer
         p.first = i.first;
         p.second = i.second;
         ships.push_back( p );
+
+        SmartPointer<TempShip> tShip = new TempShip;
+        tShip->position.x = i.second.x;
+        tShip->position.y = i.second.y;
+        tShip->radius = i.second.radius; 
+        tShip->id = i.second.id;
+
+        shipsThisTurn.push_back(tShip);
+
       }
       
       // 
@@ -242,6 +251,17 @@ namespace visualizer
             p.second.health = 0;
             
             ships.push_back( p );
+
+            SmartPointer<TempShip> tShip = new TempShip;
+            auto shipID = ship.second.id;
+            auto sPosition = m_PersistentShips[shipID]->LocationOn(state, 0);
+            tShip->position.x = sPosition.x;
+            tShip->position.y = sPosition.y;
+            tShip->radius = m_PersistentShips[shipID]->radius;
+            tShip->id = shipID;
+
+            shipsThisTurn.push_back(tShip);
+
           }
         }
       }
@@ -326,6 +346,7 @@ namespace visualizer
       }
 
 
+#if 0
       if(state > 0)
       {
         for(auto& ship : m_game->states[ state - 1 ].ships)
@@ -345,15 +366,16 @@ namespace visualizer
 
       if(state > 0)
       {
-        cout << "========" << state-1 << "========" << endl;
-        auto ids = createIDs<TempShip>(shipsThisTurn, 15, 1.0f);
+#endif
+        cout << "========" << state << "========" << endl;
+        auto ids = createIDs<TempShip>(shipsThisTurn, 35, 1.0f);
         for(auto& i: ids)
         {
           if(i.id == 11)
             cout << "YHESLERKJLK" << endl;
-          m_PersistentShips[i.id]->m_idPositions[state-1] = i.center;
+          m_PersistentShips[i.id]->m_idPositions[state] = i.center;
         }
-      }
+     // }
 
       // Start adding stuff to draw
       Frame turn;  // The frame that will be drawn
