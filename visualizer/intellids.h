@@ -60,11 +60,6 @@ namespace visualizer
       bool collision = true;
       for(float radius = unit->radius + idRadius; radius < unit->radius + 500 && collision; radius += 15)
       {
-        if(unit->id==11)
-        {
-          cout << radius << endl;
-        }
-
         for(size_t theta = 0; theta < (360-angle) / angle && collision; theta++)
         {
 

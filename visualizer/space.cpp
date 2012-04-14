@@ -313,8 +313,6 @@ namespace visualizer
                 m_PersistentShips[ attack.targetID ]->AddEMPed( state + 1 );
               }
               
-              //if( shipID == 10 )
-                //cout << "Attack found on turn " << state << " of attacker " << shipID << " attacking " << attack.targetID << endl;
               
             } break;
             case parser::STEALTH:
@@ -350,36 +348,11 @@ namespace visualizer
       }
 
 
-#if 0
-      if(state > 0)
+      auto ids = createIDs<TempShip>(shipsThisTurn, options->getNumber("Unit ID Distance"), 1.0f);
+      for(auto& i: ids)
       {
-        for(auto& ship : m_game->states[ state - 1 ].ships)
-        {
-          SmartPointer<TempShip> tShip = new TempShip;
-          auto shipID = ship.second.id;
-          auto sPosition = m_PersistentShips[shipID]->LocationOn(state-1, 0);
-          tShip->position.x = sPosition.x;
-          tShip->position.y = sPosition.y;
-          tShip->radius = m_PersistentShips[shipID]->radius;
-          tShip->id = shipID;
-
-          shipsThisTurn.push_back(tShip);
-        }
+        m_PersistentShips[i.id]->m_idPositions[state] = i.center;
       }
-        
-
-      if(state > 0)
-      {
-#endif
-        cout << "========" << state << "========" << endl;
-        auto ids = createIDs<TempShip>(shipsThisTurn, options->getNumber("Unit ID Distance"), 1.0f);
-        for(auto& i: ids)
-        {
-          if(i.id == 11)
-            cout << "YHESLERKJLK" << endl;
-          m_PersistentShips[i.id]->m_idPositions[state] = i.center;
-        }
-     // }
 
       // Start adding stuff to draw
       Frame turn;  // The frame that will be drawn

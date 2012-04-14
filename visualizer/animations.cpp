@@ -153,8 +153,6 @@ namespace visualizer
     }
     else
     {
-      //shipTexture << "Ship-Default";
-      //cout << "Ship-" << (m_PersistentShip->owner ? "Blue-" : "Red-") << m_PersistentShip->type << endl;
       shipTexture << "Ship-" << (m_PersistentShip->owner ? "Blue-" : "Red-") << shipType;
     }
 
@@ -263,7 +261,7 @@ namespace visualizer
       game->renderer->drawArc(shipCenter.x, shipCenter.y, shipRange, 100 );
     }
 
-    if(m_Turn < m_PersistentShip->m_DeathTurn && game->options->getNumber( "Draw Unit IDs" ))
+    if(m_Turn < m_PersistentShip->m_DeathTurn && game->options->getNumber( "Display Unit IDs" ))
     {
       stringstream idName;
       idName << m_PersistentShip->id;
