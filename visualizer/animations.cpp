@@ -84,7 +84,7 @@ namespace visualizer
     }
 
     // Draw the round end win screen
-    if( m_RoundHUD->drawWinScreen )
+    if( m_RoundHUD->drawWinScreen && game->options->getNumber( "Display Round Winner" ) )
     {
       float op = t;
       stringstream winnerText;
