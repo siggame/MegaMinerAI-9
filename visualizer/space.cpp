@@ -5,7 +5,7 @@
 #include "animations.h"
 #include "persistents.h"
 #include <utility>
-
+#include <time.h>
 #include <list>
 using std::list;
 using glm::vec2;
@@ -186,6 +186,9 @@ namespace visualizer
     map < int, vector< SmartPointer < Warp > > > Warps;
     Warps[ 0 ] = vector< SmartPointer< Warp > >();
     
+    srand( time( NULL ) );
+    int random = rand()%11;
+    
     // Build the Debug Table's Headers
     QStringList header;
     header << "Owner" << "Type" << "Locations" << "Movement Left" << "Health" << "Attacks Who" << "Attacks Left";
@@ -346,6 +349,7 @@ namespace visualizer
       SmartPointer<Background> background = new Background();
       background->radius = m_mapRadius;
       background->turn = m_game->states[ state ].turnNumber;
+      background->random = random;
       background->addKeyFrame( new DrawBackground( background ) );
       turn.addAnimatable( background );
 
