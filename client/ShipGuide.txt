@@ -82,7 +82,7 @@ range = 75
 selfDestructDamage = 60
 
 [Mine Layer]
-"What makes me a good miner layer? If I were a bad miner layer I wouldn't be sitting here, discussing it with you, now would I?!"  
+"What makes me a good mine layer? If I were a bad mine layer I wouldn't be sitting here, discussing it with you, now would I?!"  
 The Mine Layer specializes in this kind of combat.  
 Instead of attack opponents directly, when a Mine Layer is commanded to attack it will drop a Mine at its current location.  
 This Mine will then act as a remote detonation device, ready to obliterate your opponent.  Choose your Mine placement wisely, 
