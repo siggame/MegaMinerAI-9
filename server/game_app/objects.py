@@ -228,6 +228,8 @@ class Ship(ShipDescription):
       return "No friendly fire. Your %s %i cannot attack your %s %i "%(self.type,self.id,target.type,target.id)
     elif not self.inRange(target):
       return "%s %i's target, %s %i, is too far away"%(self.type, self.id,target.type,target.id)
+    elif target.isStealthed:
+      return "HACKER! You cannot attack %i when it is stealthed!"%(target.id)
     else:
       #Factor in damage buff for Support ships neat opponent
       modifier = 1
