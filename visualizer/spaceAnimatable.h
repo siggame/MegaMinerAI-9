@@ -14,6 +14,7 @@ namespace visualizer
     {
         int radius;
         int turn;
+        int random;
     };
     
     struct PersistentShipAnim: public Animatable

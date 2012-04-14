@@ -5,7 +5,7 @@
 #include "animations.h"
 #include "persistents.h"
 #include <utility>
-
+#include <time.h>
 #include <list>
 using std::list;
 using glm::vec2;
@@ -186,6 +186,9 @@ namespace visualizer
     map < int, vector< SmartPointer < Warp > > > Warps;
     Warps[ 0 ] = vector< SmartPointer< Warp > >();
     
+    srand( time( NULL ) );
+    int random = rand()%11;
+    
     // Build the Debug Table's Headers
     QStringList header;
     header << "Owner" << "Type" << "Locations" << "Movement Left" << "Health" << "Attacks Who" << "Attacks Left";
@@ -272,6 +275,7 @@ namespace visualizer
         shipsThisTurn.push_back(tShip);
         
         vector< vec2 > moves;
+        char stealthState = 'u';
         // Check for this ship's animations in the gamelog
         for( auto& j : m_game->states[state].animations[shipID] )
         {
@@ -303,11 +307,11 @@ namespace visualizer
             } break;
             case parser::STEALTH:
             {
-              m_PersistentShips[shipID]->AddStealth( state );
+              stealthState = 's';
             } break;
             case parser::DESTEALTH:
             {
-              m_PersistentShips[shipID]->AddDeStealth( state );
+              stealthState = 'd';
             } break;
             case parser::SELFDESTRUCT:
             {
@@ -321,7 +325,7 @@ namespace visualizer
           moves.push_back(vec2(i.second.x, i.second.y));
         }
         
-        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.health, i.second.movementLeft, i.second.attacksLeft );
+        m_PersistentShips[shipID]->AddTurn( state, moves, i.second.health, i.second.movementLeft, i.second.attacksLeft, stealthState );
         
         // Check to see if this ship dies next turn (doesn't exist next turn)
         if( state + 1 != m_game->states.size() )
@@ -346,6 +350,7 @@ namespace visualizer
       SmartPointer<Background> background = new Background();
       background->radius = m_mapRadius;
       background->turn = m_game->states[ state ].turnNumber;
+      background->random = random;
       background->addKeyFrame( new DrawBackground( background ) );
       turn.addAnimatable( background );
 
@@ -381,7 +386,7 @@ namespace visualizer
           turn[i.first]["Health"] = dto.str().c_str();
           dto.str("");
           turn[i.first]["Attacks Who"] = i.second->AttacksWhoOn( state ).c_str();
-          turn[i.first]["Attacks Left"] = 0;
+          turn[i.first]["Attacks Left"] = i.second->AttacksLeftOn( state ).c_str();
 
           // Then and and draw it
           SmartPointer<PersistentShipAnim> ship = new PersistentShipAnim();
