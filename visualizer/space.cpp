@@ -175,6 +175,8 @@ namespace visualizer
     }
     // END: Initial Setup
     
+    MESSAGE( "GAME NUMBER: %d", m_game->states[0].gameNumber );
+
     // Setup the renderer as mapRadius*2 x mapRadius*2
     renderer->setCamera( 0, 0, m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2);
     renderer->setGridDimensions( m_game->states[0].mapRadius * 2, m_game->states[0].mapRadius * 2 );
