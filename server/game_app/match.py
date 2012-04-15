@@ -153,10 +153,16 @@ class Match(DefaultGameWorld):
     cost = min([shipType.cost for shipType in self.objects.shipTypes])
     if self.turnNumber >= self.turnLimit:
       return True
-    if player1.energy < cost and len([ship for ship in self.objects.ships if ship.owner == 0]) < 2 and player1.warpGate.health < player2.warpGate.health:
-      return True
-    if player2.energy < cost and len([ship for ship in self.objects.ships if ship.owner == 1]) < 2 and player2.warpGate.health < player1.warpGate.health:
-      return True
+    if player1.energy < cost:
+      if len([ship for ship in self.objects.ships if ship.owner == 0]) < 2:
+        if len(player1.warping) == 0: 
+          if player1.warpGate.health < player2.warpGate.health:
+            return True
+    if player2.energy < cost:
+      if len([ship for ship in self.objects.ships if ship.owner == 1]) < 2:
+        if len(player2.warping) == 0: 
+          if player2.warpGate.health < player1.warpGate.health:
+            return True
     return False
   
   def checkRoundWinner(self):
