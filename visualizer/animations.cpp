@@ -107,6 +107,7 @@ namespace visualizer
     // Draw the round end win screen
     if( m_RoundHUD->drawWinScreen && game->options->getNumber( "Display Round Winner" ) )
     {
+      game->timeManager->setSpeed(1 - t);
       float op = t;
       stringstream winnerText;
       winnerText << "Winner: " << m_RoundHUD->winner;
@@ -120,6 +121,11 @@ namespace visualizer
       game->renderer->setColor( textColor );
       game->renderer->drawText( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius - 30, "Roboto", winnerText.str(), 300, IRenderer::Center );
       game->renderer->drawText( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius + 70, "Roboto", m_RoundHUD->message, 170, IRenderer::Center );
+    }
+    
+    if(game->timeManager->getSpeed() >= 0.0f && game->timeManager->getSpeed() <= 0.01f )
+    {
+      game->timeManager->setSpeed( 1.0f );
     }
   }
 
