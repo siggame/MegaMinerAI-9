@@ -28,14 +28,12 @@ class WebServerAuthenticator(object):
         login - the team's login
         passwd - the team's password
         """
-        print "Warning, webserver login turned off, remove line 32 in networking/WebServerAuthenticator.py"
-        return login
         # Make a connection to the specified URL
         conn = httplib.HTTPConnection(self.url)
         # Create a GET query string and send it...
         params = urllib.urlencode({'l': login, 
-                                   'c': 'megaminer-8-botnet',
-                                   'p': hashlib.sha1(passwd).hexdigest()})
+                                   'c': 'megaminerai-9-space',
+                                   'p': passwd})
         try:
             conn.request("GET", "/api/competition/team/auth?"+params)
         except:
