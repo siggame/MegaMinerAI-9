@@ -148,6 +148,11 @@ namespace visualizer
   
   string PersistentShip::AttacksLeftOn( int turn )
   {
+    if( !CheckTurn( turn ) || m_AttacksLeft.size() == 0 )
+    {
+      cout << "Error: Attacks Left On turn was out of bounds\n";
+      return "";
+    }
     stringstream ss;
     
     if( turn >= m_CreatedAtTurn && turn <= m_DeathTurn )
@@ -178,6 +183,12 @@ namespace visualizer
 
   vector<vec2> PersistentShip::AttacksOn( int turn, float t )
   {
+    if( !CheckTurn( turn ) )
+    {
+      cout << "Error: Attacks on turn was out of bounds\n";
+      return vector<vec2>();
+    }
+    
     if( m_AttackVictims.find( turn ) == m_AttackVictims.end() )
       return vector<vec2>();
 
@@ -209,7 +220,13 @@ namespace visualizer
 
   float PersistentShip::StealthOn( int turn, float /*t*/)
   {
-    return strcmp("Stealth", type.c_str()) != 0 ? 1 : (m_Stealths[ turn - m_CreatedAtTurn ] ? 0.5f : 1.0f);
+    if( CheckTurn( turn ) )
+    {
+      return strcmp("Stealth", type.c_str()) != 0 ? 1 : (m_Stealths[ turn - m_CreatedAtTurn ] ? 0.5f : 1.0f);
+    }
+    
+    cout << "Stealth on turn out of bounds\n";
+    return 1.0f;
   }
 
   float PersistentShip::ExplodingOn( int turn )
@@ -275,6 +292,12 @@ namespace visualizer
 
   string PersistentShip::MovementOn( int turn )
   {
+  
+    if( !CheckTurn( turn ) )
+    {
+      cout << "Error: Movement On out of bounds\n";
+      return "";
+    }
     turn -= m_CreatedAtTurn;
     stringstream ss;
     if( turn >= m_MovementLeft.size() || turn < 0 )
@@ -383,5 +406,10 @@ namespace visualizer
     float hy = (3*c4*t + 2*c3)*t +c2;
 
     return make_pair(vec2(px, py), atan2(hy, hx));
+  }
+  
+  bool PersistentShip::CheckTurn( int turn )
+  {
+    return turn >= m_CreatedAtTurn && turn <= m_DeathTurn;
   }
 } // visualizer
