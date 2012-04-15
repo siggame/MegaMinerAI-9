@@ -110,11 +110,11 @@ class AI(BaseAI):
   """The class implementing gameplay logic."""
   @staticmethod
   def username():
-    return "goldman"
+    return "goldman1"
 
   @staticmethod
   def password():
-    return "password"
+    return "ZaZMmY"
 
 
   def nextRound(self):

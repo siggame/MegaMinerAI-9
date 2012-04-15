@@ -1,1 +1,2 @@
-../../client/python/ExistentialError.py
+class ExistentialError(LookupError):
+  pass
