@@ -100,7 +100,7 @@ class GameApp(AccountsAppMixin, BaseApp):
   @requireGame
   def gameStatus(self):
     """ Requests the status of your game """
-    self.game.sendStatus([self])
+    return self.game.nextTurn()
 
   @protocolmethod
   @errorBuffer
