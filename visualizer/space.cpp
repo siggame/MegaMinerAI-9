@@ -137,6 +137,7 @@ namespace visualizer
   list<int> Space::getSelectedUnits()
   {
     list< int > selectedShipIDs;
+    selectedShipIDs.push_back(-1);
 
     for ( auto& i : m_PersistentShips )
     {
@@ -208,7 +209,6 @@ namespace visualizer
     // BEGIN: Look through the game logs and build the m_PersistentShips
     for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
     {
-      cout << "State: " << state << endl;
       // Loop though each PersistentShip in the current state
 
       // The list of ships this turn to do some blob calculations on
@@ -461,6 +461,7 @@ namespace visualizer
           stringstream talkstring;
           talkstring << "(" << state << ") " << talk.message;
           playerTalks[ player.first ] = talkstring.str();
+          turn[-1]["TALK"] = talkstring.str().c_str();
         }
       }
       
