@@ -51,7 +51,7 @@ namespace visualizer
   {
     list<ID> ids;
 
-    const float angle = 15;
+    const float angle = 5;
 
     for(auto& unit: units)
     {

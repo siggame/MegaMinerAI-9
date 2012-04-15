@@ -137,6 +137,7 @@ namespace visualizer
   list<int> Space::getSelectedUnits()
   {
     list< int > selectedShipIDs;
+    selectedShipIDs.push_back(-1);
 
     for ( auto& i : m_PersistentShips )
     {
@@ -187,7 +188,12 @@ namespace visualizer
     Warps[ 0 ] = vector< SmartPointer< Warp > >();
     
     srand( time( NULL ) );
-    int random = rand()%11;
+    int random[ m_game->states.back().roundNumber + 1 ];
+    
+    for(int ran = 0; ran < m_game->states.back().roundNumber + 1; ran++)
+    {
+      random[ ran ] = rand()%20;
+    }
     
     // Build the Debug Table's Headers
     QStringList header;
@@ -198,6 +204,7 @@ namespace visualizer
     animationEngine->registerGame(0, 0);
 
     m_mapRadius = m_game->states[ 0 ].mapRadius;
+    string playerTalks[ 2 ];
 
     // BEGIN: Look through the game logs and build the m_PersistentShips
     for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
@@ -361,7 +368,7 @@ namespace visualizer
       SmartPointer<Background> background = new Background();
       background->radius = m_mapRadius;
       background->turn = m_game->states[ state ].turnNumber;
-      background->random = random;
+      background->random = random[ m_game->states[ state ].roundNumber ];
       background->addKeyFrame( new DrawBackground( background ) );
       turn.addAnimatable( background );
 
@@ -446,7 +453,23 @@ namespace visualizer
         shipTypes.push_back( shipType.second.type );
       }
       
-      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].roundNumber, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerMessage, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].roundNumber < m_game->states[ state + 1 ].roundNumber, shipTypes );
+      for( auto& player : m_game->states[ state ].players )
+      { 
+        for( auto& t : m_game->states[state].animations[ player.first ] )
+        {
+          parser::playerTalk &talk = (parser::playerTalk&)*t;
+          stringstream talkstring;
+          talkstring << "(" << state << ") " << talk.message;
+          playerTalks[ player.first ] = talkstring.str();
+          turn[-1]["TALK"] = talkstring.str().c_str();
+        }
+      }
+      
+      SmartPointer<RoundHUD> roundHUD = new RoundHUD( m_game->states[ state ].roundNumber, m_game->states[ state ].turnNumber, roundWinnerID == -1 ? "Draw" : m_game->states[0].players[ roundWinnerID ].playerName, roundWinnerMessage, roundWinnerID, m_mapRadius, state+1 == m_game->states.size() || m_game->states[ state ].roundNumber < m_game->states[ state + 1 ].roundNumber, shipTypes, m_game->states[ state ].gameNumber );
+      
+      roundHUD->playerTalk[0] = playerTalks[0];
+      roundHUD->playerTalk[1] = playerTalks[1];
+      
       roundHUD->addKeyFrame( new DrawRoundHUD( roundHUD ) );
       turn.addAnimatable( roundHUD );
 

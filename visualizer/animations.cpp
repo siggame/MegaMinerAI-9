@@ -32,7 +32,12 @@ namespace visualizer
   void DrawBackground::animate( const float& /*t*/, AnimData * /*d*/, IGame* game )
   {
     stringstream ss;
-    ss << "background-" << m_Background->random;
+    int rand = m_Background->random;
+    if( rand > 20 || rand < 0 )
+    {
+      rand = 0;
+    }
+    ss << "background-" << rand;
     game->renderer->setColor( Color( 1, 1, 1, 1 ) );
     game->renderer->drawTexturedQuad(0, 0, m_Background->radius * 2, m_Background->radius * 2, ss.str());
     //game->renderer->drawTexturedQuad(m_Background->outerRadius - m_Background->innerRadius, m_Background->outerRadius - m_Background->innerRadius, m_Background->innerRadius * 3, m_Background->innerRadius * 2, "planet");
@@ -48,11 +53,18 @@ namespace visualizer
 
   void DrawRoundHUD::animate( const float& t, AnimData * /* d */, IGame* game )
   {
-    stringstream round;
-    round << "Round: " << (m_RoundHUD->round + 1) << "  Turn: " << m_RoundHUD->turn;
+    stringstream round, gameNum;
+    round << "Round: " << m_RoundHUD->round << "  Turn: " << m_RoundHUD->turn;
     game->renderer->setColor( Color( 1, 1, 1, 1 ) );
+    
     game->renderer->drawText( m_RoundHUD->mapRadius, 1, "Roboto", round.str(), 100, IRenderer::Center);
-
+    
+    if( game->options->getNumber( "Display Game Number" ) )
+    {
+      gameNum << "Game Number: " << m_RoundHUD->gameNumber;
+      game->renderer->drawText( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius*2 - 30, "Roboto", gameNum.str(), 100, IRenderer::Center);
+    }
+    
     // Draw the t "hand"
     //game->renderer->drawArc( m_RoundHUD->mapRadius, m_RoundHUD->mapRadius, m_RoundHUD->mapRadius, 60, 0, 360.0f * t );
     
@@ -83,6 +95,13 @@ namespace visualizer
         
         i++;
       }
+    }
+    
+    // Draw player talk
+    for(int i = 0; i < 2; i++)
+    {
+      game->renderer->setColor( i ? Color( 0, 0.4, 1, 1 ) : Color(1, 0, 0, 1 ) );
+      game->renderer->drawText( m_RoundHUD->mapRadius * 2.1, m_RoundHUD->mapRadius + i * 50 + 250, "Roboto", m_RoundHUD->playerTalk[i], 70 );
     }
 
     // Draw the round end win screen
@@ -308,7 +327,7 @@ namespace visualizer
 
     game->renderer->setColor( m_PlayerHUD->id ? Color(0, 0.4f, 1, 1) : Color(1, 0, 0, 1) );
     // Draw the player's name
-    game->renderer->drawText( m_PlayerHUD->NameX(), 20, "Roboto", m_PlayerHUD->name, 200 , align);
+    game->renderer->drawText( m_PlayerHUD->NameX(), 20, "Roboto", m_PlayerHUD->name, m_PlayerHUD->name.length() > 9 ? 200 * (9.0f / m_PlayerHUD->name.length()) : 200, align);
 
     // Draw the player's energy
     stringstream energy;

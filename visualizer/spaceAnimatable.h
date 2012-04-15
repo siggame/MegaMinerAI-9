@@ -58,8 +58,10 @@ namespace visualizer
             int mapRadius;
             bool drawWinScreen;
             vector< string > shipTypes;
+            int gameNumber;
+            string playerTalk[2];
             
-            RoundHUD( int n, int t, string win, string mes, int id, int r, bool b, vector< char* > ships )
+            RoundHUD( int n, int t, string win, string mes, int id, int r, bool b, vector< char* > ships, int gameNum )
             {
                 round = n;
                 turn = t;
@@ -68,6 +70,7 @@ namespace visualizer
                 mapRadius = r;
                 drawWinScreen = b;
                 message = mes;
+                gameNumber = gameNum;
                 
                 for( auto& ship: ships )
                 {
