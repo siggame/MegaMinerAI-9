@@ -127,6 +127,7 @@ namespace visualizer
 
       pair<vec2, float> GardnersSplineOn(int turn, float t);
       pair<vec2, float> SplineOn(int turn, float t);
+      bool CheckTurn( int turn );
 
   };
 }

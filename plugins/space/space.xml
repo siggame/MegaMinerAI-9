@@ -1,5 +1,12 @@
 <options>
   <option>
+    <key>Display Game Number</key>
+    <type>Integer</type>
+    <value>1</value>
+    <minvalue>0</minvalue>
+    <maxvalue>1</maxvalue>
+  </option>
+  <option>
     <key>Display Round Winner</key>
     <type>Integer</type>
     <value>0</value>
@@ -16,7 +23,7 @@
   <option>
     <key>Display Ships' Sheild</key>
     <type>Integer</type>
-    <value>0</value>
+    <value>1</value>
     <minvalue>0</minvalue>
     <maxvalue>1</maxvalue>
   </option>
@@ -24,13 +31,6 @@
     <key>Display Unit IDs</key>
     <type>Integer</type>
     <value>0</value>
-    <minvalue>0</minvalue>
-    <maxvalue>1</maxvalue>
-  </option>
-  <option>
-    <key>Display Game Number</key>
-    <type>Integer</type>
-    <value>1</value>
     <minvalue>0</minvalue>
     <maxvalue>1</maxvalue>
   </option>
