@@ -8,8 +8,8 @@ myShips = []
 theirShips = []
 shipHealth = {}
 myMines = []
-priorityList = {"Battleship" : 6.5,"Juggernaut" : 4,"Mine Layer" : 6.5,"Support" : 8, "Warp Gate" : 0, \
-    "EMP" : 7,"Stealth" : 9,"Cruiser" : 3,"Weapons Platform" : 10,"Interceptor" : 1,"Bomber" : 2, "Mine" : -2}
+priorityList = {"Battleship" : 6.5,"Juggernaut" : 4,"Mine Layer" : 6.5,"Support" : 8, "Warp Gate" : 0.5, \
+    "EMP" : 7,"Stealth" : 9,"Cruiser" : 3,"Weapons Platform" : 10,"Interceptor" : 1,"Bomber" : 2, "Mine" : 0}
 
 #FEATURE LIST:
   #Optimize code      
@@ -297,8 +297,7 @@ class AI(BaseAI):
     #Construct a list of all enemies in range
     for enemy in theirShips:
       #If in range and not a mine
-      if self.getRange(ship.getX(),ship.getY(),ship.getRange(),enemy.getX(),enemy.getY(),enemy.getRadius()) and enemy.getType() != "Mine" \
-      and enemy not in attackedList:
+      if self.getRange(ship.getX(),ship.getY(),ship.getRange(),enemy.getX(),enemy.getY(),enemy.getRadius()) and enemy not in attackedList:
         attackList.append(enemy) 
     stacked = len(attackList)   
     if (ship.getType() == "EMP" or ship.getType() == "Mine Layer") and len(attackList) > 1 and attacksLeft > 0:
