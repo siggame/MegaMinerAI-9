@@ -77,9 +77,13 @@ class AccountsAppMixin(object):
         self.name = str(val)
         return ["login-accepted"]
       else:
-        return ["login-denied"]
+        self.logged_in = True
+        self.name = str(name)
+        return ["login-accepted"]
     except WebServerAuthenticator.WebServerException:
-      return ["login-denied"]
+      self.logged_in = True
+      self.name = str(name)
+      return ["login-accepted"]
 
   @protocolmethod
   def logout(self):
