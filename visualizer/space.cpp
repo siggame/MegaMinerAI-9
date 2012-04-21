@@ -110,7 +110,7 @@ namespace visualizer
     i.searchLength = 1000;
     i.gamelogRegexPattern = "Space";
     i.returnFilename = false;
-    i.spectateMode = true;
+    i.spectateMode = false;
     i.pluginName = "MegaMinerAI9: Space Plugin";
 
 

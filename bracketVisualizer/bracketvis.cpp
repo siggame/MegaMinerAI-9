@@ -1,6 +1,8 @@
 #include <utility>
 #include <time.h>
 #include <list>
+#include <QDomDocument>
+#include <QFile>
 #include "bracketvis.h"
 
 namespace visualizer
@@ -40,17 +42,52 @@ namespace visualizer
   {
     PluginInfo i;
     i.searchLength = 1000;
-    i.gamelogRegexPattern = "Space";
-    i.returnFilename = false;
-    i.spectateMode = true;
-    i.pluginName = "MegaMinerAI9: Space Plugin";
-
+    i.gamelogRegexPattern = "<response>";
+    i.returnFilename = true;
+    i.spectateMode = false;
+    i.pluginName = "MegaMinerAI Bracket Visualizer";
 
     return i;
   } 
 
   void BracketVis::loadGamelog( std::string gamelog )
   {
+    QDomDocument doc( "TournamentML" );
+    QFile file( gamelog.c_str() );
+
+    if( !file.open( QIODevice::ReadOnly ) )
+    {
+      WARNING( "Could not load tournament file: %s", gamelog.c_str() );
+      return;
+    }
+
+    if( !doc.setContent( &file ) )
+    {
+      file.close();
+      WARNING( "%s was unable to parse the XML", gamelog.c_str() );
+      return;
+    }
+
+    file.close();
+
+    QDomElement root = doc.documentElement().firstChild().toElement();
+
+    if( root.tagName() != "objects" )
+    {
+      WARNING( "%s did not have an 'objects' root.", gamelog.c_str() );
+      return;
+    }
+
+    QDomElement n = root.firstChild();
+    while( !n.isNull() )
+    {
+      QDomElement e = n.toElement();
+      if( !e.isNull() )
+      {
+
+      }
+
+    }
   } 
 
 } // visualizer

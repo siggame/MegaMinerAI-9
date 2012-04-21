@@ -22,4 +22,4 @@ DESTDIR = ../plugins/
 QMAKE_CXXFLAGS += -std=c++0x
 QMAKE_CXXFLAGS_DEBUG += -std=c++0x
 
-QT += opengl
+QT += opengl xml

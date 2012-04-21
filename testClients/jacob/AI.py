@@ -20,11 +20,12 @@ class FleetTable:
           'defense': 100,
           'support': 100
           }
-    else: 
+    else:
       self.fleet = fleet
 
   def __sub__(self, rhs):
-    fleet
+    pass
+    #fleet
 
   def __add__(self, rhs):
     pass
@@ -96,11 +97,11 @@ class AI(BaseAI):
   """The class implementing gameplay logic."""
   @staticmethod
   def username():
-    return "Shell AI"
+    return "dev_applejack"
 
   @staticmethod
   def password():
-    return "password"
+    return "gNJrtJ"
 
   ##This function is called once, before your first turn
   def init(self):
@@ -145,6 +146,15 @@ class AI(BaseAI):
     self.initTurn()
     if self.you.energy != self.enemy.energy and self.turnNumber > 2:
       self.enemy.unknown = (self.enemy.energy - self.you.energy) / 5
+
+    move = self.distance(self.warpGate.x, self.warpGate.y, self.target.x, self.target.y)
+    if move > self.warpGate.movementLeft:
+      move = self.warpGate.movementLeft
+
+    pt = self.pointOnLine(self.warpGate.x, self.warpGate.y, self.target.x, self.target.y, move)
+
+    self.warpGate.move(pt[0], pt[1])
+    self.me.talk("I WANT HUGS!!")
 
     self.buyShip()
 

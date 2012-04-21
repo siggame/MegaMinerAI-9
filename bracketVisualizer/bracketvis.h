@@ -10,24 +10,32 @@ using namespace std;
 
 namespace visualizer
 {
-    class BracketVis: public QThread, public AnimSequence, public IGame
-    {
-        Q_OBJECT;
-        Q_INTERFACES( visualizer::IGame );
-        public: 
-            BracketVis();
-            ~BracketVis();
 
-            PluginInfo getPluginInfo();
-            void loadGamelog( std::string gamelog );
+  struct bracket 
+  {
+    int winner;
+    int loser;
+    int id;
+  };
 
-            void destroy();
+  class BracketVis: public QThread, public AnimSequence, public IGame
+  {
+    Q_OBJECT;
+    Q_INTERFACES( visualizer::IGame );
+    public: 
+    BracketVis();
+    ~BracketVis();
 
-            void preDraw();
-            void postDraw();
+    PluginInfo getPluginInfo();
+    void loadGamelog( std::string gamelog );
 
-        private:
-    }; 
+    void destroy();
+
+    void preDraw();
+    void postDraw();
+
+    private:
+  }; 
 
 } // visualizer
 

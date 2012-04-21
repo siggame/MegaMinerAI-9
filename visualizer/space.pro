@@ -15,7 +15,7 @@ HEADERS +=  *.h \
             ./parser/*.h \
             ./parser/sexp/*.h
 
-CONFIG += release plugin dll 
+CONFIG += config plugin dll 
 debug:DEFINES += __DEBUG__
 #QMAKE_CFLAGS_DEBUG += -pg
 #QMAKE_CXXFLAGS_DEBUG += -pg
